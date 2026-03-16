@@ -21,7 +21,7 @@ export function transformListParams(
     if (value === undefined) continue;
 
     if (PASSTHROUGH_KEYS.has(key)) {
-      // Join arrays for passthrough keys (e.g., expand: ['variants', 'images'] → 'variants,images')
+      // Join arrays for passthrough keys (e.g., expand: ['variants', 'media'] → 'variants,media')
       result[key] = Array.isArray(value) ? (value as (string | number)[]).join(',') : value as ParamValue;
       continue;
     }

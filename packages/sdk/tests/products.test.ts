@@ -56,10 +56,10 @@ describe('products', () => {
       });
 
       await customClient.products.get('test-product', {
-        expand: ['variants', 'images'],
+        expand: ['variants', 'media'],
       });
 
-      expect(capturedUrl).toContain('expand=variants%2Cimages');
+      expect(capturedUrl).toContain('expand=variants%2Cmedia');
     });
 
     it('omits expand param when array is empty', async () => {

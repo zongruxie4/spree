@@ -48,8 +48,8 @@ module Spree
     has_many :option_value_variants, class_name: 'Spree::OptionValueVariant'
     has_many :option_values, through: :option_value_variants, dependent: :destroy, class_name: 'Spree::OptionValue'
 
-    has_many :images, -> { order(:position) }, as: :viewable, dependent: :destroy, class_name: 'Spree::Image'
-    belongs_to :thumbnail, class_name: 'Spree::Image', optional: true
+    has_many :images, -> { order(:position) }, as: :viewable, dependent: :destroy, class_name: 'Spree::Asset'
+    belongs_to :primary_media, class_name: 'Spree::Asset', optional: true, foreign_key: :primary_media_id
 
     has_many :prices,
              class_name: 'Spree::Price',
@@ -279,26 +279,35 @@ module Spree
       is_master? ? name + ' - Master' : name + ' - ' + options_text
     end
 
-    # Returns true if the variant has images.
+    # Returns the variant's media gallery.
+    # Currently returns direct images. In 6.0 will use variant_media join table.
+    # @return [ActiveRecord::Relation]
+    def gallery_media
+      images
+    end
+
+    # Returns true if the variant has media.
     # Uses loaded association when available, otherwise falls back to counter cache.
     # @return [Boolean]
-    def has_images?
+    def has_media?
       return images.any? if images.loaded?
 
-      image_count.positive?
+      media_count.positive?
     end
 
-    # Returns default Image for Variant.
-    # @return [Spree::Image, nil]
+    alias has_images? has_media?
+
+    # @deprecated Use #primary_media instead.
     def default_image
-      thumbnail
+      Spree::Deprecation.warn('Spree::Variant#default_image is deprecated and will be removed in Spree 6.0. Please use Spree::Variant#primary_media instead.')
+      primary_media
     end
 
-    # Updates the thumbnail_id to the first image by position.
-    # Called when images are added, removed, or reordered.
+    # Updates primary_media_id to the first media item by position.
+    # Called when media is added, removed, or reordered.
     def update_thumbnail!
-      first_image = images.order(:position).first
-      update_column(:thumbnail_id, first_image&.id)
+      first_media = images.order(:position).first
+      update_column(:primary_media_id, first_media&.id)
     end
 
     # Returns first Image for Variant.

@@ -35,7 +35,7 @@ module Spree
 
         scope = current_store.products.not_archived.accessible_by(current_ability, :index)
         scope = scope.where.not(id: params[:omit_ids].split(',')) if params[:omit_ids].present?
-        @products = scope.includes(:thumbnail).multi_search(query).limit(params[:limit] || 10)
+        @products = scope.includes(:primary_media).multi_search(query).limit(params[:limit] || 10)
 
         respond_to do |format|
           format.turbo_stream do
@@ -223,7 +223,7 @@ module Spree
 
       def collection_includes
         {
-          thumbnail: [attachment_attachment: :blob],
+          primary_media: [attachment_attachment: :blob],
           stock_items: [],
           master: [:prices, :stock_items],
           variants: [:prices, :stock_items]

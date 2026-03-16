@@ -1,7 +1,7 @@
 // This file is auto-generated. Do not edit directly.
 import { z } from 'zod';
 import { CategorySchema } from './Category';
-import { ImageSchema } from './Image';
+import { MediaSchema } from './Media';
 import { MetafieldSchema } from './Metafield';
 import { OptionTypeSchema } from './OptionType';
 import { PriceSchema } from './Price';
@@ -27,7 +27,8 @@ export const ProductSchema = z.object({
   tags: z.array(z.string()),
   price: PriceSchema,
   original_price: PriceSchema.nullable(),
-  images: z.array(ImageSchema).optional(),
+  primary_media: MediaSchema.optional(),
+  media: z.array(MediaSchema).optional(),
   variants: z.array(VariantSchema).optional(),
   default_variant: VariantSchema.optional(),
   master_variant: VariantSchema.optional(),

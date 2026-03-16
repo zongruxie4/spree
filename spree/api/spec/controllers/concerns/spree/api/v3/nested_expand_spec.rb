@@ -30,58 +30,58 @@ RSpec.describe Spree::Api::V3::Store::ProductsController, type: :controller do
     end
 
     describe 'nested expand with dot notation' do
-      it 'expands variants with nested images' do
-        get :show, params: { id: product.prefixed_id, expand: 'variants.images' }
+      it 'expands variants with nested media' do
+        get :show, params: { id: product.prefixed_id, expand: 'variants.media' }
 
         data = JSON.parse(response.body)
         expect(data).to have_key('variants')
         data['variants'].each do |variant|
-          expect(variant).to have_key('images')
+          expect(variant).to have_key('media')
         end
       end
 
-      it 'expands variants without images when only variants requested' do
+      it 'expands variants without media when only variants requested' do
         get :show, params: { id: product.prefixed_id, expand: 'variants' }
 
         data = JSON.parse(response.body)
         expect(data).to have_key('variants')
         data['variants'].each do |variant|
-          expect(variant).not_to have_key('images')
+          expect(variant).not_to have_key('media')
         end
       end
 
       it 'supports multiple nested expands' do
-        get :show, params: { id: product.prefixed_id, expand: 'variants.images,variants.metafields' }
+        get :show, params: { id: product.prefixed_id, expand: 'variants.media,variants.metafields' }
 
         data = JSON.parse(response.body)
         expect(data).to have_key('variants')
         data['variants'].each do |variant|
-          expect(variant).to have_key('images')
+          expect(variant).to have_key('media')
           expect(variant).to have_key('metafields')
         end
       end
 
       it 'supports mixed top-level and nested expands' do
-        get :show, params: { id: product.prefixed_id, expand: 'variants.images,option_types' }
+        get :show, params: { id: product.prefixed_id, expand: 'variants.media,option_types' }
 
         data = JSON.parse(response.body)
         expect(data).to have_key('variants')
         expect(data).to have_key('option_types')
         data['variants'].each do |variant|
-          expect(variant).to have_key('images')
+          expect(variant).to have_key('media')
         end
       end
     end
 
     describe 'collection endpoint' do
       it 'supports nested expand on index' do
-        get :index, params: { expand: 'variants.images' }
+        get :index, params: { expand: 'variants.media' }
 
         data = JSON.parse(response.body)['data']
         data.each do |product|
           expect(product).to have_key('variants')
           product['variants'].each do |variant|
-            expect(variant).to have_key('images')
+            expect(variant).to have_key('media')
           end
         end
       end

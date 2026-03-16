@@ -38,7 +38,7 @@ module Spree
         end
 
         # Check if an association should be expanded
-        # Supports dot notation: expand?('variants') matches both 'variants' and 'variants.images'
+        # Supports dot notation: expand?('variants') matches both 'variants' and 'variants.media'
         def expand?(name)
           name = name.to_s
           expands.any? { |e| e == name || e.start_with?("#{name}.") }

@@ -40,9 +40,9 @@ module Spree
           product.default_variant&.prefixed_id
         end
 
-        # Main product image URL for listings (cached thumbnail)
+        # Main product image URL for listings (cached primary_media)
         attribute :thumbnail_url do |product|
-          image_url_for(product.thumbnail)
+          image_url_for(product.primary_media)
         end
 
         attribute :tags do |product|
@@ -68,10 +68,14 @@ module Spree
         end
 
         # Conditional associations
-        many :variant_images,
-             key: :images,
-             resource: Spree.api.image_serializer,
-             if: proc { expand?('images') }
+        one :primary_media,
+            resource: Spree.api.media_serializer,
+            if: proc { expand?('primary_media') }
+
+        many :gallery_media,
+             key: :media,
+             resource: Spree.api.media_serializer,
+             if: proc { expand?('media') }
 
         many :variants,
              resource: Spree.api.variant_serializer,

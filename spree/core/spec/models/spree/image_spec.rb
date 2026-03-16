@@ -64,92 +64,92 @@ describe Spree::Image, type: :model do
     end
   end
 
-  describe 'image_count counter cache' do
+  describe 'media_count counter cache' do
     let(:variant) { create(:variant) }
 
-    it 'increments image_count when image is created' do
-      expect { create(:image, viewable: variant) }.to change { variant.reload.image_count }.by(1)
+    it 'increments media_count when image is created' do
+      expect { create(:image, viewable: variant) }.to change { variant.reload.media_count }.by(1)
     end
 
-    it 'decrements image_count when image is destroyed' do
+    it 'decrements media_count when image is destroyed' do
       image = create(:image, viewable: variant)
-      expect { image.destroy }.to change { variant.reload.image_count }.by(-1)
+      expect { image.destroy }.to change { variant.reload.media_count }.by(-1)
     end
 
     it 'tracks multiple images correctly' do
-      expect(variant.image_count).to eq(0)
+      expect(variant.media_count).to eq(0)
       create(:image, viewable: variant)
       create(:image, viewable: variant)
-      expect(variant.reload.image_count).to eq(2)
+      expect(variant.reload.media_count).to eq(2)
     end
   end
 
-  describe 'total_image_count counter cache on product' do
+  describe 'product media_count counter cache' do
     let(:product) { create(:product) }
     let(:variant) { create(:variant, product: product) }
 
-    it 'increments total_image_count when image is created on master' do
-      expect { create(:image, viewable: product.master) }.to change { product.reload.total_image_count }.by(1)
+    it 'increments media_count when image is created on master' do
+      expect { create(:image, viewable: product.master) }.to change { product.reload.media_count }.by(1)
     end
 
-    it 'increments total_image_count when image is created on variant' do
-      expect { create(:image, viewable: variant) }.to change { product.reload.total_image_count }.by(1)
+    it 'increments media_count when image is created on variant' do
+      expect { create(:image, viewable: variant) }.to change { product.reload.media_count }.by(1)
     end
 
-    it 'decrements total_image_count when image is destroyed' do
+    it 'decrements media_count when image is destroyed' do
       image = create(:image, viewable: variant)
-      expect { image.destroy }.to change { product.reload.total_image_count }.by(-1)
+      expect { image.destroy }.to change { product.reload.media_count }.by(-1)
     end
 
-    it 'tracks images across all variants correctly' do
-      expect(product.total_image_count).to eq(0)
+    it 'tracks media across all variants correctly' do
+      expect(product.media_count).to eq(0)
       create(:image, viewable: product.master)
       create(:image, viewable: variant)
       create(:image, viewable: variant)
-      expect(product.reload.total_image_count).to eq(3)
+      expect(product.reload.media_count).to eq(3)
     end
   end
 
-  describe 'thumbnail_id updates' do
+  describe 'primary_media_id updates' do
     let(:product) { create(:product) }
     let(:variant) { product.master }
 
-    it 'sets variant thumbnail_id when first image is created' do
-      expect(variant.thumbnail_id).to be_nil
+    it 'sets variant primary_media_id when first image is created' do
+      expect(variant.primary_media_id).to be_nil
       image = create(:image, viewable: variant)
-      expect(variant.reload.thumbnail_id).to eq(image.id)
+      expect(variant.reload.primary_media_id).to eq(image.id)
     end
 
-    it 'sets product thumbnail_id when first image is created' do
-      expect(product.thumbnail_id).to be_nil
+    it 'sets product primary_media_id when first image is created' do
+      expect(product.primary_media_id).to be_nil
       image = create(:image, viewable: variant)
-      expect(product.reload.thumbnail_id).to eq(image.id)
+      expect(product.reload.primary_media_id).to eq(image.id)
     end
 
-    it 'updates thumbnail_id when first image is destroyed' do
+    it 'updates primary_media_id when first image is destroyed' do
       image1 = create(:image, viewable: variant, position: 1)
       image2 = create(:image, viewable: variant, position: 2)
-      expect(variant.reload.thumbnail_id).to eq(image1.id)
+      expect(variant.reload.primary_media_id).to eq(image1.id)
 
       image1.destroy
-      expect(variant.reload.thumbnail_id).to eq(image2.id)
+      expect(variant.reload.primary_media_id).to eq(image2.id)
     end
 
-    it 'sets thumbnail_id to nil when last image is destroyed' do
+    it 'sets primary_media_id to nil when last image is destroyed' do
       image = create(:image, viewable: variant)
-      expect(variant.reload.thumbnail_id).to eq(image.id)
+      expect(variant.reload.primary_media_id).to eq(image.id)
 
       image.destroy
-      expect(variant.reload.thumbnail_id).to be_nil
+      expect(variant.reload.primary_media_id).to be_nil
     end
 
-    it 'updates thumbnail_id when image position changes' do
+    it 'updates primary_media_id when image position changes' do
       image1 = create(:image, viewable: variant, position: 1)
       image2 = create(:image, viewable: variant, position: 2)
-      expect(variant.reload.thumbnail_id).to eq(image1.id)
+      expect(variant.reload.primary_media_id).to eq(image1.id)
 
       image2.update!(position: 0)
-      expect(variant.reload.thumbnail_id).to eq(image2.id)
+      expect(variant.reload.primary_media_id).to eq(image2.id)
     end
   end
 end

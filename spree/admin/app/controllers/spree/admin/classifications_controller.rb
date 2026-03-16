@@ -38,7 +38,7 @@ module Spree
                         includes(
                           :taxon,
                           product: {
-                            thumbnail: [attachment_attachment: :blob],
+                            primary_media: [attachment_attachment: :blob],
                             master: [:stock_items, :stock_locations],
                             variants: [:stock_items, :stock_locations]
                           }

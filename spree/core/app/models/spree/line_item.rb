@@ -55,10 +55,10 @@ module Spree
     delegate :name, :description, :brand, :category, to: :product
 
     # Returns the thumbnail image for this line item
-    # Prefers variant thumbnail, falls back to product thumbnail
-    # @return [Spree::Image, nil]
+    # Prefers variant primary media, falls back to product primary media
+    # @return [Spree::Asset, nil]
     def thumbnail
-      variant.thumbnail || product.thumbnail
+      variant.primary_media || product.primary_media
     end
     delegate :tax_zone, to: :order
     delegate :digital?, :can_supply?, to: :variant

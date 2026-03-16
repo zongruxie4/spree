@@ -1388,20 +1388,20 @@ describe Spree::Variant, type: :model do
     end
   end
 
-  describe '#default_image' do
+  describe '#primary_media' do
     let(:variant) { create(:variant) }
 
     context 'when variant has images' do
       let!(:image) { create(:image, position: 1, viewable: variant) }
 
       it 'returns the first image' do
-        expect(variant.reload.default_image).to eq(image)
+        expect(variant.reload.primary_media).to eq(image)
       end
     end
 
     context 'when variant has no images' do
       it 'returns nil' do
-        expect(variant.default_image).to be_nil
+        expect(variant.primary_media).to be_nil
       end
     end
   end

@@ -18,7 +18,7 @@ export type {
   Export,
   GiftCardBatch,
   GiftCard,
-  Image,
+  Media,
   ImportRow,
   Import,
   Invitation,
@@ -74,7 +74,7 @@ export type { DigitalLink as StoreDigitalLink } from './generated';
 export type { Digital as StoreDigital } from './generated';
 export type { GiftCardBatch as StoreGiftCardBatch } from './generated';
 export type { GiftCard as StoreGiftCard } from './generated';
-export type { Image as StoreImage } from './generated';
+export type { Media as StoreMedia } from './generated';
 export type { LineItem as StoreLineItem } from './generated';
 export type { Locale as StoreLocale } from './generated';
 export type { Market as StoreMarket } from './generated';

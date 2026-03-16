@@ -88,7 +88,7 @@ export type {
   PaymentMethod,
   PaymentSession,
   PaymentSetupSession,
-  Image,
+  Media,
   OptionType,
   OptionValue,
   Price,

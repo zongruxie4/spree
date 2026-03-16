@@ -27,7 +27,7 @@ const client = createClient({
 // Browse products (Store API)
 const products = await client.products.list({
   limit: 10,
-  expand: ['variants', 'images'],
+  expand: ['variants', 'media'],
 });
 
 // Get a single product

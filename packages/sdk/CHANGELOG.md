@@ -1,5 +1,17 @@
 # @spree/sdk
 
+## 0.11.0
+
+### Minor Changes
+
+- **Breaking:** Rename `images` to `media` across the Store API
+  - `expand: ['images']` → `expand: ['media']` on products and variants
+  - Response key `images` → `media`
+  - `Image` type replaced by `Media` type (with `media_type`, `product_id`, `focal_point_x/y`, `external_video_url`)
+  - `StoreImage` type replaced by `StoreMedia`
+  - Removed `viewable_id` and `viewable_type` from media responses
+  - Added `product_id` field to media responses
+
 ## 0.10.1
 
 ### Patch Changes

@@ -1,6 +1,6 @@
 // This file is auto-generated. Do not edit directly.
 import { z } from 'zod';
-import { ImageSchema } from './Image';
+import { MediaSchema } from './Media';
 import { MetafieldSchema } from './Metafield';
 import { OptionValueSchema } from './OptionValue';
 import { PriceSchema } from './Price';
@@ -12,10 +12,10 @@ export const VariantSchema = z.object({
   is_master: z.boolean(),
   options_text: z.string(),
   track_inventory: z.boolean(),
-  image_count: z.number(),
+  media_count: z.number(),
   created_at: z.string(),
   updated_at: z.string(),
-  thumbnail: z.string().nullable(),
+  thumbnail_url: z.string().nullable(),
   purchasable: z.boolean(),
   in_stock: z.boolean(),
   backorderable: z.boolean(),
@@ -25,7 +25,8 @@ export const VariantSchema = z.object({
   depth: z.number().nullable(),
   price: PriceSchema,
   original_price: PriceSchema.nullable(),
-  images: z.array(ImageSchema).optional(),
+  primary_media: MediaSchema.optional(),
+  media: z.array(MediaSchema).optional(),
   option_values: z.array(OptionValueSchema),
   metafields: z.array(MetafieldSchema).optional(),
 });

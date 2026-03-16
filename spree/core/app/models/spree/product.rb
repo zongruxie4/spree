@@ -114,10 +114,12 @@ module Spree
     has_many :orders, through: :line_items
     has_many :completed_orders, -> { reorder(nil).distinct.complete }, through: :line_items, source: :order
 
+    has_many :media, -> { order(:position) }, as: :viewable, dependent: :destroy, class_name: 'Spree::Asset'
+
     has_many :variant_images, -> { order(:position) }, source: :images, through: :variants_including_master
     has_many :variant_images_without_master, -> { order(:position) }, source: :images, through: :variants
 
-    belongs_to :thumbnail, class_name: 'Spree::Image', optional: true
+    belongs_to :primary_media, class_name: 'Spree::Asset', optional: true, foreign_key: :primary_media_id
 
     has_many :option_value_variants, class_name: 'Spree::OptionValueVariant', through: :variants
     has_many :option_values, class_name: 'Spree::OptionValue', through: :variants
@@ -335,17 +337,26 @@ module Spree
       @default_variant_id ||= default_variant.id
     end
 
-    # Returns true if any variant (including master) has images.
-    # Uses loaded association when available, otherwise falls back to counter cache.
-    # @return [Boolean]
-    def has_variant_images?
-      return variant_images.any? if association(:variant_images).loaded?
+    # Returns the product's media gallery.
+    # Uses product-level media if present, otherwise falls back to variant images.
+    # @return [ActiveRecord::Relation]
+    def gallery_media
+      return media if association(:media).loaded? ? media.any? : media.exists?
 
-      total_image_count.positive?
+      variant_images
     end
 
-    # Alias for has_variant_images? for consistency with Variant#has_images?
-    alias has_images? has_variant_images?
+    # Returns true if the product has any media (product-level or variant-level).
+    # Uses counter cache for performance.
+    # @return [Boolean]
+    def has_media?
+      return variant_images.any? if association(:variant_images).loaded?
+
+      media_count.positive?
+    end
+
+    alias has_images? has_media?
+    alias has_variant_images? has_media?
 
     # Returns the variant that should be used for displaying images.
     # Priority: master > default_variant > first variant with images
@@ -354,47 +365,47 @@ module Spree
       @variant_for_images ||= find_variant_for_images
     end
 
-    # Returns default Image for Product.
-    # Uses cached thumbnail_id which is updated when images are added/removed/reordered.
-    # @return [Spree::Image, nil]
+    # @deprecated Use #primary_media instead.
     def default_image
-      thumbnail
+      Spree::Deprecation.warn('Spree::Product#default_image is deprecated and will be removed in Spree 6.0. Please use Spree::Product#primary_media instead.')
+      primary_media
     end
 
-    # Backward compatibility for Spree 5.2 and earlier.
-    # @deprecated Use Spree::Product#default_image instead.
+    # @deprecated Use #primary_media instead.
     def featured_image
-      Spree::Deprecation.warn('Spree::Product#featured_image is deprecated and will be removed in Spree 5.5. Please use Spree::Product#default_image instead.')
-
-      default_image
+      Spree::Deprecation.warn('Spree::Product#featured_image is deprecated and will be removed in Spree 6.0. Please use Spree::Product#primary_media instead.')
+      primary_media
     end
 
-    # Returns secondary Image for Product (for hover effects).
-    # @return [Spree::Image, nil]
+    # @deprecated Use #primary_media instead.
+    def primary_image
+      Spree::Deprecation.warn('Spree::Product#primary_image is deprecated and will be removed in Spree 6.0. Please use Spree::Product#primary_media instead.')
+      primary_media
+    end
+
+    # Returns secondary media for Product (for hover effects).
+    # @return [Spree::Asset, nil]
     def secondary_image
       variant_for_images&.secondary_image
     end
 
-    # Alias for default_image for consistency.
-    alias primary_image default_image
-
-    # Returns the image count from the variant used for displaying images.
-    # @return [Integer]
+    # @deprecated Use media_count instead
     def image_count
-      variant_for_images&.image_count || 0
+      media_count
     end
 
-    # Updates the thumbnail_id to the first image from variant_images.
-    # Called when images are added, removed, or reordered on any variant.
+    # Updates primary_media_id to the first media item.
+    # Checks product-level media first, then falls back to variant images.
+    # Called when media is added, removed, or reordered.
     def update_thumbnail!
-      first_image = variant_images.order(:position).first
-      update_column(:thumbnail_id, first_image&.id)
+      first_media = media.order(:position).first || variant_images.order(:position).first
+      update_column(:primary_media_id, first_media&.id)
     end
 
-    # Finds first variant with images using preloaded data when available.
+    # Finds first variant with media using preloaded data when available.
     # @return [Spree::Variant, nil]
     def find_variant_with_images
-      return variants.find(&:has_images?) if variants.loaded?
+      return variants.find(&:has_media?) if variants.loaded?
 
       variants.joins(:images).first
     end
@@ -630,12 +641,12 @@ module Spree
 
     private
 
-    # Determines which variant should be used for displaying images.
-    # Priority: master > default_variant > first variant with images
+    # Determines which variant should be used for displaying media.
+    # Priority: master > default_variant > first variant with media
     def find_variant_for_images
-      return master if master.has_images?
-      return default_variant if has_variants? && default_variant.has_images?
-      return find_variant_with_images if has_variant_images?
+      return master if master.has_media?
+      return default_variant if has_variants? && default_variant.has_media?
+      return find_variant_with_images if has_media?
 
       nil
     end

@@ -60,12 +60,12 @@ describe Spree::Admin::AssetsController, type: :controller do
         expect(Spree::Image.last.viewable).to eq(product.master)
       end
 
-      it 'increments variant image_count counter cache' do
-        expect { subject }.to change { product.master.reload.image_count }.by(1)
+      it 'increments variant media_count counter cache' do
+        expect { subject }.to change { product.master.reload.media_count }.by(1)
       end
 
-      it 'increments product total_image_count counter cache' do
-        expect { subject }.to change { product.reload.total_image_count }.by(1)
+      it 'increments product media_count counter cache' do
+        expect { subject }.to change { product.reload.media_count }.by(1)
       end
     end
   end

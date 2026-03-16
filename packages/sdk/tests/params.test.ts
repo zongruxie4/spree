@@ -8,8 +8,8 @@ describe('transformListParams', () => {
   });
 
   it('joins expand array into comma-separated string', () => {
-    const result = transformListParams({ expand: ['variants', 'images'] });
-    expect(result).toEqual({ expand: 'variants,images' });
+    const result = transformListParams({ expand: ['variants', 'media'] });
+    expect(result).toEqual({ expand: 'variants,media' });
   });
 
   it('joins single-element expand array', () => {
@@ -95,7 +95,7 @@ describe('transformListParams', () => {
     const result = transformListParams({
       page: 1,
       limit: 12,
-      expand: ['images', 'default_variant'],
+      expand: ['media', 'default_variant'],
       sort: '-created_at',
       name_cont: 'shirt',
       price_gte: 20,
@@ -104,7 +104,7 @@ describe('transformListParams', () => {
     expect(result).toEqual({
       page: 1,
       limit: 12,
-      expand: 'images,default_variant',
+      expand: 'media,default_variant',
       sort: '-created_at',
       'q[name_cont]': 'shirt',
       'q[price_gte]': 20,

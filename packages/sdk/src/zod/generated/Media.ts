@@ -1,13 +1,16 @@
 // This file is auto-generated. Do not edit directly.
 import { z } from 'zod';
 
-export const ImageSchema = z.object({
+export const MediaSchema = z.object({
   id: z.string(),
-  viewable_id: z.string(),
-  type: z.string().nullable(),
-  viewable_type: z.string(),
-  position: z.number().nullable(),
+  product_id: z.string().nullable(),
+  variant_ids: z.array(z.string()),
+  position: z.number(),
   alt: z.string().nullable(),
+  media_type: z.string(),
+  focal_point_x: z.number().nullable(),
+  focal_point_y: z.number().nullable(),
+  external_video_url: z.string().nullable(),
   created_at: z.string(),
   updated_at: z.string(),
   original_url: z.string().nullable(),
@@ -19,4 +22,4 @@ export const ImageSchema = z.object({
   og_image_url: z.string().nullable(),
 });
 
-export type Image = z.infer<typeof ImageSchema>;
+export type Media = z.infer<typeof MediaSchema>;

@@ -791,14 +791,14 @@ describe Spree::Product, type: :model do
     end
   end
 
-  describe '#default_image' do
+  describe '#primary_media' do
     let(:product) { create(:product, stores: [store]) }
 
     context 'when master has images' do
       let!(:image) { create(:image, viewable: product.master) }
 
       it 'returns the master image' do
-        expect(product.reload.default_image).to eq(image)
+        expect(product.reload.primary_media).to eq(image)
       end
 
       context 'with variants that also have images' do
@@ -806,7 +806,7 @@ describe Spree::Product, type: :model do
         let!(:variant_image) { create(:image, viewable: variant) }
 
         it 'returns the master image (master takes priority)' do
-          expect(product.reload.default_image).to eq(image)
+          expect(product.reload.primary_media).to eq(image)
         end
       end
     end
@@ -816,13 +816,13 @@ describe Spree::Product, type: :model do
       let!(:variant_image) { create(:image, viewable: variant) }
 
       it 'returns the variant image' do
-        expect(product.reload.default_image).to eq(variant_image)
+        expect(product.reload.primary_media).to eq(variant_image)
       end
     end
 
     context 'when no variants have images' do
       it 'returns nil' do
-        expect(product.default_image).to be_nil
+        expect(product.primary_media).to be_nil
       end
     end
   end
@@ -904,42 +904,38 @@ describe Spree::Product, type: :model do
     end
   end
 
-  describe '#image_count' do
+  describe '#media_count' do
     let(:product) { create(:product, stores: [store]) }
 
-    context 'when no variants have images' do
+    context 'when no variants have media' do
       it 'returns 0' do
-        expect(product.image_count).to eq(0)
+        expect(product.media_count).to eq(0)
       end
     end
 
-    context 'when master has images' do
+    context 'when master has media' do
       let!(:images) { create_list(:image, 2, viewable: product.master) }
 
-      it 'returns the master image count' do
-        expect(product.reload.image_count).to eq(2)
+      it 'returns total media count' do
+        expect(product.reload.media_count).to eq(2)
       end
 
-      context 'when variant also has images' do
+      context 'when variant also has media' do
         let!(:variant) { create(:variant, product: product) }
         let!(:variant_images) { create_list(:image, 3, viewable: variant) }
 
-        it 'returns master image count (master takes priority)' do
-          product.reload
-          expect(product.variant_for_images).to eq(product.master)
-          expect(product.image_count).to eq(2)
+        it 'returns total across all variants' do
+          expect(product.reload.media_count).to eq(5)
         end
       end
     end
 
-    context 'when only variant has images' do
+    context 'when only variant has media' do
       let!(:variant) { create(:variant, product: product) }
       let!(:variant_images) { create_list(:image, 3, viewable: variant) }
 
-      it 'returns the variant image count' do
-        product.reload
-        expect(product.variant_for_images).to eq(variant)
-        expect(product.image_count).to eq(3)
+      it 'returns the variant media count' do
+        expect(product.reload.media_count).to eq(3)
       end
     end
   end
@@ -1037,7 +1033,7 @@ describe Spree::Product, type: :model do
     it 'returns correct images with storefront includes' do
       loaded_product = Spree::Product.includes(*storefront_includes).find(product.id)
 
-      expect(loaded_product.default_image).to eq(image)
+      expect(loaded_product.primary_media).to eq(image)
       expect(loaded_product.variant_for_images).to eq(variant)
       expect(loaded_product.has_images?).to be true
     end
@@ -1055,7 +1051,7 @@ describe Spree::Product, type: :model do
 
         expect(loaded_product.default_variant).to eq(variant2)
         expect(loaded_product.variant_for_images).to eq(variant)
-        expect(loaded_product.default_image).to eq(image)
+        expect(loaded_product.primary_media).to eq(image)
       end
     end
   end

@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe Spree::Asset, type: :model do
   it_behaves_like 'metadata'
-  it_behaves_like 'lifecycle events'
+  it_behaves_like 'lifecycle events', event_prefix: 'media'
 
   describe 'named variants' do
     let(:reflection) { described_class.attachment_reflections['attachment'] }

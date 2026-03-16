@@ -92,7 +92,8 @@ module Spree
 
     @@api_key_attributes = [:name, :key_type]
 
-    @@asset_attributes = [:type, :viewable_id, :viewable_type, :attachment, :alt, :position]
+    @@asset_attributes = [:type, :viewable_id, :viewable_type, :attachment, :alt, :position,
+                          :media_type, :focal_point_x, :focal_point_y, :external_video_url]
 
     @@checkout_attributes = [
       :coupon_code, :email, :shipping_method_id, :special_instructions, :use_billing, :use_shipping,

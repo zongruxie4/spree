@@ -1,14 +1,16 @@
 namespace :spree do
   namespace :products do
-    desc 'Reset counter caches (variant_count, classification_count, total_image_count) on products'
+    desc 'Reset counter caches (variant_count, classification_count, media_count) on products'
     task reset_counter_caches: :environment do |_t, _args|
       puts 'Resetting product counter caches...'
 
       Spree::Product.find_each do |product|
+        total_media = product.media.count + product.variant_images.where.not(id: product.media.select(:id)).count
+
         product.update_columns(
           variant_count: product.variants.count,
           classification_count: product.classifications.count,
-          total_image_count: product.variant_images.count,
+          media_count: total_media,
           updated_at: Time.current
         )
         print '.'

@@ -133,15 +133,15 @@ const product = await client.products.get('spree-tote')
 
 // Get with included relations
 const detailed = await client.products.get('spree-tote', {
-  expand: ['variants', 'images', 'option_types', 'categories'],
+  expand: ['variants', 'media', 'option_types', 'categories'],
 })
 // detailed.variants => [{ id: "var_xxx", sku: "TOTE-S-R", price: { amount: "15.99", currency: "USD" }, ... }]
-// detailed.images => [{ id: "img_xxx", url: "https://cdn...", position: 1 }]
+// detailed.media => [{ id: "img_xxx", url: "https://cdn...", position: 1 }]
 // detailed.option_types => [{ name: "size", presentation: "Size", option_values: [...] }]
 ```
 
 ```bash cURL
-curl 'https://api.mystore.com/api/v3/store/products/spree-tote?expand=variants,images,option_types,categories' \
+curl 'https://api.mystore.com/api/v3/store/products/spree-tote?expand=variants,media,option_types,categories' \
   -H 'Authorization: Bearer spree_pk_xxx'
 ```
 
@@ -244,13 +244,13 @@ curl 'https://api.mystore.com/api/v3/store/products/spree-tee?expand=option_type
 Option type `name` and `presentation` fields are translatable.
 </Info>
 
-## Images
+## Media
 
-Images can be attached to the product (via the master variant) or to individual variants. When displaying a product, show the images for the selected variant, falling back to the product-level images.
+Media can be attached to the product (via the master variant) or to individual variants. When displaying a product, show the images for the selected variant, falling back to the product-level images.
 
 ### Thumbnails
 
-Every product response includes a `thumbnail_url` field — the URL to the first image, ready to use without any expands. Similarly, each variant includes a `thumbnail` URL and an `image_count` counter.
+Every product response includes a `thumbnail_url` field — the URL to the first image, ready to use without any expands. Similarly, each variant includes a `thumbnail_url` URL and an `media_count` counter.
 
 Use these fields for product listing pages to avoid loading all images:
 
@@ -274,33 +274,33 @@ curl 'https://api.mystore.com/api/v3/store/products?limit=12' \
 </CodeGroup>
 
 <Warning>
-Avoid using `?expand=images` on listing pages. This loads **all** images for every product in the response, which is unnecessary when you only need a thumbnail. Use `thumbnail_url` instead and only expand full images on the product detail page.
+Avoid using `?expand=media` on listing pages. This loads **all** images for every product in the response, which is unnecessary when you only need a thumbnail. Use `thumbnail_url` instead and only expand full media on the product detail page.
 </Warning>
 
 ### All Images
 
-On the product detail page, expand `images` and `variants` to get the full set of images. Images are ordered by `position`:
+On the product detail page, expand `media` and `variants` to get the full set of images. Images are ordered by `position`:
 
 <CodeGroup>
 
 ```typescript SDK
 const product = await client.products.get('spree-tote', {
-  expand: ['images', 'variants'],
+  expand: ['media', 'variants'],
 })
 
 // Product-level images (from master variant)
-product.images // [{ url: "https://cdn.../tote-front.jpg", position: 1 }, ...]
+product.media // [{ url: "https://cdn.../tote-front.jpg", position: 1 }, ...]
 
-// Each variant has its own thumbnail and image_count
+// Each variant has its own thumbnail and media_count
 product.variants?.forEach(variant => {
   variant.thumbnail    // "https://cdn.../tote-red.jpg" — always available
-  variant.image_count  // 3 — quick check without loading images
-  variant.images       // full image array (only when ?expand=images)
+  variant.media_count  // 3 — quick check without loading media
+  variant.media        // full image array (only when ?expand=media)
 })
 ```
 
 ```bash cURL
-curl 'https://api.mystore.com/api/v3/store/products/spree-tote?expand=images,variants' \
+curl 'https://api.mystore.com/api/v3/store/products/spree-tote?expand=media,variants' \
   -H 'Authorization: Bearer spree_pk_xxx'
 ```
 
@@ -308,10 +308,10 @@ curl 'https://api.mystore.com/api/v3/store/products/spree-tote?expand=images,var
 
 | Field | Available on | Always returned | Description |
 |-------|-------------|:---:|-------------|
-| `thumbnail_url` | Product | Yes | URL to the product's first image |
-| `thumbnail` | Variant | Yes | URL to the variant's first image |
-| `image_count` | Variant | Yes | Number of images (counter cache — no DB query) |
-| `images` | Product, Variant | No | Full image array (requires `?expand=images`) |
+| `thumbnail_url` | Product | Yes | URL to the product's first media |
+| `thumbnail_url` | Variant | Yes | URL to the variant's first media |
+| `media_count` | Variant | Yes | Number of media |
+| `media` | Product, Variant | No | Full image array (requires `?expand=media`) |
 
 ## Prices
 
@@ -376,7 +376,7 @@ Category `name` and `description` fields are translatable.
 
 - [Pricing](/developer/core-concepts/pricing) — Price Lists, Price Rules, and market-specific pricing
 - [Inventory](/developer/core-concepts/inventory) — Stock management and backorders
-- [Images & Assets](/developer/core-concepts/images-assets) — Image management
+- [Media](/developer/core-concepts/media) — Image management
 - [Translations](/developer/core-concepts/translations) — Translating product content
 - [Search & Filtering](/developer/core-concepts/search-filtering) — Full-text search and Ransack filtering
 - [Querying](/api-reference/store-api/querying) — API filtering, sorting, and pagination

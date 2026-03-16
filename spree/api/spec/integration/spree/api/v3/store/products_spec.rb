@@ -39,7 +39,7 @@ RSpec.describe 'Products API', type: :request, swagger_doc: 'api-reference/store
           price_gte: 20,
           price_lte: 100,
           with_option_value_ids: ['optval_abc', 'optval_def'],
-          expand: ['variants', 'images'],
+          expand: ['variants', 'media'],
         })
       JS
 
@@ -64,7 +64,7 @@ RSpec.describe 'Products API', type: :request, swagger_doc: 'api-reference/store
       parameter name: 'q[in_stock]', in: :query, type: :boolean, required: false,
                 description: 'Filter to only in-stock products'
       parameter name: :expand, in: :query, type: :string, required: false,
-                description: 'Comma-separated associations to expand (variants, images, categories, option_types)'
+                description: 'Comma-separated associations to expand (variants, media, categories, option_types)'
       parameter name: :fields, in: :query, type: :string, required: false,
                 description: 'Comma-separated list of fields to include (e.g., name,slug,price). id is always included.'
 
@@ -107,7 +107,7 @@ RSpec.describe 'Products API', type: :request, swagger_doc: 'api-reference/store
 
       sdk_example <<~JS
         const product = await client.products.get('spree-tote', {
-          expand: ['variants', 'images'],
+          expand: ['variants', 'media'],
         })
       JS
 

@@ -93,7 +93,7 @@ Plain async functions for reading data in Server Components. Wrap with `"use cac
 ```typescript
 import { listProducts, getProduct, getProductFilters } from '@spree/next';
 
-const products = await listProducts({ limit: 25, expand: ['variants', 'images'] });
+const products = await listProducts({ limit: 25, expand: ['variants', 'media'] });
 const product = await getProduct('spree-tote');
 const filters = await getProductFilters({ category_id: 'ctg_123' });
 ```

@@ -49,7 +49,7 @@ Plain async functions for reading data in Server Components. Wrap with `"use cac
 import { listProducts, getProduct, getProductFilters } from '@spree/next';
 
 const products = await listProducts({ limit: 25 });
-const product = await getProduct('spree-tote', { expand: ['variants', 'images'] });
+const product = await getProduct('spree-tote', { expand: ['variants', 'media'] });
 const filters = await getProductFilters({ category_id: 'ctg_123' });
 ```
 

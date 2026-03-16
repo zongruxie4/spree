@@ -4,7 +4,7 @@ module Spree
     include Spree::ImagesHelper
 
     def variant_image_url(variant)
-      image = variant.default_image
+      image = variant.primary_media
       image.present? && image.attached? ? spree_image_url(image, variant: :mini) : image_url('noimage/small.png')
     end
 

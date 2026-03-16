@@ -1,5 +1,13 @@
 # @spree/next
 
+## 0.11.0
+
+### Minor Changes
+
+- **Breaking:** Rename `images` to `media` — aligns with Spree 5.4 Store API media system
+  - `expand: ['images']` → `expand: ['media']`
+  - `Image` type re-export replaced by `Media`
+
 ## 0.10.5
 
 ### Patch Changes

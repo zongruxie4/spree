@@ -1,7 +1,7 @@
 <% width ||= 50 %>
 <% height ||= 50 %>
 <% variant ||= :mini %>
-<% image ||= object.default_image %>
+<% image ||= object.primary_media %>
 
 <% if image.present? && image.attached? && image.variable? %>
   <% alt ||= image.alt || object.name %>

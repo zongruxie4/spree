@@ -11,7 +11,7 @@ description: Browse products and categories with the Spree SDK
 const products = await client.products.list({
   page: 1,
   limit: 25,
-  expand: ['variants', 'images', 'categories'],
+  expand: ['variants', 'media', 'categories'],
 });
 ```
 
@@ -52,7 +52,7 @@ const products = await client.products.list({
 
 const product = await client.products.get('spree-tote', {
   fields: ['name', 'slug', 'price'],
-  expand: ['images'],  // expanded associations are always included
+  expand: ['media'],  // expanded associations are always included
 });
 ```
 
@@ -65,12 +65,12 @@ Use dot notation to expand nested associations (up to 4 levels):
 ```typescript
 // Expand variants with their images in one request
 const product = await client.products.get('spree-tote', {
-  expand: ['variants.images', 'option_types'],
+  expand: ['variants.media', 'option_types'],
 });
 
 // Access nested data
 product.variants.forEach(variant => {
-  console.log(variant.images); // Images are included
+  console.log(variant.media); // Media are included
 });
 ```
 
@@ -80,7 +80,7 @@ Fetch a single product by slug or prefix ID:
 
 ```typescript
 const product = await client.products.get('spree-tote', {
-  expand: ['variants', 'images'],
+  expand: ['variants', 'media'],
 });
 ```
 
@@ -133,7 +133,7 @@ const category = await client.categories.get('clothing/shirts', {
 const categoryProducts = await client.categories.products.list('clothing/shirts', {
   page: 1,
   limit: 12,
-  expand: ['images', 'default_variant'],
+  expand: ['media', 'default_variant'],
 });
 ```
 

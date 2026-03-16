@@ -26,7 +26,7 @@ const client = createClient({
 // Browse products (Store API)
 const products = await client.products.list({
   limit: 10,
-  expand: ['variants', 'images'],
+  expand: ['variants', 'media'],
 });
 
 // Get a single product
@@ -156,12 +156,12 @@ const products = await client.products.list({
   limit: 25,
   name_cont: 'shirt',
   sort: 'price asc',
-  expand: ['variants', 'images', 'categories'],
+  expand: ['variants', 'media', 'categories'],
 });
 
 // Get single product by ID or slug
 const product = await client.products.get('spree-tote', {
-  expand: ['variants', 'images'],
+  expand: ['variants', 'media'],
 });
 
 // Get available filters (price range, availability, options, categories)
@@ -187,7 +187,7 @@ const category = await client.categories.get('clothing/shirts', {
 const categoryProducts = await client.categories.products.list('clothing/shirts', {
   page: 1,
   limit: 12,
-  expand: ['images', 'default_variant'],
+  expand: ['media', 'default_variant'],
 });
 ```
 
@@ -700,7 +700,7 @@ The SDK exports all Store API types:
 - `StoreOrderPromotion` - Promotion applied to an order (uses `oprom_` prefixed IDs)
 
 ### Product Types
-- `StoreImage` - Product image
+- `StoreMedia` - Product media (images, videos)
 - `StorePrice` - Price data
 - `StoreOptionType` - Option type (e.g., Size, Color)
 - `StoreOptionValue` - Option value (e.g., Small, Red)
