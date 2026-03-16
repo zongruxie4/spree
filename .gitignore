@@ -53,8 +53,7 @@ server/db/migrate
 TODO
 brakeman-*.*
 */app/assets/builds
-.claude
-*/.claude
+.claude/worktrees
 **/node_modules
 packages/*/package-lock.json
 .turbo
