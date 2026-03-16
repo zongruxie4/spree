@@ -1865,7 +1865,7 @@ Rails.application.config.after_initialize do
   # ==========================================
   # Register Taxonomies table
   # ==========================================
-  Spree.admin.tables.register(:taxonomies, model_class: Spree::Taxonomy, search_param: :name_cont)
+  Spree.admin.tables.register(:taxonomies, model_class: Spree::Taxonomy, search_param: :name_cont, link_to_action: :show)
 
   Spree.admin.tables.taxonomies.add :name,
                                     label: :name,
