@@ -1,5 +1,11 @@
 # @spree/sdk
 
+## 0.13.1
+
+### Patch Changes
+
+- Changed generated TypeScript types from `type` aliases to `interface` declarations, enabling declaration merging for SDK consumers who customize API serializers
+
 ## 0.13.0
 
 ### Minor Changes

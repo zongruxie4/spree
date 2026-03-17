@@ -156,3 +156,67 @@ All types are exported as unprefixed names (e.g., `Product`, `Order`). Legacy `S
 - `CompletePaymentSessionParams` - Payment session completion parameters
 - `ProductFiltersResponse` - Product filters response
 - `CheckoutRequirement` - Checkout requirement (`{ step, field, message }`)
+
+## Extending Types
+
+All generated SDK types are TypeScript `interface`s, which means you can extend them via [declaration merging](https://www.typescriptlang.org/docs/handbook/declaration-merging.html) when you customize API serializers on the backend.
+
+### Example: Adding a Brand to Products
+
+If you've customized the `ProductSerializer` in your app to include a `brand_id` attribute:
+
+```ruby
+# app/serializers/my_store/product_serializer.rb
+module MyStore
+  class ProductSerializer < Spree::Api::V3::ProductSerializer
+    typelize brand_id: :string
+
+    attribute :brand_id do |product|
+      product.brand&.prefixed_id
+    end
+  end
+end
+
+# config/initializers/spree.rb
+Spree.api.product_serializer = MyStore::ProductSerializer
+```
+
+You can extend the SDK type in your frontend code so TypeScript knows about the new field:
+
+```typescript
+// types/spree.d.ts
+declare module '@spree/sdk' {
+  interface Product {
+    brand_id: string;
+  }
+}
+```
+
+Now `brand_id` is available on every `Product` across your app — no type casting needed:
+
+```typescript
+const products = await client.products.list();
+products.data.forEach((product) => {
+  console.log(product.brand_id); // fully typed
+});
+```
+
+### Extending Zod Schemas
+
+If you use the SDK's Zod schemas for runtime validation, extend them with `.extend()`:
+
+```typescript
+import { z } from 'zod';
+import { ProductSchema } from '@spree/sdk/zod';
+
+const MyProductSchema = ProductSchema.extend({
+  brand_id: z.string(),
+});
+
+// Use for runtime validation
+const product = MyProductSchema.parse(apiResponse);
+```
+
+<Note>
+Declaration merging only affects TypeScript types (compile-time). Zod schemas perform runtime validation and must be extended separately if you need validation of custom fields.
+</Note>
