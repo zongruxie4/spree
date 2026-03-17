@@ -93,6 +93,16 @@ module Spree
                 message: { type: :string, description: 'Human-readable requirement message', example: 'Add a payment method' }
               },
               required: %w[step field message]
+            },
+            FulfillmentManifestItem: {
+              type: :object,
+              description: 'An item within a fulfillment — which line item and how many units are in this fulfillment',
+              properties: {
+                item_id: { type: :string, description: 'Line item prefixed ID', example: 'li_abc123' },
+                variant_id: { type: :string, description: 'Variant prefixed ID', example: 'variant_abc123' },
+                quantity: { type: :integer, description: 'Quantity in this fulfillment', example: 2 }
+              },
+              required: %w[item_id variant_id quantity]
             }
           }
         end
@@ -120,6 +130,7 @@ module Spree
               strip_null_from_enums(s)
             end
             patch_cart_schema(schemas)
+            patch_fulfillment_schema(schemas)
             schemas
           end
         end
@@ -138,6 +149,24 @@ module Spree
             props[req_key] = {
               type: :array,
               items: { '$ref' => '#/components/schemas/CheckoutRequirement' }
+            }
+          end
+        end
+
+        # Typelizer cannot represent Array<{...}> inline object types in OpenAPI,
+        # so we patch Fulfillment#items to reference the FulfillmentManifestItem component schema.
+        def patch_fulfillment_schema(schemas)
+          fulfillment = schemas['Fulfillment'] || schemas[:Fulfillment]
+          return unless fulfillment
+
+          props = fulfillment[:properties]
+          return unless props
+
+          items_key = props.key?('items') ? 'items' : :items
+          if props[items_key]
+            props[items_key] = {
+              type: :array,
+              items: { '$ref' => '#/components/schemas/FulfillmentManifestItem' }
             }
           end
         end

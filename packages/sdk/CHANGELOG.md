@@ -1,5 +1,48 @@
 # @spree/sdk
 
+## 0.12.1
+
+### Patch Changes
+
+- Added `items` field to `Fulfillment` type — an array of `{ item_id, variant_id, quantity }` showing which line items (and how many) are in each fulfillment. Enables storefronts to correctly display per-fulfillment item lists for split-shipment orders.
+
+## 0.12.0
+
+### Minor Changes
+
+- ### Breaking: Shipping → Delivery/Fulfillment naming
+
+  Renamed all shipping/shipment API surface to use delivery/fulfillment vocabulary:
+
+  - `client.carts.shipments` → `client.carts.fulfillments`
+  - `selected_shipping_rate_id` param → `selected_delivery_rate_id`
+  - `/carts/:id/shipments` endpoint → `/carts/:id/fulfillments`
+
+  ### Breaking: Renamed response fields
+
+  - `shipment_state` → `fulfillment_status` (on Order)
+  - `payment_state` → `payment_status` (on Order)
+  - `ship_total` / `display_ship_total` → `delivery_total` / `display_delivery_total` (on Cart/Order)
+  - `state` → `status` (on Payment, GiftCard)
+  - `shipped_at` → `fulfilled_at` (on Fulfillment)
+  - `shipping_method` → `delivery_method` (on Fulfillment, DeliveryRate)
+  - `shipping_rates` → `delivery_rates` (on Fulfillment)
+
+  ### Breaking: Removed fields
+
+  - Removed `is_master` from Variant
+  - Removed `expand=master_variant` from Product (use `expand=default_variant`)
+
+  ### Type renames
+
+  - `Shipment` → `Fulfillment` / `StoreFulfillment`
+  - `ShippingMethod` → `DeliveryMethod` / `StoreDeliveryMethod`
+  - `ShippingRate` → `DeliveryRate` / `StoreDeliveryRate`
+
+### Patch Changes
+
+- Added `items` field to `Fulfillment` type — an array of `{ item_id, variant_id, quantity }` showing which line items (and how many) are in each fulfillment. Enables storefronts to correctly display per-fulfillment item lists for split-shipment orders.
+
 ## 0.12.0
 
 ### Minor Changes

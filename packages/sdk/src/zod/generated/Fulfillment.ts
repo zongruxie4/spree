@@ -16,6 +16,7 @@ export const FulfillmentSchema = z.object({
   status: z.string(),
   fulfillment_type: z.string(),
   fulfilled_at: z.string().nullable(),
+  items: z.array(z.object({ item_id: z.any() })),
   delivery_method: DeliveryMethodSchema,
   stock_location: StockLocationSchema,
   delivery_rates: z.array(DeliveryRateSchema),
