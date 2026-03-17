@@ -107,11 +107,20 @@ describe('auth', () => {
   });
 
   describe('refresh', () => {
-    it('returns new tokens', async () => {
+    it('returns new access token and rotated refresh token', async () => {
       const client = createTestClient();
-      const result = await client.auth.refresh({ token: 'old-token' });
+      const result = await client.auth.refresh({ refresh_token: 'rt_old' });
 
       expect(result.token).toBe('refreshed-jwt-token');
+      expect(result.refresh_token).toBe('rt_refreshed');
+    });
+  });
+
+  describe('logout', () => {
+    it('revokes the refresh token', async () => {
+      const client = createTestClient();
+      await client.auth.logout({ refresh_token: 'rt_login' });
+      // 204 No Content — no error means success
     });
   });
 });

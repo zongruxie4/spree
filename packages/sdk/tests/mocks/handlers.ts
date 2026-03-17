@@ -114,15 +114,19 @@ const paginationMeta = { page: 1, limit: 25, count: 1, pages: 1 };
 export const handlers = [
   // Auth
   http.post(`${API_PREFIX}/auth/login`, () =>
-    HttpResponse.json({ token: 'test-jwt-token', user: fixtures.user })
+    HttpResponse.json({ token: 'test-jwt-token', refresh_token: 'rt_login', user: fixtures.user })
   ),
 
   http.post(`${API_PREFIX}/customers`, () =>
-    HttpResponse.json({ token: 'test-jwt-token', user: fixtures.user })
+    HttpResponse.json({ token: 'test-jwt-token', refresh_token: 'rt_register', user: fixtures.user })
   ),
 
   http.post(`${API_PREFIX}/auth/refresh`, () =>
-    HttpResponse.json({ token: 'refreshed-jwt-token', user: fixtures.user })
+    HttpResponse.json({ token: 'refreshed-jwt-token', refresh_token: 'rt_refreshed', user: fixtures.user })
+  ),
+
+  http.post(`${API_PREFIX}/auth/logout`, () =>
+    new HttpResponse(null, { status: 204 })
   ),
 
   // Products

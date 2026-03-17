@@ -133,6 +133,7 @@ export type {
 // Store auth types
 export interface AuthTokens {
   token: string;
+  refresh_token: string;
   user: {
     id: string;
     email: string;

@@ -55,10 +55,12 @@ module Spree
 
               if user.update(password: params[:password], password_confirmation: params[:password_confirmation])
                 jwt = generate_jwt(user)
+                refresh_token = Spree::RefreshToken.create_for(user, request_env: { ip_address: request.remote_ip, user_agent: request.user_agent&.truncate(255) })
                 user.publish_event('customer.password_reset')
 
                 render json: {
                   token: jwt,
+                  refresh_token: refresh_token.token,
                   user: serializer_class.new(user, params: serializer_params).to_h
                 }
               else

@@ -79,37 +79,44 @@ RSpec.describe 'Authentication API', type: :request, swagger_doc: 'api-reference
   path '/api/v3/store/auth/refresh' do
     post 'Refresh token' do
       tags 'Authentication'
+      consumes 'application/json'
       produces 'application/json'
-      security [api_key: [], bearer_auth: []]
-      description 'Generates a new JWT token for the authenticated user'
+      security [api_key: []]
+      description 'Exchanges a refresh token for a new access JWT and rotated refresh token. No Authorization header needed.'
 
       sdk_example <<~JS
         const auth = await client.auth.refresh({
-          bearerToken: '<token>',
+          refresh_token: 'rt_xxx',
         })
       JS
 
       parameter name: 'x-spree-api-key', in: :header, type: :string, required: true
-      parameter name: 'Authorization', in: :header, type: :string, required: true,
-                description: 'Bearer token'
+      parameter name: :body, in: :body, schema: {
+        type: :object,
+        properties: {
+          refresh_token: { type: :string, description: 'Refresh token from login response' }
+        },
+        required: %w[refresh_token]
+      }
 
       response '200', 'token refreshed' do
         let(:'x-spree-api-key') { api_key.token }
-        let(:'Authorization') { "Bearer #{jwt_token}" }
-        let(:jwt_token) { Spree::Api::V3::TestingSupport.generate_jwt(existing_user) }
+        let(:refresh_token_record) { Spree::RefreshToken.create_for(existing_user) }
+        let(:body) { { refresh_token: refresh_token_record.token } }
 
         schema '$ref' => '#/components/schemas/AuthResponse'
 
         run_test! do |response|
           data = JSON.parse(response.body)
           expect(data['token']).to be_present
+          expect(data['refresh_token']).to be_present
           expect(data['user']).to be_present
         end
       end
 
-      response '401', 'missing or invalid token' do
+      response '401', 'missing or invalid refresh token' do
         let(:'x-spree-api-key') { api_key.token }
-        let(:'Authorization') { 'Bearer invalid_token' }
+        let(:body) { { refresh_token: 'invalid_token' } }
 
         schema '$ref' => '#/components/schemas/ErrorResponse'
 

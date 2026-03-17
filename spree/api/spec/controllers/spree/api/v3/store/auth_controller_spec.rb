@@ -19,6 +19,19 @@ RSpec.describe Spree::Api::V3::Store::AuthController, type: :controller do
       expect(json_response['token']).to be_present
     end
 
+    it 'returns a refresh token on login' do
+      post :create, params: { provider: 'email', email: existing_user.email, password: 'password123' }
+
+      expect(response).to have_http_status(:ok)
+      expect(json_response['refresh_token']).to be_present
+    end
+
+    it 'creates a RefreshToken record' do
+      expect {
+        post :create, params: { provider: 'email', email: existing_user.email, password: 'password123' }
+      }.to change(Spree::RefreshToken, :count).by(1)
+    end
+
     it 'returns user data on successful login' do
       post :create, params: { provider: 'email', email: existing_user.email, password: 'password123' }
 
@@ -52,6 +65,12 @@ RSpec.describe Spree::Api::V3::Store::AuthController, type: :controller do
 
         expect(response).to have_http_status(:unauthorized)
       end
+
+      it 'does not create a RefreshToken on failure' do
+        expect {
+          post :create, params: { provider: 'email', email: existing_user.email, password: 'wrong' }
+        }.not_to change(Spree::RefreshToken, :count)
+      end
     end
 
     context 'without API key' do
@@ -66,50 +85,90 @@ RSpec.describe Spree::Api::V3::Store::AuthController, type: :controller do
   end
 
   describe 'POST #refresh' do
-    before do
-      request.headers['Authorization'] = "Bearer #{jwt_token}"
-    end
+    let!(:existing_user) { create(:user, password: 'password123', password_confirmation: 'password123') }
+    let!(:refresh_token) { Spree::RefreshToken.create_for(existing_user) }
 
-    it 'returns a new token' do
-      post :refresh
+    it 'returns a new access token and rotated refresh token' do
+      post :refresh, params: { refresh_token: refresh_token.token }
 
       expect(response).to have_http_status(:ok)
       expect(json_response['token']).to be_present
+      expect(json_response['refresh_token']).to be_present
+      # Refresh token should be rotated (different from original)
+      expect(json_response['refresh_token']).not_to eq(refresh_token.token)
     end
 
-    context 'without token' do
-      before { request.headers['Authorization'] = nil }
+    it 'returns user data' do
+      post :refresh, params: { refresh_token: refresh_token.token }
 
+      expect(json_response['user']).to be_present
+      expect(json_response['user']['email']).to eq(existing_user.email)
+    end
+
+    it 'destroys the old refresh token' do
+      post :refresh, params: { refresh_token: refresh_token.token }
+
+      expect(Spree::RefreshToken.find_by(id: refresh_token.id)).to be_nil
+    end
+
+    it 'creates a new refresh token' do
+      expect {
+        post :refresh, params: { refresh_token: refresh_token.token }
+      }.not_to change(Spree::RefreshToken, :count) # one destroyed, one created
+    end
+
+    context 'without refresh_token param' do
       it 'returns unauthorized' do
         post :refresh
 
         expect(response).to have_http_status(:unauthorized)
-        expect(json_response['error']['code']).to eq('authentication_required')
+        expect(json_response['error']['code']).to eq('invalid_refresh_token')
       end
     end
 
-    context 'with invalid token' do
-      before { request.headers['Authorization'] = 'Bearer invalid' }
-
+    context 'with invalid refresh token' do
       it 'returns unauthorized' do
-        post :refresh
+        post :refresh, params: { refresh_token: 'invalid_token' }
 
         expect(response).to have_http_status(:unauthorized)
-        expect(json_response['error']['code']).to eq('authentication_required')
+        expect(json_response['error']['code']).to eq('invalid_refresh_token')
       end
     end
 
-    context 'with expired token' do
-      let(:expired_token) { Spree::Api::V3::TestingSupport.generate_jwt(user, expiration: -1.hour.to_i) }
-
-      before { request.headers['Authorization'] = "Bearer #{expired_token}" }
+    context 'with expired refresh token' do
+      before { refresh_token.update_column(:expires_at, 1.day.ago) }
 
       it 'returns unauthorized' do
-        post :refresh
+        post :refresh, params: { refresh_token: refresh_token.token }
 
         expect(response).to have_http_status(:unauthorized)
-        expect(json_response['error']['code']).to eq('authentication_required')
+        expect(json_response['error']['code']).to eq('invalid_refresh_token')
       end
+    end
+  end
+
+  describe 'POST #logout' do
+    let!(:existing_user) { create(:user, password: 'password123', password_confirmation: 'password123') }
+    let!(:refresh_token) { Spree::RefreshToken.create_for(existing_user) }
+
+    it 'revokes the refresh token' do
+      expect {
+        post :logout, params: { refresh_token: refresh_token.token }
+      }.to change(Spree::RefreshToken, :count).by(-1)
+
+      expect(response).to have_http_status(:no_content)
+    end
+
+    it 'succeeds even with invalid refresh token' do
+      post :logout, params: { refresh_token: 'nonexistent' }
+
+      expect(response).to have_http_status(:no_content)
+    end
+
+    it 'succeeds without refresh token param' do
+      post :logout
+
+      expect(response).to have_http_status(:no_content)
     end
   end
 end

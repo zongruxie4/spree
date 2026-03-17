@@ -13,9 +13,13 @@ module Spree
             user = Spree.user_class.new(create_params)
 
             if user.save
-              token = generate_jwt(user)
+              refresh_token = Spree::RefreshToken.create_for(user, request_env: {
+                ip_address: request.remote_ip,
+                user_agent: request.user_agent&.truncate(255)
+              })
               render json: {
-                token: token,
+                token: generate_jwt(user),
+                refresh_token: refresh_token.token,
                 user: user_serializer.new(user, params: serializer_params).to_h
               }, status: :created
             else

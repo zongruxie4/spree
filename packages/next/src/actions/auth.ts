@@ -3,7 +3,7 @@
 import { revalidateTag } from 'next/cache';
 import type { Customer } from '@spree/sdk';
 import { getClient } from '../config';
-import { setAccessToken, clearAccessToken, getAccessToken, getCartToken, getCartId, clearCartCookies } from '../cookies';
+import { setAccessToken, clearAccessToken, getAccessToken, setRefreshToken, getRefreshToken, clearRefreshToken, getCartToken, getCartId, clearCartCookies } from '../cookies';
 import { withAuthRefresh } from '../auth-helpers';
 
 /**
@@ -17,6 +17,7 @@ export async function login(
   try {
     const result = await getClient().auth.login({ email, password });
     await setAccessToken(result.token);
+    await setRefreshToken(result.refresh_token);
 
     // Associate guest cart if one exists
     const cartToken = await getCartToken();
@@ -62,6 +63,7 @@ export async function register(
   try {
     const result = await getClient().customers.create(params);
     await setAccessToken(result.token);
+    await setRefreshToken(result.refresh_token);
 
     // Associate guest cart
     const cartToken = await getCartToken();
@@ -94,7 +96,18 @@ export async function register(
  * from seeing/modifying the previous user's cart.
  */
 export async function logout(): Promise<void> {
+  // Revoke refresh token server-side
+  const refreshToken = await getRefreshToken();
+  if (refreshToken) {
+    try {
+      await getClient().auth.logout({ refresh_token: refreshToken });
+    } catch {
+      // Non-fatal — token may already be expired/revoked
+    }
+  }
+
   await clearAccessToken();
+  await clearRefreshToken();
   await clearCartCookies();
   revalidateTag('customer');
   revalidateTag('cart');
@@ -115,6 +128,7 @@ export async function getCustomer(): Promise<Customer | null> {
     });
   } catch {
     await clearAccessToken();
+    await clearRefreshToken();
     return null;
   }
 }
@@ -152,6 +166,7 @@ export async function resetPassword(
       password_confirmation,
     });
     await setAccessToken(result.token);
+    await setRefreshToken(result.refresh_token);
     revalidateTag('customer');
     revalidateTag('cart');
     return { success: true };

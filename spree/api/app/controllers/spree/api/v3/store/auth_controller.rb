@@ -7,9 +7,9 @@ module Spree
           rate_limit to: Spree::Api::Config[:rate_limit_login], within: Spree::Api::Config[:rate_limit_window].seconds, store: Rails.cache, only: :create, with: RATE_LIMIT_RESPONSE
           rate_limit to: Spree::Api::Config[:rate_limit_refresh], within: Spree::Api::Config[:rate_limit_window].seconds, store: Rails.cache, only: :refresh, with: RATE_LIMIT_RESPONSE
           rate_limit to: Spree::Api::Config[:rate_limit_oauth], within: Spree::Api::Config[:rate_limit_window].seconds, store: Rails.cache, only: :oauth_callback, with: RATE_LIMIT_RESPONSE
+          rate_limit to: Spree::Api::Config[:rate_limit_refresh], within: Spree::Api::Config[:rate_limit_window].seconds, store: Rails.cache, only: :logout, with: RATE_LIMIT_RESPONSE
 
-          skip_before_action :authenticate_user, only: [:create, :oauth_callback]
-          prepend_before_action :require_authentication!, only: [:refresh]
+          skip_before_action :authenticate_user, only: [:create, :refresh, :oauth_callback]
 
           # POST  /api/v3/store/auth/login
           # Supports multiple authentication providers via :provider param
@@ -23,11 +23,7 @@ module Spree
 
             if result.success?
               user = result.value
-              token = generate_jwt(user)
-              render json: {
-                token: token,
-                user: user_serializer.new(user, params: serializer_params).to_h
-              }
+              render json: auth_response(user)
             else
               render_error(
                 code: ERROR_CODES[:authentication_failed],
@@ -38,21 +34,55 @@ module Spree
           end
 
           # POST  /api/v3/store/auth/refresh
+          # Accepts: { "refresh_token": "rt_xxx" }
+          # Returns new access JWT + rotated refresh token
           def refresh
-            token = generate_jwt(current_user)
+            refresh_token_value = params[:refresh_token]
+
+            if refresh_token_value.blank?
+              return render_error(
+                code: ERROR_CODES[:invalid_refresh_token],
+                message: 'refresh_token is required',
+                status: :unauthorized
+              )
+            end
+
+            refresh_token = Spree::RefreshToken.active.find_by(token: refresh_token_value)
+
+            if refresh_token.nil?
+              return render_error(
+                code: ERROR_CODES[:invalid_refresh_token],
+                message: 'Invalid or expired refresh token',
+                status: :unauthorized
+              )
+            end
+
+            user = refresh_token.user
+            new_refresh_token = refresh_token.rotate!(request_env: request_env_for_token)
+
             render json: {
-              token: token,
-              user: user_serializer.new(current_user, params: serializer_params).to_h
+              token: generate_jwt(user),
+              refresh_token: new_refresh_token.token,
+              user: user_serializer.new(user, params: serializer_params).to_h
             }
+          end
+
+          # POST  /api/v3/store/auth/logout
+          # Accepts: { "refresh_token": "rt_xxx" }
+          # Revokes the refresh token
+          def logout
+            refresh_token_value = params[:refresh_token]
+
+            if refresh_token_value.present?
+              Spree::RefreshToken.find_by(token: refresh_token_value)&.destroy
+            end
+
+            head :no_content
           end
 
           # POST  /api/v3/store/auth/oauth/callback
           # OAuth callback endpoint for server-side OAuth flows
           def oauth_callback
-            # This endpoint is designed for OAuth flows where the server
-            # exchanges the authorization code for an access token
-            # For client-side flows, use the regular /login endpoint with id_token
-
             strategy = authentication_strategy
             return unless strategy # Error already rendered by determine_strategy
 
@@ -60,11 +90,7 @@ module Spree
 
             if result.success?
               user = result.value
-              token = generate_jwt(user)
-              render json: {
-                token: token,
-                user: user_serializer.new(user, params: serializer_params).to_h
-              }
+              render json: auth_response(user)
             else
               render_error(
                 code: ERROR_CODES[:authentication_failed],
@@ -87,6 +113,23 @@ module Spree
           end
 
           private
+
+          def auth_response(user)
+            refresh_token = Spree::RefreshToken.create_for(user, request_env: request_env_for_token)
+
+            {
+              token: generate_jwt(user),
+              refresh_token: refresh_token.token,
+              user: user_serializer.new(user, params: serializer_params).to_h
+            }
+          end
+
+          def request_env_for_token
+            {
+              ip_address: request.remote_ip,
+              user_agent: request.user_agent&.truncate(255)
+            }
+          end
 
           def authentication_strategy
             strategy_class = determine_strategy

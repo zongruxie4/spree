@@ -12,6 +12,7 @@ module Spree
           access_denied: 'access_denied',
           invalid_token: 'invalid_token',
           invalid_provider: 'invalid_provider',
+          invalid_refresh_token: 'invalid_refresh_token',
           current_password_invalid: 'current_password_invalid',
           password_reset_token_invalid: 'password_reset_token_invalid',
           redirect_url_not_allowed: 'redirect_url_not_allowed',

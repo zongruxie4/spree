@@ -1,3 +1,44 @@
+## 2026-03-17: Rename StockItem → StockLevel
+`Spree::StockItem` → `Spree::StockLevel`, `spree_stock_items` → `spree_stock_levels`.
+Prefix ID: `si_` → `sl_`.
+
+Every other platform uses "level" for this concept — Shopify (`InventoryLevel`),
+Medusa (`InventoryLevel`), Vendure (`StockLevel`), Saleor (`Stock`). "Item" sounds
+like a physical object; "level" correctly describes "the quantity of a variant at
+a location."
+
+Part of the 6.0 model rename wave. Includes renaming the FK columns
+(`stock_item_id` → `stock_level_id`) on StockMovement, StockReservation, and
+any other referencing tables.
+
+## 2026-03-16: Rename user_id → customer_id on customer-facing models
+As part of the User → Customer rename (6.0-platform-auth.md), rename `user_id`
+foreign key columns to `customer_id` on all models where the FK references a
+storefront customer (not an admin user).
+
+**Rename to `customer_id`** (11 models — FK references Spree.customer_class):
+- `spree_orders.user_id` → `customer_id`
+- `spree_addresses.user_id` → `customer_id`
+- `spree_credit_cards.user_id` → `customer_id`
+- `spree_store_credits.user_id` → `customer_id`
+- `spree_wishlists.user_id` → `customer_id`
+- `spree_gift_cards.user_id` → `customer_id`
+- `spree_gateway_customers.user_id` → `customer_id`
+- `spree_payment_sources.user_id` → `customer_id`
+- `spree_newsletter_subscribers.user_id` → `customer_id`
+- `spree_promotion_rule_users.user_id` → `customer_id`
+- `spree_customer_group_users.user_id` → `customer_id`
+
+**Keep as `user_id`** (5 models — FK references Spree.admin_user_class or is polymorphic):
+- `spree_imports.user_id` — admin who ran the import
+- `spree_exports.user_id` — admin who ran the export
+- `spree_reports.user_id` — admin who generated the report
+- `spree_state_changes.user_id` — admin who triggered the change
+- `spree_user_identities.user_id` — polymorphic (Customer or AdminUser)
+
+Single migration renames all 11 columns. Model associations updated:
+`belongs_to :user` → `belongs_to :customer` with `class_name: Spree.customer_class`.
+
 ## 2026-03-16: PaymentMethod and DeliveryMethod become SingleStoreResource
 Both PaymentMethod and DeliveryMethod (renamed from ShippingMethod) switch from
 multi-store join tables (`StorePaymentMethod`, `StoreShippingMethod`) to

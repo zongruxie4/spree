@@ -23,6 +23,7 @@ Current plans:
 - `6.0-fulfillment-and-delivery.md` — Shipment→Fulfillment, ShippingMethod→DeliveryMethod, drop ShippingCategory, FulfillmentProvider strategy
 - `6.0-returns-exchanges-claims.md` — First-class Return, Exchange, Claim models replacing ReturnAuthorization/Reimbursement chain
 - `6.0-channels-catalogs-b2b.md` — Channel, Catalog, ProductListing (replaces StoreProduct), Company/CompanyLocation/CompanyContact for B2B
+- `6.0-platform-auth.md` — Drop Devise, own auth stack, User→Customer/Staff rename
 - `5.x-store-api-bridges.md` — Bridge 6.0 naming into 5.5 Store API (fulfillments, delivery, status, remove master_variant)
 
 ## Monorepo Structure

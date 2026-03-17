@@ -1,5 +1,40 @@
 # @spree/next
 
+## 0.13.0
+
+### Minor Changes
+
+- ### Breaking: Shipping → Delivery/Fulfillment naming
+
+  Renamed server actions to match SDK 0.12.0 naming:
+
+  - `getShipments()` → `getFulfillments()`
+  - `selectShippingRate(shipmentId, rateId)` → `selectDeliveryRate(fulfillmentId, rateId)`
+
+  ### Updated type re-exports
+
+  - `Shipment` → `Fulfillment`
+  - `ShippingRate` → `DeliveryRate`
+
+- ### Refresh token support
+
+  - New `_spree_refresh_token` cookie — stored alongside JWT on login/register/password reset
+  - `withAuthRefresh()` now uses refresh tokens for 401 recovery instead of re-sending the expired JWT
+  - Proactive token refresh triggers at 5 minutes before expiry (was 1 hour)
+  - `logout()` now revokes the refresh token server-side before clearing cookies
+  - `login()`, `register()`, `resetPassword()` automatically save the refresh token cookie
+
+### Patch Changes
+
+- Allow `getCart()` to accept an optional `explicitCartId` parameter. When provided, fetches that specific cart directly by ID instead of reading from cookies. Needed for the confirm-payment flow where the cart ID is known from the URL but cookies may have been cleared.
+
+## 1.0.0
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @spree/sdk@0.13.0
+
 ## 0.12.0
 
 ### Minor Changes

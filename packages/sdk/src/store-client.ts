@@ -67,10 +67,18 @@ export class StoreClient {
       this.request<AuthTokens>('POST', '/auth/login', { body: credentials }),
 
     /**
-     * Refresh access token (requires valid Bearer token)
+     * Refresh access token using a refresh token.
+     * Returns new access JWT + rotated refresh token.
+     * No Authorization header needed — uses refresh_token in body.
      */
-    refresh: (options: RequestOptions): Promise<AuthTokens> =>
-      this.request<AuthTokens>('POST', '/auth/refresh', options),
+    refresh: (params: { refresh_token: string }, options?: RequestOptions): Promise<AuthTokens> =>
+      this.request<AuthTokens>('POST', '/auth/refresh', { ...options, body: params }),
+
+    /**
+     * Logout — revokes the refresh token.
+     */
+    logout: (params: { refresh_token: string }, options?: RequestOptions): Promise<void> =>
+      this.request<void>('POST', '/auth/logout', { ...options, body: params }),
   };
 
   // ============================================

@@ -11,6 +11,7 @@ module Spree
 
       preference :jwt_expiration, :integer, default: 3600 # 1 hour in seconds
       preference :jwt_secret_key, :string, default: nil
+      preference :refresh_token_expiry, :integer, default: 2_592_000 # 30 days in seconds
 
       # Rate limiting
       preference :rate_limit_per_key, :integer, default: 300 # per publishable API key

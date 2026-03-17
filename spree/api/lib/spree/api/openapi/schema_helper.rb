@@ -81,9 +81,10 @@ module Spree
               type: :object,
               properties: {
                 token: { type: :string, description: 'JWT access token' },
+                refresh_token: { type: :string, description: 'Refresh token for obtaining new access tokens' },
                 user: { '$ref' => '#/components/schemas/Customer' }
               },
-              required: %w[token user]
+              required: %w[token refresh_token user]
             },
             CheckoutRequirement: {
               type: :object,
