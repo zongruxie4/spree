@@ -48,7 +48,6 @@ test_app
 .ruby-gemset
 **/.bundle
 **/vendor/bundle
-server/db/migrate
 .ignore
 TODO
 brakeman-*.*

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_16_114857) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_17_150033) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
@@ -136,11 +136,20 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_16_114857) do
   end
 
   create_table "spree_admin_users", force: :cascade do |t|
+    t.datetime "confirmation_sent_at"
+    t.string "confirmation_token"
+    t.datetime "confirmed_at"
     t.datetime "created_at", null: false
+    t.datetime "current_sign_in_at"
+    t.string "current_sign_in_ip"
     t.string "email", default: "", null: false
     t.string "encrypted_password", default: "", null: false
+    t.integer "failed_attempts", default: 0, null: false
     t.string "first_name"
     t.string "last_name"
+    t.datetime "last_sign_in_at"
+    t.string "last_sign_in_ip"
+    t.datetime "locked_at"
     t.string "login"
     t.jsonb "private_metadata"
     t.jsonb "public_metadata"
@@ -148,9 +157,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_16_114857) do
     t.datetime "reset_password_sent_at"
     t.string "reset_password_token"
     t.string "selected_locale"
+    t.integer "sign_in_count", default: 0, null: false
+    t.string "unconfirmed_email"
+    t.string "unlock_token"
     t.datetime "updated_at", null: false
+    t.index ["confirmation_token"], name: "index_spree_admin_users_on_confirmation_token", unique: true
     t.index ["email"], name: "index_spree_admin_users_on_email", unique: true
     t.index ["reset_password_token"], name: "index_spree_admin_users_on_reset_password_token", unique: true
+    t.index ["unlock_token"], name: "index_spree_admin_users_on_unlock_token", unique: true
   end
 
   create_table "spree_allowed_origins", force: :cascade do |t|
@@ -1199,6 +1213,21 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_16_114857) do
     t.jsonb "private_metadata"
     t.jsonb "public_metadata"
     t.datetime "updated_at", null: false
+  end
+
+  create_table "spree_refresh_tokens", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.datetime "expires_at", null: false
+    t.string "ip_address"
+    t.string "token", null: false
+    t.datetime "updated_at", null: false
+    t.string "user_agent"
+    t.bigint "user_id", null: false
+    t.string "user_type", null: false
+    t.index ["expires_at"], name: "index_spree_refresh_tokens_on_expires_at"
+    t.index ["token"], name: "index_spree_refresh_tokens_on_token", unique: true
+    t.index ["user_type", "user_id"], name: "idx_refresh_tokens_user"
+    t.index ["user_type", "user_id"], name: "index_spree_refresh_tokens_on_user"
   end
 
   create_table "spree_refund_reasons", force: :cascade do |t|
