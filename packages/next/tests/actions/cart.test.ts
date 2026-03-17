@@ -16,7 +16,7 @@ const mockClient = {
       update: vi.fn(),
       delete: vi.fn(),
     },
-    shipments: {
+    fulfillments: {
       list: vi.fn(),
       update: vi.fn(),
     },
@@ -33,7 +33,7 @@ vi.mock('@spree/sdk', () => ({
 
 import {
   getCart, getOrCreateCart, addItem, updateItem, removeItem, clearCart, associateCart,
-  updateCart, getShipments, selectShippingRate, applyCoupon, removeCoupon, complete,
+  updateCart, getFulfillments, selectDeliveryRate, applyCoupon, removeCoupon, complete,
 } from '../../src/actions/cart';
 import { revalidateTag } from 'next/cache';
 
@@ -253,41 +253,41 @@ describe('cart actions', () => {
     });
   });
 
-  describe('getShipments', () => {
-    it('returns shipments for the cart', async () => {
-      const mockShipments = { data: [{ id: 's1', shipping_rates: [] }] };
+  describe('getFulfillments', () => {
+    it('returns fulfillments for the cart', async () => {
+      const mockFulfillments = { data: [{ id: 'ful_1', delivery_rates: [] }] };
       mockCookies({
         '_spree_cart_token': 'order_token',
         '_spree_cart_token_id': 'cart_1',
         '_spree_jwt': 'jwt_token',
       });
-      mockClient.carts.shipments.list.mockResolvedValue(mockShipments);
+      mockClient.carts.fulfillments.list.mockResolvedValue(mockFulfillments);
 
-      const result = await getShipments();
-      expect(result).toEqual(mockShipments);
-      expect(mockClient.carts.shipments.list).toHaveBeenCalledWith(
+      const result = await getFulfillments();
+      expect(result).toEqual(mockFulfillments);
+      expect(mockClient.carts.fulfillments.list).toHaveBeenCalledWith(
         'cart_1',
         { spreeToken: 'order_token', token: 'jwt_token' }
       );
     });
   });
 
-  describe('selectShippingRate', () => {
-    it('selects shipping rate and revalidates', async () => {
-      const updatedCart = { id: 'cart_1', ship_total: '10.0' };
+  describe('selectDeliveryRate', () => {
+    it('selects delivery rate and revalidates', async () => {
+      const updatedCart = { id: 'cart_1', delivery_total: '10.0' };
       mockCookies({
         '_spree_cart_token': 'order_token',
         '_spree_cart_token_id': 'cart_1',
         '_spree_jwt': 'jwt_token',
       });
-      mockClient.carts.shipments.update.mockResolvedValue(updatedCart);
+      mockClient.carts.fulfillments.update.mockResolvedValue(updatedCart);
 
-      const result = await selectShippingRate('s1', 'sr1');
+      const result = await selectDeliveryRate('ful_1', 'dr_1');
       expect(result).toEqual(updatedCart);
-      expect(mockClient.carts.shipments.update).toHaveBeenCalledWith(
+      expect(mockClient.carts.fulfillments.update).toHaveBeenCalledWith(
         'cart_1',
-        's1',
-        { selected_shipping_rate_id: 'sr1' },
+        'ful_1',
+        { selected_delivery_rate_id: 'dr_1' },
         { spreeToken: 'order_token', token: 'jwt_token' }
       );
       expect(revalidateTag).toHaveBeenCalledWith('checkout');

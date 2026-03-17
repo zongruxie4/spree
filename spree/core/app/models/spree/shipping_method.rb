@@ -1,6 +1,6 @@
 module Spree
   class ShippingMethod < Spree.base_class
-    has_prefix_id :shpm  # Spree-specific: shipping method
+    has_prefix_id :dm
 
     acts_as_paranoid
     include Spree::CalculatedAdjustments

@@ -62,7 +62,7 @@ const order = await client.orders.get('or_abc123', {}, { token });
 // Monetary fields are strings
 order.total;         // "129.99"
 order.item_total;    // "99.99"
-order.ship_total;    // "10.00"
+order.delivery_total;    // "10.00"
 order.tax_total;     // "20.00"
 
 // Display fields include currency formatting
@@ -72,7 +72,7 @@ order.display_total; // "$129.99"
 const total = parseFloat(order.total);
 ```
 
-This applies to all monetary fields across all types: `StoreOrder`, `StoreLineItem`, `StoreShipment`, `StorePayment`, `StoreGiftCard`, `StorePrice`, etc.
+This applies to all monetary fields across all types: `Order`, `LineItem`, `Fulfillment`, `Payment`, `GiftCard`, `Price`, etc.
 
 ## TypeScript Support
 
@@ -80,68 +80,79 @@ The SDK includes full TypeScript support with generated types from the API seria
 
 ```typescript
 import type {
-  StoreProduct,
-  StoreOrder,
-  StoreVariant,
-  StoreCategory,
-  StoreLineItem,
-  StoreAddress,
-  StoreCustomer,
+  Product,
+  Order,
+  Cart,
+  Variant,
+  Category,
+  LineItem,
+  Address,
+  Customer,
   PaginatedResponse,
 } from '@spree/sdk';
 
 // All responses are fully typed
-const products: PaginatedResponse<StoreProduct> = await client.products.list();
-const category: StoreCategory = await client.categories.get('clothing');
+const products: PaginatedResponse<Product> = await client.products.list();
+const category: Category = await client.categories.get('clothing');
 ```
 
 ## Available Types
 
+All types are exported as unprefixed names (e.g., `Product`, `Order`). Legacy `Store*` prefixed aliases (e.g., `StoreProduct`) are still available for backward compatibility.
+
 ### Core Types
-- `StoreProduct` - Product data
-- `StoreVariant` - Variant data
-- `StoreOrder` - Order/cart data
-- `StoreLineItem` - Line item in cart
-- `StoreCategory` - Category
-- `StoreCountry` - Country with states
-- `StoreState` - State/province
-- `StoreAddress` - Customer address
-- `StoreCustomer` - Customer profile
+- `Product` - Product data
+- `Variant` - Variant data
+- `Cart` - Cart data (uses `cart_` prefixed IDs)
+- `Order` - Completed order data (uses `or_` prefixed IDs)
+- `LineItem` - Line item in cart
+- `Category` - Category
+- `Country` - Country with states
+- `State` - State/province
+- `Address` - Customer address
+- `Customer` - Customer profile
+- `Market` - Market configuration (currency, locales, countries)
 
 ### Commerce Types
-- `StorePayment` - Payment record
-- `StorePaymentMethod` - Payment method
-- `StorePaymentSession` - Provider-agnostic payment session
-- `StoreShipment` - Shipment record
-- `StoreShippingRate` - Shipping rate option
-- `StoreShippingMethod` - Shipping method
-- `StoreCreditCard` - Saved credit card
-- `StoreGiftCard` - Gift card
+- `Payment` - Payment record
+- `PaymentMethod` - Payment method
+- `PaymentSession` - Provider-agnostic payment session
+- `Fulfillment` - Fulfillment record
+- `DeliveryRate` - Delivery rate option
+- `DeliveryMethod` - Delivery method
+- `CreditCard` - Saved credit card
+- `GiftCard` - Gift card
+- `CartPromotion` - Promotion applied to a cart
+- `OrderPromotion` - Promotion applied to an order
 
 ### Product Types
-- `StoreImage` - Product image
-- `StorePrice` - Price data
-- `StoreOptionType` - Option type (e.g., Size, Color)
-- `StoreOptionValue` - Option value (e.g., Small, Red)
-- `StoreDigitalLink` - Digital download link
+- `Media` - Product media (images, videos)
+- `Price` - Price data
+- `OptionType` - Option type (e.g., Size, Color)
+- `OptionValue` - Option value (e.g., Small, Red)
+- `DigitalLink` - Digital download link
+- `Metafield` - Custom metafield data
 
 ### Wishlist Types
-- `StoreWishlist` - Wishlist
-- `StoreWishedItem` - Wishlist item
+- `Wishlist` - Wishlist
+- `WishedItem` - Wishlist item
 
 ### Client Types
-- `SpreeClient` - Main client class
-- `StoreClient` - Store API client
-- `AdminClient` - Admin API client
-- `SpreeClientConfig` - Client configuration
+- `Client` - Main client interface
+- `StoreClient` - Store API client class
+- `ClientConfig` - Client configuration
 - `RequestOptions` - Per-request options
 - `RetryConfig` - Retry behavior configuration
 
 ### Utility Types
 - `PaginatedResponse<T>` - Paginated API response
+- `ListResponse<T>` - List API response
 - `AuthTokens` - JWT tokens from login
 - `AddressParams` - Address input parameters
+- `UpdateCartParams` - Cart update parameters
+- `CreatePaymentParams` - Direct payment creation parameters
 - `CreatePaymentSessionParams` - Payment session creation parameters
 - `UpdatePaymentSessionParams` - Payment session update parameters
 - `CompletePaymentSessionParams` - Payment session completion parameters
 - `ProductFiltersResponse` - Product filters response
+- `CheckoutRequirement` - Checkout requirement (`{ step, field, message }`)

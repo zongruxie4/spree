@@ -40,7 +40,7 @@ RSpec.describe 'Gift Cards API', type: :request, swagger_doc: 'api-reference/sto
         run_test! do |response|
           data = JSON.parse(response.body)
           expect(data['data']).to be_an(Array)
-          expect(data['data'].first).to include('id', 'code', 'amount', 'state')
+          expect(data['data'].first).to include('id', 'code', 'amount', 'status')
         end
       end
 

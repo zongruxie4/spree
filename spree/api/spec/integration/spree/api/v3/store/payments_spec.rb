@@ -84,7 +84,7 @@ RSpec.describe 'Cart Payments API', type: :request, swagger_doc: 'api-reference/
 
         run_test! do |response|
           data = JSON.parse(response.body)
-          expect(data['state']).to eq('checkout')
+          expect(data['status']).to eq('checkout')
           expect(data['payment_method_id']).to eq(check_method.prefixed_id)
         end
       end

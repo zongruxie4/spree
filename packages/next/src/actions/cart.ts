@@ -1,7 +1,7 @@
 'use server';
 
 import { revalidateTag } from 'next/cache';
-import type { Cart, Order, Shipment, CreateCartParams, UpdateCartParams, ListResponse } from '@spree/sdk';
+import type { Cart, Order, Fulfillment, CreateCartParams, UpdateCartParams, ListResponse } from '@spree/sdk';
 import { getClient } from '../config';
 import {
   getCartToken, getCartId,
@@ -169,28 +169,28 @@ export async function updateCart(
 }
 
 /**
- * Get shipments with shipping rates for the current cart.
+ * Get fulfillments with delivery rates for the current cart.
  */
-export async function getShipments(): Promise<ListResponse<Shipment>> {
+export async function getFulfillments(): Promise<ListResponse<Fulfillment>> {
   const options = await getCartOptions();
   const cartId = await requireCartId();
-  return getClient().carts.shipments.list(cartId, options);
+  return getClient().carts.fulfillments.list(cartId, options);
 }
 
 /**
- * Select a shipping rate for a shipment.
+ * Select a delivery rate for a fulfillment.
  * Returns the updated cart with recalculated totals.
  */
-export async function selectShippingRate(
-  shipmentId: string,
-  shippingRateId: string
+export async function selectDeliveryRate(
+  fulfillmentId: string,
+  deliveryRateId: string
 ): Promise<Cart> {
   const options = await getCartOptions();
   const cartId = await requireCartId();
-  const result = await getClient().carts.shipments.update(
+  const result = await getClient().carts.fulfillments.update(
     cartId,
-    shipmentId,
-    { selected_shipping_rate_id: shippingRateId },
+    fulfillmentId,
+    { selected_delivery_rate_id: deliveryRateId },
     options
   );
   revalidateTag('checkout');

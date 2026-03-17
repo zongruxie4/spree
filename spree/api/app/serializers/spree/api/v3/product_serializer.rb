@@ -85,11 +85,6 @@ module Spree
             resource: Spree.api.variant_serializer,
             if: proc { expand?('default_variant') }
 
-        one :master,
-            key: :master_variant,
-            resource: Spree.api.variant_serializer,
-            if: proc { expand?('master_variant') }
-
         many :option_types,
              resource: Spree.api.option_type_serializer,
              if: proc { expand?('option_types') }

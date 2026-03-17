@@ -27,7 +27,7 @@ RSpec.describe Spree::Api::V3::Store::Customer::GiftCardsController, type: :cont
       expect(card_data).to include(
         'id',
         'code',
-        'state',
+        'status',
         'amount',
         'amount_used',
         'amount_remaining',
@@ -99,7 +99,7 @@ RSpec.describe Spree::Api::V3::Store::Customer::GiftCardsController, type: :cont
         expired_data = json_response['data'].find { |c| c['id'] == expired_card.prefixed_id }
         expect(expired_data['expired']).to be true
         expect(expired_data['active']).to be false
-        expect(expired_data['state']).to eq('expired')
+        expect(expired_data['status']).to eq('expired')
       end
     end
 
@@ -110,7 +110,7 @@ RSpec.describe Spree::Api::V3::Store::Customer::GiftCardsController, type: :cont
         get :index
 
         partial_data = json_response['data'].find { |c| c['id'] == partial_card.prefixed_id }
-        expect(partial_data['state']).to eq('partially_redeemed')
+        expect(partial_data['status']).to eq('partially_redeemed')
         expect(partial_data['amount_remaining']).to eq('30.0')
       end
     end

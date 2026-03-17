@@ -4,7 +4,7 @@ import { z } from 'zod';
 export const GiftCardSchema = z.object({
   id: z.string(),
   code: z.string(),
-  state: z.string(),
+  status: z.string(),
   currency: z.string(),
   amount: z.string(),
   amount_used: z.string(),

@@ -144,8 +144,8 @@ All checkout functions operate on the current cart implicitly (via the cart cook
 import {
   getCheckout,
   updateCheckout,
-  getShipments,
-  selectShippingRate,
+  getFulfillments,
+  selectDeliveryRate,
   applyCoupon,
   removeCoupon,
   complete,
@@ -153,8 +153,8 @@ import {
 
 const checkout = await getCheckout();
 await updateCheckout({ ship_address: { ... }, bill_address: { ... } });
-const shipments = await getShipments();
-await selectShippingRate(shipmentId, rateId);
+const fulfillments = await getFulfillments();
+await selectDeliveryRate(fulfillmentId, rateId);
 await applyCoupon('SAVE20');
 await removeCoupon('SAVE20');
 await complete();

@@ -8,7 +8,7 @@ export const NewsletterSubscriberSchema = z.object({
   updated_at: z.string(),
   verified: z.boolean(),
   verified_at: z.string().nullable(),
-  user_id: z.string().nullable(),
+  customer_id: z.string().nullable(),
 });
 
 export type NewsletterSubscriber = z.infer<typeof NewsletterSubscriberSchema>;

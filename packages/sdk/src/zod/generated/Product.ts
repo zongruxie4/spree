@@ -31,7 +31,6 @@ export const ProductSchema = z.object({
   media: z.array(MediaSchema).optional(),
   variants: z.array(VariantSchema).optional(),
   default_variant: VariantSchema.optional(),
-  master_variant: VariantSchema.optional(),
   option_types: z.array(OptionTypeSchema).optional(),
   categories: z.array(z.lazy(() => CategorySchema)).optional(),
   metafields: z.array(MetafieldSchema).optional(),

@@ -2,7 +2,7 @@ require 'ostruct'
 
 module Spree
   class Shipment < Spree.base_class
-    has_prefix_id :ship  # Spree-specific: shipment
+    has_prefix_id :ful
 
     include Spree::Core::NumberGenerator.new(prefix: 'H', length: 11)
     include Spree::NumberIdentifier

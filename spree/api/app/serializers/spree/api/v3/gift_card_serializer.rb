@@ -3,7 +3,7 @@ module Spree
     module V3
       class GiftCardSerializer < BaseSerializer
         typelize code: :string,
-                 state: :string,
+                 status: :string,
                  amount: :string,
                  amount_used: :string,
                  amount_authorized: :string,
@@ -21,7 +21,7 @@ module Spree
           gift_card.display_code
         end
 
-        attribute :state do |gift_card|
+        attribute :status do |gift_card|
           gift_card.display_state
         end
 

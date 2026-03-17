@@ -33,8 +33,8 @@ export const fixtures = {
     total: '0.00',
     item_total: '0.00',
     completed_at: '2026-03-01T00:00:00.000Z',
-    shipment_state: 'shipped',
-    payment_state: 'paid',
+    fulfillment_status: 'shipped',
+    payment_status: 'paid',
     items: [],
   },
   lineItem: {
@@ -247,12 +247,12 @@ export const handlers = [
     HttpResponse.json(fixtures.cart)
   ),
 
-  // Carts > Shipments
-  http.get(`${API_PREFIX}/carts/:cartId/shipments`, () =>
+  // Carts > Fulfillments
+  http.get(`${API_PREFIX}/carts/:cartId/fulfillments`, () =>
     HttpResponse.json({ data: [], meta: { count: 0 } })
   ),
 
-  http.patch(`${API_PREFIX}/carts/:cartId/shipments/:id`, () =>
+  http.patch(`${API_PREFIX}/carts/:cartId/fulfillments/:id`, () =>
     HttpResponse.json(fixtures.cart)
   ),
 

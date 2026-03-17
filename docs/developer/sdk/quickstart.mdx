@@ -60,7 +60,7 @@ The SDK uses a resource builder pattern for nested resources:
 | `carts` | `payments` | `list`, `get`, `create` |
 | `carts` | `paymentMethods` | `list` |
 | `carts` | `paymentSessions` | `create`, `get`, `update`, `complete` |
-| `carts` | `shipments` | `list`, `update` |
+| `carts` | `fulfillments` | `list`, `update` |
 | `carts` | `couponCodes` | `apply`, `remove` |
 | `carts` | `storeCredits` | `apply`, `remove` |
 | `customer` | `addresses` | `list`, `get`, `create`, `update`, `delete`, `markAsDefault` |
@@ -75,7 +75,7 @@ The SDK uses a resource builder pattern for nested resources:
 // Nested resources follow the pattern: client.parent.nested.method(parentId, ...)
 await client.carts.items.create(cartId, params, options);
 await client.carts.payments.list(cartId, options);
-await client.carts.shipments.update(cartId, shipmentId, params, options);
+await client.carts.fulfillments.update(cartId, fulfillmentId, params, options);
 await client.customer.addresses.list({}, options);
 await client.categories.products.list(categoryId, params, options);
 await client.wishlists.items.create(wishlistId, params, options);

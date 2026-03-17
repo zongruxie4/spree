@@ -6,7 +6,7 @@ module Spree
       class NewsletterSubscriberSerializer < BaseSerializer
         typelize email: :string, verified: :boolean,
                  verified_at: [:string, nullable: true],
-                 user_id: [:string, nullable: true]
+                 customer_id: [:string, nullable: true]
 
         attributes :email, created_at: :iso8601, updated_at: :iso8601
 
@@ -18,7 +18,7 @@ module Spree
           subscriber.verified_at&.iso8601
         end
 
-        attribute :user_id do |subscriber|
+        attribute :customer_id do |subscriber|
           subscriber.user&.prefixed_id
         end
       end

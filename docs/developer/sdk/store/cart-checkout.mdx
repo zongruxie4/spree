@@ -5,7 +5,7 @@ description: Manage carts, line items, coupons, checkout flow, and completed ord
 
 The Store API is split into two resource groups:
 
-- **Carts** — managing shopping carts, items, coupon codes, checkout flow (addresses, shipping, payments, completion)
+- **Carts** — managing shopping carts, items, coupon codes, checkout flow (addresses, delivery, payments, completion)
 - **Orders** — retrieving completed orders
 
 All cart and checkout endpoints require a `cartId` as the first argument.
@@ -94,17 +94,17 @@ await client.carts.update(cartId, {
 await client.carts.complete(cartId, { spreeToken: cart.token });
 ```
 
-### Shipments
+### Fulfillments
 
 ```typescript
 const options = { spreeToken: cart.token };
 
-// List shipments
-const shipments = await client.carts.shipments.list(cartId, options);
+// List fulfillments
+const fulfillments = await client.carts.fulfillments.list(cartId, options);
 
-// Select a shipping rate
-await client.carts.shipments.update(cartId, shipmentId, {
-  selected_shipping_rate_id: 'rate_xxx',
+// Select a delivery rate
+await client.carts.fulfillments.update(cartId, fulfillmentId, {
+  selected_delivery_rate_id: 'rate_xxx',
 }, options);
 ```
 
@@ -129,7 +129,7 @@ await client.carts.storeCredits.remove(cartId, options);
 
 ```typescript
 const order = await client.orders.get('R123456789', {
-  expand: ['items', 'shipments'],
+  expand: ['items', 'fulfillments'],
 }, { spreeToken: cart.token });
 ```
 

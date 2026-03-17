@@ -2,22 +2,22 @@
 
 require 'swagger_helper'
 
-RSpec.describe 'Cart Shipments API', type: :request, swagger_doc: 'api-reference/store.yaml' do
+RSpec.describe 'Cart Fulfillments API', type: :request, swagger_doc: 'api-reference/store.yaml' do
   include_context 'API v3 Store'
 
   let!(:order) { create(:order_with_line_items, store: store, user: user, state: 'delivery') }
-  let!(:shipment) { order.shipments.first }
+  let!(:fulfillment) { order.shipments.first }
   let(:cart_id) { order.prefixed_id }
 
-  path '/api/v3/store/carts/{cart_id}/shipments' do
-    get 'List shipments' do
+  path '/api/v3/store/carts/{cart_id}/fulfillments' do
+    get 'List fulfillments' do
       tags 'Carts'
       produces 'application/json'
       security [api_key: [], bearer_auth: []]
-      description 'Returns all shipments with shipping rates for the cart.'
+      description 'Returns all fulfillments with delivery rates for the cart.'
 
       sdk_example <<~JS
-        const shipments = await client.carts.shipments.list('cart_abc123', {
+        const fulfillments = await client.carts.fulfillments.list('cart_abc123', {
           bearerToken: '<token>',
         })
       JS
@@ -27,7 +27,7 @@ RSpec.describe 'Cart Shipments API', type: :request, swagger_doc: 'api-reference
       parameter name: :cart_id, in: :path, type: :string, required: true, description: 'Cart prefixed ID (e.g., cart_abc123)'
       parameter name: 'x-spree-token', in: :header, type: :string, required: false, description: 'Order token for guest access'
 
-      response '200', 'shipments found' do
+      response '200', 'fulfillments found' do
         let(:'x-spree-api-key') { api_key.token }
         let(:'Authorization') { "Bearer #{jwt_token}" }
 
@@ -40,17 +40,17 @@ RSpec.describe 'Cart Shipments API', type: :request, swagger_doc: 'api-reference
     end
   end
 
-  path '/api/v3/store/carts/{cart_id}/shipments/{id}' do
-    patch 'Select shipping rate for shipment' do
+  path '/api/v3/store/carts/{cart_id}/fulfillments/{id}' do
+    patch 'Select delivery rate for fulfillment' do
       tags 'Carts'
       consumes 'application/json'
       produces 'application/json'
       security [api_key: [], bearer_auth: []]
-      description 'Selects a shipping rate for a specific shipment and auto-advances checkout.'
+      description 'Selects a delivery rate for a specific fulfillment and auto-advances checkout.'
 
       sdk_example <<~JS
-        const cart = await client.carts.shipments.update('cart_abc123', 'ship_abc123', {
-          selected_shipping_rate_id: 'shpr_abc123',
+        const cart = await client.carts.fulfillments.update('cart_abc123', 'ful_abc123', {
+          selected_delivery_rate_id: 'dr_abc123',
         }, {
           bearerToken: '<token>',
         })
@@ -59,22 +59,22 @@ RSpec.describe 'Cart Shipments API', type: :request, swagger_doc: 'api-reference
       parameter name: 'x-spree-api-key', in: :header, type: :string, required: true
       parameter name: 'Authorization', in: :header, type: :string, required: false
       parameter name: :cart_id, in: :path, type: :string, required: true, description: 'Cart prefixed ID'
-      parameter name: :id, in: :path, type: :string, required: true, description: 'Shipment ID'
+      parameter name: :id, in: :path, type: :string, required: true, description: 'Fulfillment ID'
       parameter name: 'x-spree-token', in: :header, type: :string, required: false, description: 'Order token for guest access'
       parameter name: :body, in: :body, schema: {
         type: :object,
         properties: {
-          selected_shipping_rate_id: { type: :string, example: 'shpr_abc123', description: 'Shipping rate ID to select' }
+          selected_delivery_rate_id: { type: :string, example: 'dr_abc123', description: 'Delivery rate ID to select' }
         },
-        required: %w[selected_shipping_rate_id]
+        required: %w[selected_delivery_rate_id]
       }
 
-      response '200', 'shipping rate selected, returns updated cart' do
-        let(:shipping_rate) { shipment.shipping_rates.first }
+      response '200', 'delivery rate selected, returns updated cart' do
+        let(:delivery_rate) { fulfillment.shipping_rates.first }
         let(:'x-spree-api-key') { api_key.token }
         let(:'Authorization') { "Bearer #{jwt_token}" }
-        let(:id) { shipment.to_param }
-        let(:body) { { selected_shipping_rate_id: shipping_rate.to_param } }
+        let(:id) { fulfillment.to_param }
+        let(:body) { { selected_delivery_rate_id: delivery_rate.to_param } }
 
         schema '$ref' => '#/components/schemas/Cart'
 
@@ -85,11 +85,11 @@ RSpec.describe 'Cart Shipments API', type: :request, swagger_doc: 'api-reference
         end
       end
 
-      response '404', 'shipping rate not found' do
+      response '404', 'delivery rate not found' do
         let(:'x-spree-api-key') { api_key.token }
         let(:'Authorization') { "Bearer #{jwt_token}" }
-        let(:id) { shipment.to_param }
-        let(:body) { { selected_shipping_rate_id: 'shpr_invalid' } }
+        let(:id) { fulfillment.to_param }
+        let(:body) { { selected_delivery_rate_id: 'dr_invalid' } }
 
         schema '$ref' => '#/components/schemas/ErrorResponse'
 

@@ -9,7 +9,7 @@ RSpec.describe Spree::Api::V3::GiftCardSerializer do
 
   it 'includes all expected attributes' do
     expect(subject.keys).to match_array(%w[
-      id code state currency
+      id code status currency
       amount amount_used amount_authorized amount_remaining
       display_amount display_amount_used display_amount_remaining
       expires_at redeemed_at expired active
@@ -42,8 +42,8 @@ RSpec.describe Spree::Api::V3::GiftCardSerializer do
     expect(subject['currency']).to eq(gift_card.currency)
   end
 
-  it 'returns state' do
-    expect(subject['state']).to eq('active')
+  it 'returns status' do
+    expect(subject['status']).to eq('active')
   end
 
   it 'returns active as true for active card' do
@@ -64,8 +64,8 @@ RSpec.describe Spree::Api::V3::GiftCardSerializer do
   context 'with expired gift card' do
     let(:gift_card) { create(:gift_card, :expired, store: store, amount: 50) }
 
-    it 'returns expired state' do
-      expect(subject['state']).to eq('expired')
+    it 'returns expired status' do
+      expect(subject['status']).to eq('expired')
       expect(subject['expired']).to be true
       expect(subject['active']).to be false
     end
@@ -78,8 +78,8 @@ RSpec.describe Spree::Api::V3::GiftCardSerializer do
   context 'with redeemed gift card' do
     let(:gift_card) { create(:gift_card, :redeemed, store: store, amount: 50) }
 
-    it 'returns redeemed state' do
-      expect(subject['state']).to eq('redeemed')
+    it 'returns redeemed status' do
+      expect(subject['status']).to eq('redeemed')
     end
 
     it 'returns redeemed_at as ISO 8601' do
@@ -94,8 +94,8 @@ RSpec.describe Spree::Api::V3::GiftCardSerializer do
   context 'with partially redeemed gift card' do
     let(:gift_card) { create(:gift_card, store: store, state: :partially_redeemed, amount: 100, amount_used: 40) }
 
-    it 'returns partially_redeemed state' do
-      expect(subject['state']).to eq('partially_redeemed')
+    it 'returns partially_redeemed status' do
+      expect(subject['status']).to eq('partially_redeemed')
     end
 
     it 'returns correct remaining amount' do

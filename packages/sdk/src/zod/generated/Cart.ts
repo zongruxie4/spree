@@ -2,10 +2,10 @@
 import { z } from 'zod';
 import { AddressSchema } from './Address';
 import { CartPromotionSchema } from './CartPromotion';
+import { FulfillmentSchema } from './Fulfillment';
 import { LineItemSchema } from './LineItem';
 import { PaymentSchema } from './Payment';
 import { PaymentMethodSchema } from './PaymentMethod';
-import { ShipmentSchema } from './Shipment';
 
 export const CartSchema = z.object({
   id: z.string(),
@@ -18,8 +18,6 @@ export const CartSchema = z.object({
   item_count: z.number(),
   item_total: z.string(),
   display_item_total: z.string(),
-  ship_total: z.string(),
-  display_ship_total: z.string(),
   adjustment_total: z.string(),
   display_adjustment_total: z.string(),
   promo_total: z.string(),
@@ -34,12 +32,14 @@ export const CartSchema = z.object({
   display_total: z.string(),
   created_at: z.string(),
   updated_at: z.string(),
+  delivery_total: z.string(),
+  display_delivery_total: z.string(),
   current_step: z.string(),
   completed_steps: z.array(z.string()),
   requirements: z.array(z.object({ step: z.string(), field: z.string(), message: z.string() })),
   promotions: z.array(CartPromotionSchema),
   items: z.array(LineItemSchema),
-  shipments: z.array(ShipmentSchema),
+  fulfillments: z.array(FulfillmentSchema),
   payments: z.array(PaymentSchema),
   bill_address: AddressSchema.nullable(),
   ship_address: AddressSchema.nullable(),

@@ -11,7 +11,7 @@ RSpec.describe Spree::Api::V3::NewsletterSubscriberSerializer do
 
   it 'includes all expected attributes' do
     expect(subject.keys).to match_array(%w[
-      id email verified verified_at user_id created_at updated_at
+      id email verified verified_at customer_id created_at updated_at
     ])
   end
 

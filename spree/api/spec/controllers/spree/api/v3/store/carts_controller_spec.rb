@@ -404,7 +404,7 @@ RSpec.describe Spree::Api::V3::Store::CartsController, type: :controller do
         get :show, params: { id: cart.prefixed_id }
 
         expect(response).to have_http_status(:ok)
-        expect(json_response['shipments']).to be_present
+        expect(json_response['fulfillments']).to be_present
       end
 
       it 'does not advance when no address is set' do
@@ -415,7 +415,7 @@ RSpec.describe Spree::Api::V3::Store::CartsController, type: :controller do
         get :show, params: { id: cart.prefixed_id }
 
         expect(response).to have_http_status(:ok)
-        expect(json_response['shipments']).to be_empty
+        expect(json_response['fulfillments']).to be_empty
       end
     end
   end

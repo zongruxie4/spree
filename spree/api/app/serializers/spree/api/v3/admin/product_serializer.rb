@@ -32,11 +32,6 @@ module Spree
               resource: Spree.api.admin_variant_serializer,
               if: proc { expand?('default_variant') }
 
-          one :master,
-              key: :master_variant,
-              resource: Spree.api.admin_variant_serializer,
-              if: proc { expand?('master_variant') }
-
           one :primary_media,
               resource: Spree.api.admin_media_serializer,
               if: proc { expand?('primary_media') }

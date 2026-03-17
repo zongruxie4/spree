@@ -265,17 +265,17 @@ await client.carts.couponCodes.apply('cart_xxx', 'SAVE20', options);
 await client.carts.couponCodes.remove('cart_xxx', 'SAVE20', options);
 ```
 
-### Shipments
+### Fulfillments
 
 ```typescript
 const options = { spreeToken: cart.token };
 
-// List shipments for the cart
-const shipments = await client.carts.shipments.list('cart_xxx', options);
+// List fulfillments for the cart
+const fulfillments = await client.carts.fulfillments.list('cart_xxx', options);
 
-// Select a shipping rate
-await client.carts.shipments.update('cart_xxx', shipmentId, {
-  selected_shipping_rate_id: 'rate_xxx',
+// Select a delivery rate
+await client.carts.fulfillments.update('cart_xxx', fulfillmentId, {
+  selected_delivery_rate_id: 'rate_xxx',
 }, options);
 ```
 
@@ -368,7 +368,7 @@ Completed orders can be looked up by ID or number:
 ```typescript
 // Get a completed order by ID or number
 const order = await client.orders.get('R123456789', {
-  expand: ['items', 'shipments'],
+  expand: ['items', 'fulfillments'],
 }, { spreeToken: orderToken });
 ```
 
@@ -382,7 +382,7 @@ const orders = await client.customer.orders.list({}, options);
 
 // Get a specific order from history
 const order = await client.customer.orders.get('or_xxx', {
-  expand: ['items', 'shipments'],
+  expand: ['items', 'fulfillments'],
 }, options);
 ```
 
@@ -558,7 +558,7 @@ The SDK uses a resource builder pattern for nested resources:
 |-----------------|-----------------|-------------------|
 | `carts` | `items` | `create`, `update`, `delete` |
 | `carts` | `couponCodes` | `apply`, `remove` |
-| `carts` | `shipments` | `list`, `update` |
+| `carts` | `fulfillments` | `list`, `update` |
 | `carts` | `paymentMethods` | `list` |
 | `carts` | `payments` | `list`, `get`, `create` |
 | `carts` | `paymentSessions` | `create`, `get`, `update`, `complete` |
@@ -577,7 +577,7 @@ Example:
 // Cart resources take cartId as first argument
 await client.carts.items.create(cartId, params, options);
 await client.carts.couponCodes.apply(cartId, code, options);
-await client.carts.shipments.update(cartId, shipmentId, params, options);
+await client.carts.fulfillments.update(cartId, fulfillmentId, params, options);
 await client.carts.payments.list(cartId, options);
 await client.carts.paymentSessions.create(cartId, params, options);
 await client.carts.storeCredits.apply(cartId, amount, options);
@@ -691,9 +691,9 @@ The SDK exports all Store API types:
 - `StorePayment` - Payment record
 - `StorePaymentMethod` - Payment method
 - `StorePaymentSession` - Provider-agnostic payment session
-- `StoreShipment` - Shipment record
-- `StoreShippingRate` - Shipping rate option
-- `StoreShippingMethod` - Shipping method
+- `StoreFulfillment` - Fulfillment record
+- `StoreDeliveryRate` - Delivery rate option
+- `StoreDeliveryMethod` - Delivery method
 - `StoreCreditCard` - Saved credit card
 - `StoreGiftCard` - Gift card
 - `StoreCartPromotion` - Promotion applied to a cart (uses `cpromo_` prefixed IDs)

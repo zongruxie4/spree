@@ -1,6 +1,6 @@
 module Spree
   class InventoryUnit < Spree.base_class
-    has_prefix_id :iu
+    has_prefix_id :fi
 
     extend Spree::DisplayMoney
 

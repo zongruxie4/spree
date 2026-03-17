@@ -5,7 +5,7 @@ module Spree
       # Customer-facing variant data with limited fields
       class VariantSerializer < BaseSerializer
         typelize product_id: :string, sku: [:string, nullable: true],
-                 is_master: :boolean, options_text: :string, track_inventory: :boolean, media_count: :number,
+                 options_text: :string, track_inventory: :boolean, media_count: :number,
                  thumbnail_url: [:string, nullable: true],
                  purchasable: :boolean, in_stock: :boolean, backorderable: :boolean,
                  weight: [:number, nullable: true], height: [:number, nullable: true], width: [:number, nullable: true], depth: [:number, nullable: true],
@@ -16,7 +16,7 @@ module Spree
           variant.product&.prefixed_id
         end
 
-        attributes :sku, :is_master, :options_text, :track_inventory, :media_count,
+        attributes :sku, :options_text, :track_inventory, :media_count,
                    created_at: :iso8601, updated_at: :iso8601
 
         # Main variant image URL for listings (cached primary_media)

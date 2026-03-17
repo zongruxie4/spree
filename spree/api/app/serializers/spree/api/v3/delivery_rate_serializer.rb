@@ -1,11 +1,11 @@
 module Spree
   module Api
     module V3
-      class ShippingRateSerializer < BaseSerializer
-        typelize name: :string, selected: :boolean, shipping_method_id: :string,
+      class DeliveryRateSerializer < BaseSerializer
+        typelize name: :string, selected: :boolean, delivery_method_id: :string,
                  cost: :string, display_cost: :string
 
-        attribute :shipping_method_id do |shipping_rate|
+        attribute :delivery_method_id do |shipping_rate|
           shipping_rate.shipping_method&.prefixed_id
         end
 
@@ -15,7 +15,7 @@ module Spree
           shipping_rate.display_cost.to_s
         end
 
-        one :shipping_method, resource: Spree.api.shipping_method_serializer
+        one :shipping_method, key: :delivery_method, resource: Spree.api.delivery_method_serializer
       end
     end
   end

@@ -11,7 +11,7 @@ module Spree
                    store_owner_notification_delivered: :boolean,
                    internal_note: [:string, nullable: true], approver_id: [:string, nullable: true],
                    canceler_id: [:string, nullable: true], created_by_id: [:string, nullable: true],
-                   user_id: [:string, nullable: true],
+                   customer_id: [:string, nullable: true],
                    canceled_at: [:string, nullable: true], approved_at: [:string, nullable: true],
                    payment_total: :string, display_payment_total: :string,
                    metadata: 'Record<string, unknown> | null'
@@ -38,14 +38,14 @@ module Spree
             order.created_by&.prefixed_id
           end
 
-          attribute :user_id do |order|
+          attribute :customer_id do |order|
             order.user&.prefixed_id
           end
 
           # Override inherited associations to use admin serializers
           many :order_promotions, key: :promotions, resource: Spree.api.admin_order_promotion_serializer, if: proc { expand?('promotions') }
           many :line_items, key: :items, resource: Spree.api.admin_line_item_serializer, if: proc { expand?('items') }
-          many :shipments, resource: Spree.api.admin_shipment_serializer, if: proc { expand?('shipments') }
+          many :shipments, key: :fulfillments, resource: Spree.api.admin_fulfillment_serializer, if: proc { expand?('fulfillments') }
           many :payments, resource: Spree.api.admin_payment_serializer, if: proc { expand?('payments') }
 
           one :bill_address, resource: Spree.api.admin_address_serializer, if: proc { expand?('bill_address') }
@@ -54,8 +54,9 @@ module Spree
           many :payment_methods, resource: Spree.api.admin_payment_method_serializer, if: proc { expand?('payment_methods') }
 
           one :user,
+              key: :customer,
               resource: Spree.api.admin_customer_serializer,
-              if: proc { expand?('user') }
+              if: proc { expand?('customer') }
 
           one :approver,
               resource: Spree.api.admin_customer_serializer,

@@ -112,17 +112,17 @@ describe('carts', () => {
     });
   });
 
-  describe('shipments', () => {
-    it('lists shipments', async () => {
-      const result = await client.carts.shipments.list('cart_1', opts);
+  describe('fulfillments', () => {
+    it('lists fulfillments', async () => {
+      const result = await client.carts.fulfillments.list('cart_1', opts);
       expect(result.data).toBeDefined();
     });
 
-    it('selects a shipping rate', async () => {
-      const result = await client.carts.shipments.update(
+    it('selects a delivery rate', async () => {
+      const result = await client.carts.fulfillments.update(
         'cart_1',
-        'ship_1',
-        { selected_shipping_rate_id: 'rate_1' },
+        'ful_1',
+        { selected_delivery_rate_id: 'rate_1' },
         opts
       );
       expect(result.id).toBe('cart_1');

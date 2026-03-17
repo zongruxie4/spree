@@ -1,5 +1,21 @@
 # @spree/next
 
+## 0.12.0
+
+### Minor Changes
+
+- ### Breaking: Shipping → Delivery/Fulfillment naming
+
+  Renamed server actions to match SDK 0.12.0 naming:
+
+  - `getShipments()` → `getFulfillments()`
+  - `selectShippingRate(shipmentId, rateId)` → `selectDeliveryRate(fulfillmentId, rateId)`
+
+  ### Updated type re-exports
+
+  - `Shipment` → `Fulfillment`
+  - `ShippingRate` → `DeliveryRate`
+
 ## 0.11.0
 
 ### Minor Changes

@@ -44,10 +44,10 @@ export type {
   Report,
   ReturnAuthorization,
   ReturnItem,
-  Shipment,
+  DeliveryMethod,
+  DeliveryRate,
+  Fulfillment,
   ShippingCategory,
-  ShippingMethod,
-  ShippingRate,
   State,
   StockItem,
   StockLocation,
@@ -96,10 +96,10 @@ export type { Refund as StoreRefund } from './generated';
 export type { Reimbursement as StoreReimbursement } from './generated';
 export type { ReturnAuthorization as StoreReturnAuthorization } from './generated';
 export type { ReturnItem as StoreReturnItem } from './generated';
-export type { Shipment as StoreShipment } from './generated';
+export type { DeliveryMethod as StoreDeliveryMethod } from './generated';
+export type { DeliveryRate as StoreDeliveryRate } from './generated';
+export type { Fulfillment as StoreFulfillment } from './generated';
 export type { ShippingCategory as StoreShippingCategory } from './generated';
-export type { ShippingMethod as StoreShippingMethod } from './generated';
-export type { ShippingRate as StoreShippingRate } from './generated';
 export type { State as StoreState } from './generated';
 export type { StockItem as StoreStockItem } from './generated';
 export type { StockLocation as StoreStockLocation } from './generated';

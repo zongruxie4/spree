@@ -12,7 +12,7 @@ RSpec.describe Spree::Api::V3::PaymentSerializer do
     it 'includes standard attributes' do
       expect(subject).to include(
         'id' => payment.prefixed_id,
-        'state' => 'checkout',
+        'status' => 'checkout',
         'number' => payment.number,
         'response_code' => '12345'
       )

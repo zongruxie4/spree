@@ -4,13 +4,13 @@ module Spree
       module Admin
         class AddressSerializer < V3::AddressSerializer
           typelize label: [:string, nullable: true],
-                   user_id: [:string, nullable: true],
+                   customer_id: [:string, nullable: true],
                    metadata: 'Record<string, unknown> | null'
 
           attributes :label,
                      created_at: :iso8601, updated_at: :iso8601
 
-          attribute :user_id do |address|
+          attribute :customer_id do |address|
             address.user&.prefixed_id
           end
 

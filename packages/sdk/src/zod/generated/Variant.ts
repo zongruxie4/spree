@@ -9,7 +9,6 @@ export const VariantSchema = z.object({
   id: z.string(),
   product_id: z.string(),
   sku: z.string().nullable(),
-  is_master: z.boolean(),
   options_text: z.string(),
   track_inventory: z.boolean(),
   media_count: z.number(),

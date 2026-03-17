@@ -3,11 +3,11 @@ module Spree
     module V3
       module Admin
         class StoreCreditSerializer < V3::StoreCreditSerializer
-          typelize user_id: [:string, nullable: true],
+          typelize customer_id: [:string, nullable: true],
                    created_by_id: [:string, nullable: true],
                    metadata: 'Record<string, unknown> | null'
 
-          attribute :user_id do |store_credit|
+          attribute :customer_id do |store_credit|
             store_credit.user&.prefixed_id
           end
 

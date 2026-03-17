@@ -1,10 +1,10 @@
 // This file is auto-generated. Do not edit directly.
 import { z } from 'zod';
 import { AddressSchema } from './Address';
+import { FulfillmentSchema } from './Fulfillment';
 import { LineItemSchema } from './LineItem';
 import { OrderPromotionSchema } from './OrderPromotion';
 import { PaymentSchema } from './Payment';
-import { ShipmentSchema } from './Shipment';
 
 export const OrderSchema = z.object({
   id: z.string(),
@@ -14,12 +14,8 @@ export const OrderSchema = z.object({
   currency: z.string(),
   locale: z.string().nullable(),
   item_count: z.number(),
-  shipment_state: z.string().nullable(),
-  payment_state: z.string().nullable(),
   item_total: z.string(),
   display_item_total: z.string(),
-  ship_total: z.string(),
-  display_ship_total: z.string(),
   adjustment_total: z.string(),
   display_adjustment_total: z.string(),
   promo_total: z.string(),
@@ -35,9 +31,13 @@ export const OrderSchema = z.object({
   completed_at: z.string().nullable(),
   created_at: z.string(),
   updated_at: z.string(),
+  fulfillment_status: z.string().nullable(),
+  payment_status: z.string().nullable(),
+  delivery_total: z.string(),
+  display_delivery_total: z.string(),
   promotions: z.array(OrderPromotionSchema),
   items: z.array(LineItemSchema),
-  shipments: z.array(ShipmentSchema),
+  fulfillments: z.array(FulfillmentSchema),
   payments: z.array(PaymentSchema),
   bill_address: AddressSchema.nullable(),
   ship_address: AddressSchema.nullable(),

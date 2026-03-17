@@ -2,7 +2,7 @@ module Spree
   module Api
     module V3
       module Admin
-        class ShipmentSerializer < V3::ShipmentSerializer
+        class FulfillmentSerializer < V3::FulfillmentSerializer
           typelize metadata: 'Record<string, unknown> | null',
                    order_id: [:string, nullable: true],
                    stock_location_id: [:string, nullable: true],
@@ -26,9 +26,9 @@ module Spree
           end
 
           # Override inherited associations to use admin serializers
-          one :shipping_method, resource: Spree.api.admin_shipping_method_serializer, if: proc { expand?('shipping_method') }
+          one :shipping_method, key: :delivery_method, resource: Spree.api.admin_delivery_method_serializer, if: proc { expand?('delivery_method') }
           one :stock_location, resource: Spree.api.admin_stock_location_serializer, if: proc { expand?('stock_location') }
-          many :shipping_rates, resource: Spree.api.admin_shipping_rate_serializer, if: proc { expand?('shipping_rates') }
+          many :shipping_rates, key: :delivery_rates, resource: Spree.api.admin_delivery_rate_serializer, if: proc { expand?('delivery_rates') }
 
           one :order,
               resource: Spree.api.admin_order_serializer,

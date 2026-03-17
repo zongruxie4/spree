@@ -1,6 +1,6 @@
 module Spree
   class ShippingRate < Spree.base_class
-    has_prefix_id :shpr  # Spree-specific: shipping rate
+    has_prefix_id :dr
 
     belongs_to :shipment, class_name: 'Spree::Shipment'
     belongs_to :tax_rate, -> { with_deleted }, class_name: 'Spree::TaxRate'

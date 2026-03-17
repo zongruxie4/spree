@@ -8,7 +8,7 @@ module Spree
                  special_instructions: [:string, nullable: true], currency: :string, locale: [:string, nullable: true], item_count: :number,
                  requirements: 'Array<{step: string, field: string, message: string}>',
                  item_total: :string, display_item_total: :string,
-                 ship_total: :string, display_ship_total: :string,
+                 delivery_total: :string, display_delivery_total: :string,
                  adjustment_total: :string, display_adjustment_total: :string,
                  promo_total: :string, display_promo_total: :string,
                  tax_total: :string, display_tax_total: :string,
@@ -24,11 +24,19 @@ module Spree
 
         attributes :number, :token, :email, :special_instructions,
                    :currency, :locale, :item_count,
-                   :item_total, :display_item_total, :ship_total, :display_ship_total,
+                   :item_total, :display_item_total,
                    :adjustment_total, :display_adjustment_total, :promo_total, :display_promo_total,
                    :tax_total, :display_tax_total, :included_tax_total, :display_included_tax_total,
                    :additional_tax_total, :display_additional_tax_total, :total, :display_total,
                    created_at: :iso8601, updated_at: :iso8601
+
+        attribute :delivery_total do |order|
+          order.ship_total
+        end
+
+        attribute :display_delivery_total do |order|
+          order.display_ship_total.to_s
+        end
 
         attribute :current_step do |order|
           order.current_checkout_step
@@ -44,7 +52,7 @@ module Spree
 
         many :cart_promotions, key: :promotions, resource: Spree.api.cart_promotion_serializer
         many :line_items, key: :items, resource: Spree.api.line_item_serializer
-        many :shipments, resource: Spree.api.shipment_serializer
+        many :shipments, key: :fulfillments, resource: Spree.api.fulfillment_serializer
         many :payments, resource: Spree.api.payment_serializer
         one :bill_address, resource: Spree.api.address_serializer
         one :ship_address, resource: Spree.api.address_serializer
