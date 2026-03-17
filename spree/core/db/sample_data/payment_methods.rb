@@ -4,6 +4,7 @@ cc_payment_method = Spree::Gateway::Bogus.where(
   active: true
 ).first_or_initialize
 
+cc_payment_method.display_on = 'back_end'
 cc_payment_method.stores = Spree::Store.all
 cc_payment_method.save!
 
@@ -13,5 +14,6 @@ check_payment_method = Spree::PaymentMethod::Check.where(
   active: true
 ).first_or_initialize
 
+check_payment_method.display_on = 'back_end'
 check_payment_method.stores = Spree::Store.all
 check_payment_method.save!
