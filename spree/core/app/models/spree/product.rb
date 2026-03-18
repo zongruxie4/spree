@@ -34,6 +34,7 @@ module Spree
     include Spree::Metadata
     include Spree::Product::Webhooks
     include Spree::Product::Slugs
+    include Spree::SearchIndexable
     if defined?(Spree::VendorConcern)
       include Spree::VendorConcern
     end
@@ -58,12 +59,6 @@ module Spree
 
     self::Translation.class_eval do
       normalizes :name, :meta_title, with: ->(value) { value&.to_s&.squish&.presence }
-
-      if defined?(PgSearch)
-        include PgSearch::Model
-
-        pg_search_scope :search_by_name, against: { name: 'A', meta_title: 'B' }, using: { trigram: { threshold: 0.3, word_similarity: true } }
-      end
     end
 
     # we need to have this callback before any dependent: :destroy associations
@@ -169,32 +164,15 @@ module Spree
                         where("#{Spree::Price.table_name}.compare_at_amount > #{Spree::Price.table_name}.amount")
                     }
 
-    if defined?(PgSearch)
-      scope :multi_search, lambda { |query, include_options = false|
-        return none if query.blank?
+    scope :search, ->(query) {
+      next none if query.blank?
 
-        product_ids = if Spree.use_translations?
-                        Spree::Product::Translation.search_by_name(query).pluck(:spree_product_id)
-                      else
-                        Spree::Product.search_by_name(query).ids
-                      end
+      product_ids = Spree::Variant.search_by_product_name_or_sku(query).pluck(:product_id)
+      where(id: product_ids.uniq.compact)
+    }
 
-        variant_product_ids = if include_options.present?
-                                Spree::Variant.search_by_sku_or_options(query).pluck(:product_id)
-                              else
-                                Spree::Variant.search_by_sku(query).pluck(:product_id)
-                              end
-
-        where(id: (product_ids + variant_product_ids).uniq.compact)
-      }
-    else
-      scope :multi_search, lambda { |query|
-        return none if query.blank?
-
-        product_ids = Spree::Variant.search_by_product_name_or_sku(query).pluck(:product_id)
-        where(id: product_ids.uniq.compact)
-      }
-    end
+    # Backward compatibility alias — remove in Spree 6.0
+    scope :multi_search, ->(*args) { search(*args) }
 
     scope :archivable, -> { where(status: %w[active draft]) }
     scope :by_source, ->(source) { send(source) }
@@ -224,7 +202,7 @@ module Spree
                                                    shipping_category classifications option_types]
     self.whitelisted_ransackable_scopes = %w[not_discontinued search_by_name in_taxon price_between
                                              price_lte price_gte
-                                             multi_search in_stock out_of_stock with_option_value_ids
+                                             search multi_search in_stock out_of_stock with_option_value_ids
 
                                              ascend_by_price descend_by_price]
 

@@ -103,13 +103,8 @@ module Spree
     #
     # Search
     #
-    if defined?(PgSearch)
-      include PgSearch::Model
-      pg_search_scope :search_by_name, against: :name, using: { tsearch: { any_word: true, prefix: true } }
-    else
-      def self.search_by_name(query)
-        i18n { name.lower.matches("%#{query.downcase}%") }
-      end
+    def self.search_by_name(query)
+      i18n { name.lower.matches("%#{query.downcase}%") }
     end
 
     scope :with_matching_name, lambda { |name_to_match|
