@@ -652,73 +652,74 @@ The SDK includes full TypeScript support with generated types from the API seria
 
 ```typescript
 import type {
-  StoreProduct,
-  StoreCart,
-  StoreOrder,
-  StoreVariant,
-  StoreCategory,
-  StoreLineItem,
-  StoreAddress,
-  StoreCustomer,
+  Product,
+  Cart,
+  Order,
+  Variant,
+  Category,
+  LineItem,
+  Address,
+  Customer,
   PaginatedResponse,
 } from '@spree/sdk';
 
 // All responses are fully typed
-const products: PaginatedResponse<StoreProduct> = await client.products.list();
-const category: StoreCategory = await client.categories.get('clothing');
-const cart: StoreCart = await client.carts.get('cart_xxx');
+const products: PaginatedResponse<Product> = await client.products.list();
+const category: Category = await client.categories.get('clothing');
+const cart: Cart = await client.carts.get('cart_xxx');
 ```
 
 ## Available Types
 
-The SDK exports all Store API types:
+All types are exported as unprefixed names (e.g., `Product`, `Order`). Legacy `Store*` prefixed aliases (e.g., `StoreProduct`) are still available for backward compatibility.
 
 ### Core Types
-- `StoreProduct` - Product data
-- `StoreVariant` - Variant data
-- `StoreCart` - Cart data (uses `cart_` prefixed IDs)
-- `StoreOrder` - Completed order data (uses `or_` prefixed IDs)
-- `StoreLineItem` - Line item in cart
-- `StoreCategory` - Category
-- `StoreCountry` - Country with states
-- `StoreState` - State/province
-- `StoreAddress` - Customer address
-- `StoreCustomer` - Customer profile
-- `StoreMarket` - Market configuration (currency, locales, countries)
-- `StoreStore` - Store configuration
+- `Product` - Product data
+- `Variant` - Variant data
+- `Cart` - Cart data (uses `cart_` prefixed IDs)
+- `Order` - Completed order data (uses `or_` prefixed IDs)
+- `LineItem` - Line item in cart
+- `Category` - Category
+- `Country` - Country with states
+- `State` - State/province
+- `Address` - Customer address
+- `Customer` - Customer profile
+- `Market` - Market configuration (currency, locales, countries)
 
 ### Commerce Types
-- `StorePayment` - Payment record
-- `StorePaymentMethod` - Payment method
-- `StorePaymentSession` - Provider-agnostic payment session
-- `StoreFulfillment` - Fulfillment record
-- `StoreDeliveryRate` - Delivery rate option
-- `StoreDeliveryMethod` - Delivery method
-- `StoreCreditCard` - Saved credit card
-- `StoreGiftCard` - Gift card
-- `StoreCartPromotion` - Promotion applied to a cart (uses `cpromo_` prefixed IDs)
-- `StoreOrderPromotion` - Promotion applied to an order (uses `oprom_` prefixed IDs)
+- `Payment` - Payment record
+- `PaymentMethod` - Payment method
+- `PaymentSession` - Provider-agnostic payment session
+- `Fulfillment` - Fulfillment record
+- `DeliveryRate` - Delivery rate option
+- `DeliveryMethod` - Delivery method
+- `CreditCard` - Saved credit card
+- `GiftCard` - Gift card
+- `CartPromotion` - Promotion applied to a cart (uses `cpromo_` prefixed IDs)
+- `OrderPromotion` - Promotion applied to an order (uses `oprom_` prefixed IDs)
 
 ### Product Types
-- `StoreMedia` - Product media (images, videos)
-- `StorePrice` - Price data
-- `StoreOptionType` - Option type (e.g., Size, Color)
-- `StoreOptionValue` - Option value (e.g., Small, Red)
-- `StoreDigitalLink` - Digital download link
+- `Media` - Product media (images, videos)
+- `Price` - Price data
+- `OptionType` - Option type (e.g., Size, Color)
+- `OptionValue` - Option value (e.g., Small, Red)
+- `DigitalLink` - Digital download link
+- `Metafield` - Custom metafield data
 
 ### Wishlist Types
-- `StoreWishlist` - Wishlist
-- `StoreWishedItem` - Wishlist item
+- `Wishlist` - Wishlist
+- `WishedItem` - Wishlist item
 
 ### Client Types
 - `Client` - Main client interface
-- `StoreClient` - Store API client
+- `StoreClient` - Store API client class
 - `ClientConfig` - Client configuration
 - `RequestOptions` - Per-request options
 - `RetryConfig` - Retry behavior configuration
 
 ### Utility Types
 - `PaginatedResponse<T>` - Paginated API response
+- `ListResponse<T>` - List API response
 - `AuthTokens` - JWT tokens from login
 - `AddressParams` - Address input parameters
 - `UpdateCartParams` - Cart update parameters (email, addresses, etc.)
