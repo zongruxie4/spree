@@ -110,18 +110,31 @@ module Spree
       gift_cards: :default,
       webhooks: :default,
       payment_webhooks: :default,
-      api_keys: :default
+      api_keys: :default,
+      search: :default
     )
   end
 
-  # @deprecated Spree.searcher_class is deprecated and will be removed in Spree 5.5.
+  # @deprecated Spree.searcher_class is deprecated and will be removed in Spree 5.5. Use Spree.search_provider instead.
   def self.searcher_class=(value)
-    Spree::Deprecation.warn('Spree.searcher_class is deprecated and will be removed in Spree 5.5. Please remove it from your initializer.')
+    Spree::Deprecation.warn('Spree.searcher_class is deprecated and will be removed in Spree 5.5. Use Spree.search_provider instead.')
     @@searcher_class = value
   end
 
   def self.searcher_class(constantize: true)
     @@searcher_class
+  end
+
+  # Search provider class name. Controls product search, filtering, and faceted navigation.
+  #
+  #   Spree.search_provider = 'Spree::SearchProvider::Meilisearch'
+  #
+  def self.search_provider
+    @@search_provider ||= 'Spree::SearchProvider::Database'
+  end
+
+  def self.search_provider=(value)
+    @@search_provider = value.to_s
   end
 
   # Returns the events adapter class used for publishing and subscribing to events.
