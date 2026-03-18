@@ -112,7 +112,7 @@ module Spree
       def by_query(products)
         return products unless query?
 
-        products.multi_search(query)
+        products.search(query)
       end
 
       def by_ids(products)

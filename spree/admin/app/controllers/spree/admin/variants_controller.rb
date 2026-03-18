@@ -37,7 +37,7 @@ module Spree
 
           @variants = scope.
                       eligible.
-                      multi_search(query).
+                      search(query).
                       includes(:images, :prices, :stock_items, :stock_locations, :product, option_values: :option_type).
                       limit(params[:limit] || 20).
                       reorder('').

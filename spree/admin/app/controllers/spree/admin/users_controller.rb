@@ -29,7 +29,7 @@ module Spree
         scope = model_class.accessible_by(current_ability, :index)
         scope = scope.where.not(id: params[:omit_ids].split(',')) if params[:omit_ids].present?
         @users = scope.includes(:bill_address, :ship_address, avatar_attachment: :blob)
-                      .multi_search(query)
+                      .search(query)
                       .limit(params[:limit] || 10)
 
         respond_to do |format|

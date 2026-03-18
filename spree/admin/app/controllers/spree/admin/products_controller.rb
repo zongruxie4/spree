@@ -35,7 +35,7 @@ module Spree
 
         scope = current_store.products.not_archived.accessible_by(current_ability, :index)
         scope = scope.where.not(id: params[:omit_ids].split(',')) if params[:omit_ids].present?
-        @products = scope.includes(:primary_media).multi_search(query).limit(params[:limit] || 10)
+        @products = scope.includes(:primary_media).search(query).limit(params[:limit] || 10)
 
         respond_to do |format|
           format.turbo_stream do

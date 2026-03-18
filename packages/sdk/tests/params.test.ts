@@ -45,9 +45,9 @@ describe('transformListParams', () => {
     });
   });
 
-  it('transforms multi_search', () => {
-    const result = transformListParams({ multi_search: 'shirt' });
-    expect(result).toEqual({ 'q[multi_search]': 'shirt' });
+  it('transforms search', () => {
+    const result = transformListParams({ search: 'shirt' });
+    expect(result).toEqual({ 'q[search]': 'shirt' });
   });
 
   it('passes through already-wrapped q[...] keys (backward compat)', () => {

@@ -15,19 +15,19 @@ Spree provides powerful search, filtering, and sorting capabilities for products
 
 ## Product Search
 
-Use the `multi_search` parameter for full-text search across product fields:
+Use the `search` parameter for full-text search across product fields:
 
 <CodeGroup>
 
 ```typescript SDK
 const { data: products } = await client.products.list({
-  multi_search: 'tote bag',
+  search: 'tote bag',
   limit: 12,
 })
 ```
 
 ```bash cURL
-curl 'https://api.mystore.com/api/v3/store/products?q[multi_search]=tote+bag&limit=12' \
+curl 'https://api.mystore.com/api/v3/store/products?q[search]=tote+bag&limit=12' \
   -H 'Authorization: Bearer spree_pk_xxx'
 ```
 
@@ -234,7 +234,22 @@ curl 'https://api.mystore.com/api/v3/store/products?page=1&limit=24' \
 
 See [Querying](/api-reference/store-api/querying) for the full list of filtering, sorting, and pagination options.
 
+## Search Providers
+
+Spree uses a pluggable search provider architecture. The default provider uses SQL (ILIKE + Ransack). For production catalogs with 1,000+ products, we recommend switching to [Meilisearch](/integrations/search/meilisearch) for typo tolerance, relevance ranking, and faster faceted search.
+
+```ruby
+# config/initializers/spree.rb
+Spree.search_provider = 'Spree::SearchProvider::Meilisearch'
+```
+
+No client-side or API changes are needed — the same `q[search]`, filter params, and sort options work with any provider.
+
+See [Search Providers](/developer/customization/search-providers) for architecture details and how to build custom providers.
+
 ## Related Documentation
 
 - [Products](/developer/core-concepts/products) — Product catalog and listing
 - [Querying](/api-reference/store-api/querying) — API filtering, sorting, and pagination reference
+- [Search Providers](/developer/customization/search-providers) — Architecture and custom providers
+- [Meilisearch Integration](/integrations/search/meilisearch) — Setup guide

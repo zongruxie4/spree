@@ -23,16 +23,19 @@ module Spree
     # Scopes
     #
     scope :for_resource_type, ->(resource_type) { where(resource_type: resource_type) }
-    scope :multi_search, ->(search) do
-      return all if search.blank?
+    scope :search, ->(query) do
+      return all if query.blank?
 
-      search_term = "%#{search.downcase}%"
+      search_term = "%#{query.downcase}%"
       namespace_condition = arel_table[:namespace].lower.matches(search_term)
       key_condition = arel_table[:key].lower.matches(search_term)
       name_condition = arel_table[:name].lower.matches(search_term)
 
       where(namespace_condition.or(key_condition).or(name_condition))
     end
+
+    # Backward compatibility alias — remove in Spree 6.0
+    scope :multi_search, ->(*args) { search(*args) }
 
     #
     # Callbacks
@@ -46,7 +49,7 @@ module Spree
     # Ransack
     #
     self.whitelisted_ransackable_attributes = %w[key namespace name resource_type display_on]
-    self.whitelisted_ransackable_scopes = %w[multi_search]
+    self.whitelisted_ransackable_scopes = %w[search multi_search]
 
     # Returns the full key with namespace
     # @return [String] eg. custom.id

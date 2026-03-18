@@ -41,11 +41,11 @@ RSpec.describe Spree::Admin::UsersController, type: :controller do
       expect(assigns(:collection).to_a).to eq([user_2])
     end
 
-    describe 'multi_search' do
-      subject { get :index, params: { q: { multi_search: multi_search_param } } }
+    describe 'search' do
+      subject { get :index, params: { q: { search: search_param } } }
 
       context 'when searching by email' do
-        let(:multi_search_param) { 'john.doe@example.com' }
+        let(:search_param) { 'john.doe@example.com' }
 
         it 'returns users based on an email' do
           subject
@@ -54,7 +54,7 @@ RSpec.describe Spree::Admin::UsersController, type: :controller do
       end
 
       context 'when searching by the first name' do
-        let(:multi_search_param) { 'john' }
+        let(:search_param) { 'john' }
 
         it 'returns users based on the first name' do
           subject
@@ -63,7 +63,7 @@ RSpec.describe Spree::Admin::UsersController, type: :controller do
       end
 
       context 'when searching by the last name' do
-        let(:multi_search_param) { 'doe' }
+        let(:search_param) { 'doe' }
 
         it 'returns users based on the last name' do
           subject
@@ -72,7 +72,7 @@ RSpec.describe Spree::Admin::UsersController, type: :controller do
       end
 
       context 'when searching by the full name' do
-        let(:multi_search_param) { 'joh do' }
+        let(:search_param) { 'joh do' }
 
         it 'returns users based on the full name' do
           subject
