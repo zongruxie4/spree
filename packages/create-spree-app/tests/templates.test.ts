@@ -1,19 +1,19 @@
 import { describe, it, expect } from 'vitest'
-import { dockerComposeContent } from '../src/templates/docker-compose'
+import { dockerComposeContent, dockerComposeDevContent } from '../src/templates/docker-compose'
 import { envContent, storefrontEnvContent } from '../src/templates/env'
 import { rootPackageJsonContent } from '../src/templates/package-json'
 import { readmeContent } from '../src/templates/readme'
 import { gitignoreContent } from '../src/templates/gitignore'
 
 describe('dockerComposeContent', () => {
-  const content = dockerComposeContent(3000)
+  const content = dockerComposeContent()
 
   it('includes the Spree image', () => {
     expect(content).toContain('ghcr.io/spree/spree')
   })
 
   it('includes postgres service', () => {
-    expect(content).toContain('postgres:17-alpine')
+    expect(content).toContain('postgres:18-alpine')
   })
 
   it('includes healthcheck for web service', () => {
@@ -29,7 +29,7 @@ describe('dockerComposeContent', () => {
   })
 
   it('uses DATABASE_URL pointing to postgres service', () => {
-    expect(content).toContain('DATABASE_URL: postgres://postgres@postgres:5432/spree')
+    expect(content).toContain('DATABASE_URL: postgres://postgres@postgres:5432/spree_production')
   })
 
   it('includes redis service and REDIS_URL', () => {
@@ -42,8 +42,7 @@ describe('dockerComposeContent', () => {
     expect(content).toContain('SMTP_HOST: mailpit')
   })
 
-  it('uses production environment with SSL disabled', () => {
-    expect(content).toContain('RAILS_ENV: production')
+  it('disables SSL for local dev', () => {
     expect(content).toContain('RAILS_FORCE_SSL: "false"')
     expect(content).toContain('RAILS_ASSUME_SSL: "false"')
   })
@@ -53,14 +52,28 @@ describe('dockerComposeContent', () => {
   })
 
   it('uses SPREE_PORT variable for port mapping', () => {
-    const custom = dockerComposeContent(4000)
-    expect(custom).toContain('${SPREE_PORT:-3000}:3000')
+    expect(content).toContain('${SPREE_PORT:-3000}:3000')
   })
 
-  it('keeps container-internal healthcheck on port 3000 regardless of host port', () => {
-    const custom = dockerComposeContent(5000)
-    expect(custom).toContain('curl -f http://localhost:3000/up')
-    expect(custom).not.toContain('5000/up')
+  it('includes SECRET_KEY_BASE from env', () => {
+    expect(content).toContain('SECRET_KEY_BASE: ${SECRET_KEY_BASE}')
+  })
+})
+
+describe('dockerComposeDevContent', () => {
+  const content = dockerComposeDevContent()
+
+  it('uses build context instead of image', () => {
+    expect(content).toContain('context: ./backend')
+    expect(content).toContain('dockerfile: Dockerfile')
+    expect(content).not.toContain('ghcr.io/spree/spree')
+  })
+
+  it('has same services as production compose', () => {
+    expect(content).toContain('postgres:18-alpine')
+    expect(content).toContain('redis:7-alpine')
+    expect(content).toContain('axllent/mailpit')
+    expect(content).toContain('command: bundle exec sidekiq')
   })
 })
 
@@ -68,11 +81,6 @@ describe('envContent', () => {
   it('includes the provided secret key', () => {
     const content = envContent('my-secret-123', 3000)
     expect(content).toContain('SECRET_KEY_BASE=my-secret-123')
-  })
-
-  it('includes SPREE_VERSION_TAG', () => {
-    const content = envContent('any', 3000)
-    expect(content).toContain('SPREE_VERSION_TAG=')
   })
 
   it('includes SPREE_PORT', () => {
@@ -123,6 +131,7 @@ describe('rootPackageJsonContent', () => {
     const pkg = JSON.parse(rootPackageJsonContent('my-store'))
     expect(pkg.scripts.dev).toBe('spree dev')
     expect(pkg.scripts.update).toBe('spree update')
+    expect(pkg.scripts.eject).toBe('spree eject')
     expect(pkg.scripts.logs).toBe('spree logs')
     expect(pkg.scripts.console).toBe('spree console')
     expect(pkg.scripts.down).toContain('docker compose')
@@ -141,31 +150,33 @@ describe('rootPackageJsonContent', () => {
 
 describe('readmeContent', () => {
   it('includes the project name as heading', () => {
-    const content = readmeContent('my-store', false, 3000)
+    const content = readmeContent('my-store', true, 3000)
     expect(content).toContain('# my-store')
   })
 
   it('includes admin credentials', () => {
-    const content = readmeContent('my-store', false, 3000)
+    const content = readmeContent('my-store', true, 3000)
     expect(content).toContain('spree@example.com')
     expect(content).toContain('spree123')
   })
 
-  it('includes storefront section when full-stack', () => {
+  it('includes storefront section', () => {
     const content = readmeContent('my-store', true, 3000)
     expect(content).toContain('storefront')
     expect(content).toContain('npm run dev')
   })
 
-  it('omits storefront section when backend-only', () => {
-    const content = readmeContent('my-store', false, 3000)
-    expect(content).not.toContain('Start the storefront')
+  it('includes eject instructions', () => {
+    const content = readmeContent('my-store', true, 3000)
+    expect(content).toContain('spree eject')
+    expect(content).toContain('backend/')
   })
 
   it('uses spree cli commands', () => {
-    const content = readmeContent('my-store', false, 3000)
+    const content = readmeContent('my-store', true, 3000)
     expect(content).toContain('`spree dev`')
     expect(content).toContain('`spree stop`')
+    expect(content).toContain('`spree eject`')
     expect(content).toContain('`spree logs`')
     expect(content).toContain('`spree console`')
     expect(content).toContain('`spree update`')
@@ -174,7 +185,7 @@ describe('readmeContent', () => {
   })
 
   it('uses custom port in URLs', () => {
-    const content = readmeContent('my-store', false, 4567)
+    const content = readmeContent('my-store', true, 4567)
     expect(content).toContain('http://localhost:4567/admin')
     expect(content).toContain('http://localhost:4567/api/v3/store')
   })

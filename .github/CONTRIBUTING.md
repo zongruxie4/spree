@@ -49,7 +49,7 @@ Spree is a monorepo with three main areas:
 
 - **`spree/`** — Ruby gems (core, api, admin, emails) distributed as separate packages via RubyGems
 - **`packages/`** — TypeScript packages (SDK, Next.js helpers)
-- **`server/`** — A Rails application that mounts the Spree gems and serves the API and admin interface
+- **`server/`** — A Rails application cloned from [spree-starter](https://github.com/spree/spree-starter) that mounts the Spree gems (not checked in — run `pnpm server:setup` to create it)
 
 ## Backend Development (Ruby)
 
@@ -70,25 +70,31 @@ All Spree models, controllers and other Ruby classes are namespaced by the `Spre
 
 ### Setup
 
+The server app is not checked into the monorepo. It's cloned from [spree-starter](https://github.com/spree/spree-starter) on first setup, with `SPREE_PATH=..` automatically configured so it uses your local Spree gems.
+
+**Step 1: Start infrastructure**
+
+```bash
+docker compose up -d     # starts Postgres, Redis, Mailpit
+```
+
+Or install PostgreSQL and Redis locally if you prefer.
+
+**Step 2: Clone the server app**
+
+```bash
+pnpm server:setup
+```
+
+This clones [spree-starter](https://github.com/spree/spree-starter) into `server/` and sets `SPREE_PATH=..` in `server/.env` so it uses your local Spree gems.
+
+**Step 3: Configure and run**
+
 ```bash
 cd server
-bin/setup
-bin/rails server
-```
-
-`bin/setup` handles everything: installs Ruby (via [mise](https://mise.jdx.dev) if available, otherwise uses your system Ruby), system packages (libpq, vips), gems, and prepares the database.
-
-PostgreSQL and Redis must be running before you run `bin/setup`. If you don't have them installed locally, start them with Docker:
-
-```bash
-docker run -d --name spree-postgres -p 5432:5432 -e POSTGRES_HOST_AUTH_METHOD=trust postgres:17-alpine
-docker run -d --name spree-redis -p 6379:6379 redis:7-alpine
-```
-
-By default the app connects to PostgreSQL at `localhost:5432` as user `postgres` with no password. Override with environment variables if needed:
-
-```bash
-DATABASE_HOST=127.0.0.1 DATABASE_PORT=5433 DATABASE_USERNAME=myuser bin/setup
+# Edit .env if needed (e.g. DATABASE_USERNAME, DATABASE_HOST, DATABASE_PORT)
+bin/setup        # installs Ruby (via mise), system packages, gems, prepares database
+bin/dev          # starts Rails + Sidekiq + CSS watchers via overmind
 ```
 
 Use `bin/setup --reset` to drop and recreate the database.
@@ -176,8 +182,7 @@ You may notice that your Spree store runs slower in development environment. Thi
 Caching is disabled by default. To turn on caching please run:
 
 ```bash
-cd server
-bin/rails dev:cache
+cd server && bin/rails dev:cache
 ```
 
 You will need to restart rails server after this change.
@@ -186,13 +191,13 @@ You will need to restart rails server after this change.
 
 ### Setup
 
-TypeScript developers don't need Ruby installed. Use Docker Compose from the repository root to start the backend:
+TypeScript developers don't need Ruby installed. Docker Compose from the repository root starts the backend using a prebuilt image:
 
 ```bash
 docker compose up -d
 ```
 
-This boots PostgreSQL, Redis, Mailpit, and the Spree backend automatically. The API is available at `http://localhost:3000`. All outgoing emails are caught by Mailpit and viewable at `http://localhost:8025`.
+This boots PostgreSQL, Redis, Mailpit, and the Spree backend automatically (no `pnpm server:setup` needed). The API is available at `http://localhost:3000`. All outgoing emails are caught by Mailpit and viewable at `http://localhost:8025`.
 
 Then install dependencies and start all packages in watch mode:
 

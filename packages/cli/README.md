@@ -37,20 +37,6 @@ Start Docker services, print connection info, and stream web server logs.
 spree dev
 ```
 
-```
-╭ Spree Commerce ─────────────────────╮
-│                                     │
-│  Admin Dashboard                    │
-│    http://localhost:3000/admin       │
-│    Email:    spree@example.com      │
-│    Password: spree123               │
-│                                     │
-│  Store API                          │
-│    http://localhost:3000/api/v3/store│
-│                                     │
-╰─────────────────────────────────────╯
-```
-
 Press `Ctrl+C` to stop streaming logs (services keep running).
 
 ### `spree stop`
@@ -74,6 +60,16 @@ To pin a specific version, edit `SPREE_VERSION_TAG` in your `.env` file:
 ```
 SPREE_VERSION_TAG=5.4
 ```
+
+### `spree eject`
+
+Switch from the prebuilt Docker image to building from your local `backend/` directory. This lets you customize the Rails app — add gems, override models, add migrations, etc.
+
+```bash
+spree eject
+```
+
+After ejecting, edit files in `backend/` and run `spree dev` to rebuild and restart.
 
 ### `spree logs [service]`
 
@@ -129,13 +125,6 @@ List all API keys for the default store with their name, type, token/prefix, cre
 spree api-key list
 ```
 
-```
-  Name                      Type           Token                          Created            Status
-  ────────────────────────────────────────────────────────────────────────────────────────────────
-  My Storefront             publishable    pk_abc123def456...             2025-01-15 10:30   active
-  Admin Integration         secret         sk_xyz789qwe...               2025-01-15 10:35   active
-```
-
 ### `spree api-key revoke`
 
 Revoke an API key by its token (publishable) or token prefix (secret).
@@ -176,6 +165,7 @@ Projects created with `create-spree-app` include convenience scripts in `package
 npm run dev             # spree dev
 npm run stop            # spree stop
 npm run update          # spree update
+npm run eject           # spree eject
 npm run logs            # spree logs
 npm run logs:worker     # spree logs worker
 npm run console         # spree console

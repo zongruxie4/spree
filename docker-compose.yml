@@ -1,25 +1,31 @@
+# Local development services.
+# Just works: pnpm dev (uses prebuilt Spree image)
+# Rails devs: pnpm server:setup, then pnpm server:dev (runs natively)
 x-app: &app
-  build:
-    context: .
-    dockerfile: server/Dockerfile
+  image: ghcr.io/spree/spree:latest
   depends_on:
     postgres:
       condition: service_healthy
     redis:
       condition: service_healthy
   environment: &app-env
-    DATABASE_HOST: postgres
+    DATABASE_URL: postgres://postgres@postgres:5432/spree_development
     REDIS_URL: redis://redis:6379/0
+    SECRET_KEY_BASE: development_secret_key_base_not_for_production_use_only
+    RAILS_FORCE_SSL: "false"
+    RAILS_ASSUME_SSL: "false"
     SMTP_HOST: mailpit
-    SMTP_PORT: 1025
+    SMTP_PORT: "1025"
 
 services:
   postgres:
-    image: postgres:17-alpine
+    image: postgres:18-alpine
     environment:
       POSTGRES_HOST_AUTH_METHOD: trust
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
     healthcheck:
       test: pg_isready -U postgres
       interval: 5s
@@ -30,6 +36,8 @@ services:
     image: redis:7-alpine
     volumes:
       - redis_data:/data
+    ports:
+      - "6379:6379"
     healthcheck:
       test: redis-cli ping
       interval: 5s
@@ -46,6 +54,12 @@ services:
     <<: *app
     ports:
       - "3000:3000"
+    healthcheck:
+      test: curl -f http://localhost:3000/up || exit 1
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
 
   worker:
     <<: *app

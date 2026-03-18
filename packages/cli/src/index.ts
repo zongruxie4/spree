@@ -11,11 +11,12 @@ import { registerApiKeyCommand } from './commands/api-key.js'
 import { registerSeedCommand } from './commands/seed.js'
 import { registerOpenCommand } from './commands/open.js'
 import { registerSampleDataCommand } from './commands/sample-data.js'
+import { registerEjectCommand } from './commands/eject.js'
 
 const program = new Command()
   .name('spree')
   .description('CLI for managing Spree Commerce projects')
-  .version('2.0.0-beta.3')
+  .version('2.0.0-beta.6')
 
 registerInitCommand(program)
 registerDevCommand(program)
@@ -28,6 +29,7 @@ registerApiKeyCommand(program)
 registerOpenCommand(program)
 registerSeedCommand(program)
 registerSampleDataCommand(program)
+registerEjectCommand(program)
 
 program.exitOverride()
 

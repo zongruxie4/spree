@@ -25,6 +25,7 @@ Current plans:
 - `6.0-channels-catalogs-b2b.md` — Channel, Catalog, ProductListing (replaces StoreProduct), Company/CompanyLocation/CompanyContact for B2B
 - `6.0-platform-auth.md` — Drop Devise, own auth stack, User→Customer/Staff rename
 - `5.x-store-api-bridges.md` — Bridge 6.0 naming into 5.5 Store API (fulfillments, delivery, status, remove master_variant)
+- `spree-starter-and-create-spree-app.md` — Replace monorepo server/ with spree-starter template repo, always include backend/ in create-spree-app, add spree eject
 
 ## Monorepo Structure
 
@@ -39,7 +40,7 @@ Current plans:
 | `packages/next` | `@spree/next` — Next.js server actions, data helpers, middleware |
 | `packages/cli` | `@spree/cli` — Docker-based project management CLI |
 | `packages/create-spree-app` | `create-spree-app` — project scaffolding |
-| `server/` | Rails app that mounts Spree gems and serves the API |
+| `server/` | Rails app cloned from `spree/spree-starter` (.gitignored, run `pnpm server:setup`) |
 
 ---
 

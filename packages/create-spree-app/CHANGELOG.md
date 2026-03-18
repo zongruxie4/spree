@@ -1,5 +1,11 @@
 # create-spree-app
 
+## 0.4.0
+
+### Minor Changes
+
+- Always include `backend/` directory (cloned from spree/spree-starter) with full Rails app for backend customization. Add `docker-compose.dev.yml` for local builds. Add `spree eject` script. Storefront is now optional via `--no-storefront` flag. Upgrade to PostgreSQL 18.
+
 ## 0.3.3
 
 ### Patch Changes

@@ -8,15 +8,22 @@ vi.mock('../src/storefront', async (importOriginal) => {
   const mod = await importOriginal<typeof import('../src/storefront')>()
   return {
     ...mod,
+    downloadStorefront: vi.fn(),
     installRootDeps: vi.fn(),
+    installStorefrontDeps: vi.fn(),
+    writeStorefrontEnv: vi.fn(),
   }
 })
+
+vi.mock('../src/backend', () => ({
+  downloadBackend: vi.fn(),
+}))
 
 function createTempDir(): string {
   return fs.mkdtempSync(path.join(os.tmpdir(), 'create-spree-app-test-'))
 }
 
-describe('scaffold (backend-only, no-start)', () => {
+describe('scaffold (no-start)', () => {
   const tempDirs: string[] = []
 
   function getTempProjectDir(): string {
@@ -38,7 +45,7 @@ describe('scaffold (backend-only, no-start)', () => {
 
     await scaffold({
       directory: projectDir,
-      mode: 'backend-only',
+      storefront: true,
       sampleData: false,
       start: false,
       packageManager: 'npm',
@@ -46,6 +53,7 @@ describe('scaffold (backend-only, no-start)', () => {
     })
 
     expect(fs.existsSync(path.join(projectDir, 'docker-compose.yml'))).toBe(true)
+    expect(fs.existsSync(path.join(projectDir, 'docker-compose.dev.yml'))).toBe(true)
     expect(fs.existsSync(path.join(projectDir, '.env'))).toBe(true)
     expect(fs.existsSync(path.join(projectDir, 'package.json'))).toBe(true)
     expect(fs.existsSync(path.join(projectDir, 'README.md'))).toBe(true)
@@ -57,7 +65,7 @@ describe('scaffold (backend-only, no-start)', () => {
 
     await scaffold({
       directory: projectDir,
-      mode: 'backend-only',
+      storefront: true,
       sampleData: false,
       start: false,
       packageManager: 'npm',
@@ -68,12 +76,29 @@ describe('scaffold (backend-only, no-start)', () => {
     expect(compose).toContain('ghcr.io/spree/spree')
   })
 
-  it('generates .env with SECRET_KEY_BASE and SPREE_PORT', async () => {
+  it('generates docker-compose.dev.yml with build context', async () => {
     const projectDir = getTempProjectDir()
 
     await scaffold({
       directory: projectDir,
-      mode: 'backend-only',
+      storefront: true,
+      sampleData: false,
+      start: false,
+      packageManager: 'npm',
+      port: 3000,
+    })
+
+    const compose = fs.readFileSync(path.join(projectDir, 'docker-compose.dev.yml'), 'utf-8')
+    expect(compose).toContain('context: ./backend')
+    expect(compose).not.toContain('ghcr.io/spree/spree')
+  })
+
+  it('generates .env with SECRET_KEY_BASE and PORT', async () => {
+    const projectDir = getTempProjectDir()
+
+    await scaffold({
+      directory: projectDir,
+      storefront: true,
       sampleData: false,
       start: false,
       packageManager: 'npm',
@@ -90,7 +115,7 @@ describe('scaffold (backend-only, no-start)', () => {
 
     await scaffold({
       directory: projectDir,
-      mode: 'backend-only',
+      storefront: true,
       sampleData: false,
       start: false,
       packageManager: 'npm',
@@ -100,21 +125,7 @@ describe('scaffold (backend-only, no-start)', () => {
     const content = fs.readFileSync(path.join(projectDir, 'package.json'), 'utf-8')
     const pkg = JSON.parse(content)
     expect(pkg.name).toBe('my-store')
-  })
-
-  it('does not create storefront directory in backend-only mode', async () => {
-    const projectDir = getTempProjectDir()
-
-    await scaffold({
-      directory: projectDir,
-      mode: 'backend-only',
-      sampleData: false,
-      start: false,
-      packageManager: 'npm',
-      port: 3000,
-    })
-
-    expect(fs.existsSync(path.join(projectDir, 'apps'))).toBe(false)
+    expect(pkg.scripts.eject).toBe('spree eject')
   })
 
   it('rejects non-empty directory', async () => {
@@ -130,7 +141,6 @@ describe('scaffold (backend-only, no-start)', () => {
     await expect(
       scaffold({
         directory: projectDir,
-        mode: 'backend-only',
         sampleData: false,
         start: false,
         packageManager: 'npm',

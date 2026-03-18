@@ -6,18 +6,18 @@ import { execa } from 'execa'
 import type { ScaffoldOptions } from './types.js'
 import { DEFAULT_ADMIN_EMAIL, DEFAULT_ADMIN_PASSWORD } from './constants.js'
 import { generateSecretKeyBase, isDockerRunning } from './utils.js'
-import { dockerComposeContent } from './templates/docker-compose.js'
+import { dockerComposeContent, dockerComposeDevContent } from './templates/docker-compose.js'
 import { envContent } from './templates/env.js'
 import { rootPackageJsonContent } from './templates/package-json.js'
 import { readmeContent } from './templates/readme.js'
 import { gitignoreContent } from './templates/gitignore.js'
-import { downloadStorefront, installStorefrontDeps, installRootDeps, writeStorefrontEnv } from './storefront.js'
+import { downloadStorefront, installRootDeps, installStorefrontDeps, writeStorefrontEnv } from './storefront.js'
+import { downloadBackend } from './backend.js'
 
 export async function scaffold(options: ScaffoldOptions): Promise<void> {
   const projectDir = path.resolve(options.directory)
   const projectName = path.basename(projectDir)
-  const isFullStack = options.mode === 'full-stack'
-  const { port } = options
+  const { port, storefront } = options
 
   // Pre-flight checks
   if (options.start) {
@@ -42,10 +42,11 @@ export async function scaffold(options: ScaffoldOptions): Promise<void> {
   s.start('Creating project structure...')
 
   fs.mkdirSync(projectDir, { recursive: true })
-  fs.writeFileSync(path.join(projectDir, 'docker-compose.yml'), dockerComposeContent(port))
+  fs.writeFileSync(path.join(projectDir, 'docker-compose.yml'), dockerComposeContent())
+  fs.writeFileSync(path.join(projectDir, 'docker-compose.dev.yml'), dockerComposeDevContent())
   fs.writeFileSync(path.join(projectDir, '.env'), envContent(generateSecretKeyBase(), port))
   fs.writeFileSync(path.join(projectDir, 'package.json'), rootPackageJsonContent(projectName))
-  fs.writeFileSync(path.join(projectDir, 'README.md'), readmeContent(projectName, isFullStack, port))
+  fs.writeFileSync(path.join(projectDir, 'README.md'), readmeContent(projectName, storefront, port))
   fs.writeFileSync(path.join(projectDir, '.gitignore'), gitignoreContent())
 
   s.stop('Project structure created.')
@@ -55,8 +56,13 @@ export async function scaffold(options: ScaffoldOptions): Promise<void> {
   await installRootDeps(projectDir, options.packageManager)
   s.stop('Dependencies installed.')
 
-  // Phase 2: Storefront
-  if (isFullStack) {
+  // Phase 2: Backend (always included)
+  s.start('Downloading backend template...')
+  await downloadBackend(projectDir)
+  s.stop('Backend template downloaded.')
+
+  // Phase 3: Storefront (optional)
+  if (storefront) {
     s.start('Downloading storefront template...')
     await downloadStorefront(projectDir)
     s.stop('Storefront template downloaded.')
@@ -68,7 +74,7 @@ export async function scaffold(options: ScaffoldOptions): Promise<void> {
     s.stop('Storefront dependencies installed.')
   }
 
-  // Phase 3: Initialize and start services
+  // Phase 4: Initialize and start services
   if (options.start) {
     const initArgs = ['spree', 'init']
     if (!options.sampleData) initArgs.push('--no-sample-data')
@@ -78,21 +84,17 @@ export async function scaffold(options: ScaffoldOptions): Promise<void> {
       stdio: 'inherit',
     })
 
-    if (isFullStack) {
+    if (storefront) {
       p.log.info(
         `${pc.bold('Storefront')}: ${pc.cyan(`cd ${projectName}/apps/storefront && npm run dev`)}`,
       )
     }
   } else {
-    printSuccessWithoutDocker(projectName, isFullStack, port)
+    printSuccessWithoutDocker(projectName, storefront, port)
   }
 }
 
-function printSuccessWithoutDocker(
-  projectName: string,
-  isFullStack: boolean,
-  port: number,
-): void {
+function printSuccessWithoutDocker(projectName: string, hasStorefront: boolean, port: number): void {
   const lines: string[] = [
     '',
     `${pc.bold('Next steps:')}`,
@@ -100,7 +102,7 @@ function printSuccessWithoutDocker(
     `  npx spree dev`,
   ]
 
-  if (isFullStack) {
+  if (hasStorefront) {
     lines.push(
       '',
       `  ${pc.dim('# In another terminal:')}`,
@@ -116,6 +118,10 @@ function printSuccessWithoutDocker(
     `  http://localhost:${port}/admin`,
     `  Email:    ${DEFAULT_ADMIN_EMAIL}`,
     `  Password: ${DEFAULT_ADMIN_PASSWORD}`,
+    '',
+    `${pc.bold('Customize the backend')}`,
+    `  npx spree eject`,
+    `  ${pc.dim('# Then edit backend/Gemfile, backend/app/, backend/config/')}`,
   )
 
   p.note(lines.join('\n'), 'Project created!')

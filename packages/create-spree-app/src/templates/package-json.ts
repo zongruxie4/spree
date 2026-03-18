@@ -7,6 +7,7 @@ export function rootPackageJsonContent(name: string): string {
       stop: 'spree stop',
       down: 'docker compose down',
       update: 'spree update',
+      eject: 'spree eject',
       logs: 'spree logs',
       'logs:worker': 'spree logs worker',
       seed: 'spree seed',
@@ -14,7 +15,7 @@ export function rootPackageJsonContent(name: string): string {
       console: 'spree console',
     },
     dependencies: {
-      '@spree/cli': '2.0.0-beta.5',
+      '@spree/cli': '2.0.0-beta.6',
     },
   }
 

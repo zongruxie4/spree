@@ -1,9 +1,9 @@
 import * as p from '@clack/prompts'
-import type { ScaffoldOptions, SetupMode, PackageManager } from './types.js'
+import type { ScaffoldOptions, PackageManager } from './types.js'
 
 interface PromptFlags {
   directory?: string
-  backendOnly?: boolean
+  noStorefront?: boolean
   noSampleData?: boolean
   noStart?: boolean
   packageManager?: PackageManager
@@ -27,23 +27,20 @@ export async function runPrompts(flags: PromptFlags): Promise<Omit<ScaffoldOptio
     process.exit(0)
   }
 
-  let mode: SetupMode
-  if (flags.backendOnly !== undefined) {
-    mode = flags.backendOnly ? 'backend-only' : 'full-stack'
+  let storefront: boolean
+  if (flags.noStorefront !== undefined) {
+    storefront = !flags.noStorefront
   } else {
-    const modeResult = await p.select({
-      message: 'What would you like to set up?',
-      options: [
-        { value: 'full-stack', label: 'Full-stack (Backend + Storefront)' },
-        { value: 'backend-only', label: 'Backend only' },
-      ],
+    const storefrontResult = await p.confirm({
+      message: 'Include Next.js storefront?',
+      initialValue: true,
     })
 
-    if (p.isCancel(modeResult)) {
+    if (p.isCancel(storefrontResult)) {
       p.cancel('Setup cancelled.')
       process.exit(0)
     }
-    mode = modeResult as SetupMode
+    storefront = storefrontResult
   }
 
   let sampleData: boolean
@@ -80,7 +77,7 @@ export async function runPrompts(flags: PromptFlags): Promise<Omit<ScaffoldOptio
 
   return {
     directory,
-    mode,
+    storefront,
     sampleData,
     start,
     packageManager: flags.packageManager ?? 'npm',

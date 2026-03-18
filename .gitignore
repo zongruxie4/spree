@@ -53,6 +53,7 @@ TODO
 brakeman-*.*
 */app/assets/builds
 .claude/worktrees
+server/
 **/node_modules
 packages/*/package-lock.json
 .turbo

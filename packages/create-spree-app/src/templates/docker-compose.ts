@@ -1,8 +1,17 @@
 import { SPREE_IMAGE, SPREE_VERSION_TAG } from '../constants.js'
 
-export function dockerComposeContent(_port: number): string {
+function appAnchor(useImage: boolean): string {
+  if (useImage) {
+    return `  image: ${SPREE_IMAGE}:\${SPREE_VERSION_TAG:-${SPREE_VERSION_TAG}}`
+  }
+  return `  build:
+    context: ./backend
+    dockerfile: Dockerfile`
+}
+
+function composeBody(appSection: string): string {
   return `x-app: &app
-  image: ${SPREE_IMAGE}:${SPREE_VERSION_TAG}
+${appSection}
   depends_on:
     postgres:
       condition: service_healthy
@@ -10,18 +19,17 @@ export function dockerComposeContent(_port: number): string {
       condition: service_healthy
   env_file: .env
   environment: &app-env
-    DATABASE_URL: postgres://postgres@postgres:5432/spree
+    DATABASE_URL: postgres://postgres@postgres:5432/spree_production
     REDIS_URL: redis://redis:6379/0
-    SMTP_HOST: mailpit
-    SMTP_PORT: 1025
-    RAILS_ENV: production
+    SECRET_KEY_BASE: \${SECRET_KEY_BASE}
     RAILS_FORCE_SSL: "false"
     RAILS_ASSUME_SSL: "false"
-    RAILS_LOG_TO_STDOUT: "true"
+    SMTP_HOST: mailpit
+    SMTP_PORT: "1025"
 
 services:
   postgres:
-    image: postgres:17-alpine
+    image: postgres:18-alpine
     environment:
       POSTGRES_HOST_AUTH_METHOD: trust
     volumes:
@@ -67,4 +75,12 @@ volumes:
   postgres_data:
   redis_data:
 `
+}
+
+export function dockerComposeContent(): string {
+  return composeBody(appAnchor(true))
+}
+
+export function dockerComposeDevContent(): string {
+  return composeBody(appAnchor(false))
 }
