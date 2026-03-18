@@ -74,7 +74,6 @@
     "options": ["copy", "view", "chatgpt", "claude", "mcp", "cursor", "vscode"]
   },
   "navigation": {
-    "pages": ["index"],
     "tabs": [
       {
         "tab": "Guides",
@@ -557,7 +556,7 @@
               "user/how-to/multi-currency-pricing",
               "user/how-to/multi-region-pricing",
               "user/how-to/wholesale-pricing",
-              "user/how-to/volume-pricing",
+              "user/how-to/volume-pricing"
             ]
           },
           {
