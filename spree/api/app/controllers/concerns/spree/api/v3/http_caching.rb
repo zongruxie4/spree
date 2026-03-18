@@ -72,7 +72,7 @@ module Spree
         # Includes: latest updated_at, total count, query params, pagination, expand, currency, locale
         def collection_cache_key(collection)
           # For ActiveRecord collections use updated_at, for plain arrays use store's updated_at as proxy
-          latest_updated_at = if collection.first.respond_to?(:updated_at)
+          latest_updated_at = if collection.first&.respond_to?(:updated_at)
                                 collection.map(&:updated_at).max&.to_i
                               else
                                 current_store&.updated_at&.to_i

@@ -110,5 +110,8 @@ Rails.application.config.after_initialize do
   # - Spree::PermissionSets::RoleManagement
 end
 
+# Search provider
+# Spree.search_provider = 'Spree::SearchProvider::Meilisearch'
+
 Spree.user_class = <%= (options[:user_class].blank? ? 'Spree::LegacyUser' : options[:user_class]).inspect %>
 Spree.admin_user_class = <%= (options[:admin_user_class].blank? ? (options[:user_class].blank? ? 'Spree::LegacyAdminUser' : options[:user_class]) : options[:admin_user_class]).inspect %>

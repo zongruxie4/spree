@@ -424,5 +424,66 @@ RSpec.describe Spree::Api::V3::Store::ProductsController, type: :controller do
         expect(controller.send(:current_currency)).to eq('USD')
       end
     end
+
+    context 'with Meilisearch search provider' do
+      let(:mock_client) { instance_double(::Meilisearch::Client) }
+      let(:mock_index) { double('Meilisearch::Index') }
+
+      before do
+        allow(Spree).to receive(:search_provider).and_return('Spree::SearchProvider::Meilisearch')
+        allow(::Meilisearch::Client).to receive(:new).and_return(mock_client)
+        allow(mock_client).to receive(:index).and_return(mock_index)
+      end
+
+      after do
+        allow(Spree).to receive(:search_provider).and_call_original
+      end
+
+      it 'searches via Meilisearch when q[search] is present' do
+        allow(mock_index).to receive(:search).and_return({
+          'hits' => [{ 'prefixed_id' => product.prefixed_id }],
+          'estimatedTotalHits' => 1,
+          'facetDistribution' => {}
+        })
+
+        get :index, params: { q: { search: 'shirt' } }
+
+        expect(response).to have_http_status(:ok)
+        expect(mock_index).to have_received(:search).with('shirt', hash_including(:limit, :offset))
+
+        ids = json_response['data'].map { |p| p['id'] }
+        expect(ids).to include(product.prefixed_id)
+        expect(ids).not_to include(product2.prefixed_id)
+      end
+
+      it 'respects AR scope visibility (does not return draft products from Meilisearch)' do
+        allow(mock_index).to receive(:search).and_return({
+          'hits' => [{ 'prefixed_id' => product.prefixed_id }, { 'prefixed_id' => draft_product.prefixed_id }],
+          'estimatedTotalHits' => 2,
+          'facetDistribution' => {}
+        })
+
+        get :index, params: { q: { search: 'test' } }
+
+        expect(response).to have_http_status(:ok)
+        ids = json_response['data'].map { |p| p['id'] }
+        expect(ids).to include(product.prefixed_id)
+        expect(ids).not_to include(draft_product.prefixed_id)
+      end
+
+      it 'uses Meilisearch for browsing without search query' do
+        allow(mock_index).to receive(:search).and_return({
+          'hits' => [{ 'prefixed_id' => product.prefixed_id }, { 'prefixed_id' => product2.prefixed_id }],
+          'estimatedTotalHits' => 2,
+          'facetDistribution' => {}
+        })
+
+        get :index
+
+        expect(response).to have_http_status(:ok)
+        expect(mock_index).to have_received(:search)
+        expect(json_response['data'].size).to eq(2)
+      end
+    end
   end
 end
