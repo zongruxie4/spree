@@ -44,7 +44,8 @@ Or deploy directly to the cloud:
 
 [![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/spree/spree-starter)
 
-> **Note:** This uses Render's free plan for quick evaluation. Free instances spin down after inactivity and may take 30-60s to wake up. For production, see [recommended sizing](https://spreecommerce.org/docs/developer/deployment/render#production-sizing).
+> [!NOTE]  
+> This uses Render's free plan for quick evaluation. Free instances spin down after inactivity and may take 30-60s to wake up. For production, see [recommended sizing](https://spreecommerce.org/docs/developer/deployment/render#production-sizing).
 
 If you prefer to install Spree manually, you may follow the [Quickstart Guide](https://spreecommerce.org/docs/developer/getting-started/quickstart).
 
