@@ -24,10 +24,10 @@ module Spree
         # 4. Facets (before sorting to avoid computed column conflicts with count)
         filter_facets = build_facets(scope, category: category)
 
-        # 4. Total count (before sorting to avoid computed column conflicts with count)
+        # 5. Total count (before sorting to avoid computed column conflicts with count)
         total = scope.distinct.count
 
-        # 5. Sorting + pagination
+        # 6. Sorting + pagination
         scope = apply_sort(scope, sort)
         page = [page.to_i, 1].max
         limit = limit.to_i.clamp(1, 100)
@@ -55,7 +55,7 @@ module Spree
 
         Spree::Api::V3::FiltersAggregator.new(
           scope: scope,
-          currency: Spree::Current.currency || store.default_market&.currency,
+          currency: currency,
           category: category
         ).call
       end

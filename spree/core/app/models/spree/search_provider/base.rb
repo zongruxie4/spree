@@ -66,6 +66,16 @@ module Spree
       def reindex(scope = nil)
         # no-op by default
       end
+
+      private
+
+      def locale
+        Spree::Current.locale || store.default_market&.default_locale || I18n.locale.to_s
+      end
+
+      def currency
+        Spree::Current.currency || store.default_market&.currency
+      end
     end
   end
 end

@@ -1,6 +1,12 @@
 module Spree
   module SearchProvider
     class ProductPresenter
+      # Associations needed by this presenter — used by reindex and rake task for preloading
+      REQUIRED_PRELOADS = [
+        :taxons, :option_types, :primary_media, :store_products,
+        { variants_including_master: [:prices, :option_values] }
+      ].freeze
+
       attr_reader :product, :store
 
       def initialize(product, store)
@@ -36,8 +42,6 @@ module Spree
       private
 
       def build_document(locale, currency, fallback_locale)
-        price = lowest_price(currency)
-
         {
           # Composite ID: product + locale + currency
           prefixed_id: "#{product.prefixed_id}_#{locale}_#{currency}",
@@ -49,13 +53,13 @@ module Spree
           description: translated(product, :description, fallback_locale),
           slug: translated(product, :slug, fallback_locale),
           # Price in this currency
-          price: price&.to_f,
+          price: lowest_price(currency)&.to_f,
           compare_at_price: compare_at_price(currency)&.to_f,
           # Non-locale/currency fields
           status: product.status,
           sku: product.sku,
           in_stock: product.in_stock?,
-          store_ids: product.store_ids.map(&:to_s),
+          store_ids: cached_store_ids,
           discontinue_on: product.discontinue_on&.to_i || 0,
           category_ids: product.taxons.map(&:prefixed_id),
           category_names: product.taxons.map { |t| translated(t, :name, fallback_locale) },
@@ -65,7 +69,7 @@ module Spree
           option_values: variant_option_values_data.map { |ov| translated(ov, :presentation, fallback_locale) }.uniq,
           tags: product.tag_list || [],
           thumbnail_url: product.primary_media&.url(:large),
-          units_sold_count: product.store_products.find_by(store: store)&.units_sold_count || 0,
+          units_sold_count: cached_units_sold_count,
           available_on: product.available_on&.iso8601,
           created_at: product.created_at&.iso8601,
           updated_at: product.updated_at&.iso8601
@@ -84,31 +88,43 @@ module Spree
       end
 
       # Read a translated attribute with fallback to default locale.
-      # Uses Mobility's locale: option which works across all backends.
       def translated(record, attribute, fallback_locale)
         value = record.send(attribute)
         return value if value.present?
 
         record.send(attribute, locale: fallback_locale.to_sym)
       rescue ArgumentError
-        # Attribute doesn't support locale: kwarg (not a Mobility attribute)
         value
       end
 
       def lowest_price(currency)
-        product.price_in(currency)&.amount
+        @prices_cache ||= {}
+        @prices_cache[currency] = product.price_in(currency)&.amount unless @prices_cache.key?(currency)
+        @prices_cache[currency]
       end
 
       def compare_at_price(currency)
-        product.compare_at_amount_in(currency)
+        @compare_at_cache ||= {}
+        @compare_at_cache[currency] = product.compare_at_amount_in(currency) unless @compare_at_cache.key?(currency)
+        @compare_at_cache[currency]
+      end
+
+      # Memoized — avoids N+1 when called per document
+      def cached_store_ids
+        @cached_store_ids ||= product.store_ids.map(&:to_s)
+      end
+
+      def cached_units_sold_count
+        @cached_units_sold_count ||= product.store_products.detect { |sp| sp.store_id == store.id }&.units_sold_count || 0
       end
 
       def variant_option_value_ids
         variant_option_values_data.map(&:prefixed_id).uniq
       end
 
+      # Use variants_including_master (matches reindex preload) instead of variants.includes
       def variant_option_values_data
-        @variant_option_values_data ||= product.variants.includes(:option_values).flat_map(&:option_values)
+        @variant_option_values_data ||= product.variants_including_master.flat_map(&:option_values).uniq
       end
     end
   end

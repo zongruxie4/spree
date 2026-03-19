@@ -4,11 +4,13 @@ module Spree
       module Store
         module Products
           class FiltersController < Store::BaseController
+            include Spree::Api::V3::Store::SearchProviderSupport
+
             def index
               result = search_provider.search_and_filter(
                 scope: filters_scope,
-                query: params.dig(:q, :search),
-                filters: search_filters.merge('_category' => category),
+                query: search_query,
+                filters: (search_filters || {}).merge('_category' => category),
                 page: 1,
                 limit: 0
               )
@@ -29,18 +31,9 @@ module Spree
               scope.accessible_by(current_ability, :show)
             end
 
-            def search_filters
-              q = params[:q]&.to_unsafe_h || {}
-              q.except('search')
-            end
-
             def category
               category_id = params[:category_id]
               @category ||= category_id.present? ? current_store.categories.find_by_param(category_id) : nil
-            end
-
-            def search_provider
-              @search_provider ||= Spree.search_provider.constantize.new(current_store)
             end
           end
         end

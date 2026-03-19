@@ -4,6 +4,7 @@ module Spree
       module Store
         class ProductsController < ResourceController
           include Spree::Api::V3::HttpCaching
+          include Spree::Api::V3::Store::SearchProviderSupport
 
           protected
 
@@ -57,22 +58,6 @@ module Spree
             @search_result = result
             @pagy = result.pagy
             @collection = result.products
-          end
-
-          private
-
-          def search_query
-            params.dig(:q, :search)
-          end
-
-          def search_filters
-            q = params[:q]&.to_unsafe_h || params[:q] || {}
-            q = q.to_h if q.respond_to?(:to_h) && !q.is_a?(Hash)
-            q.except('search').presence
-          end
-
-          def search_provider
-            @search_provider ||= Spree.search_provider.constantize.new(current_store)
           end
         end
       end

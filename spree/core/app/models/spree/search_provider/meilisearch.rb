@@ -65,11 +65,7 @@ module Spree
       end
 
       def remove(product)
-        # Delete all locale/currency variants of this product
-        filter = "product_id = '#{sanitize_prefixed_id(product.prefixed_id)}'"
-        client.index(index_name).delete_documents(filter: filter)
-      rescue ::Meilisearch::ApiError => e
-        raise unless e.http_code == 404
+        remove_by_id(product.prefixed_id)
       end
 
       def index_batch(documents)
@@ -89,8 +85,7 @@ module Spree
         ensure_index_settings!
 
         scope.reorder(id: :asc)
-             .preload(:taxons, :option_types, :primary_media,
-                      variants_including_master: [:prices, :option_values])
+             .preload(*ProductPresenter::REQUIRED_PRELOADS)
              .find_in_batches(batch_size: 500) do |batch|
           documents = batch.flat_map { |product| ProductPresenter.new(product, store).call }
           index_batch(documents)
@@ -176,8 +171,6 @@ module Spree
             Array(value).each do |ov|
               conditions << "option_value_ids = '#{sanitize_prefixed_id(ov)}'" if valid_prefixed_id?(ov)
             end
-          when 'status_eq'
-            conditions << "status = '#{value}'" if ALLOWED_STATUSES.include?(value.to_s)
           end
         end
 
@@ -295,14 +288,6 @@ module Spree
         })
 
         Pagy::MeilisearchPaginator.paginate(fake_result, {})
-      end
-
-      def locale
-        Spree::Current.locale || store.default_market&.default_locale || I18n.locale.to_s
-      end
-
-      def currency
-        Spree::Current.currency || store.default_market&.currency
       end
 
       def valid_prefixed_id?(value)
