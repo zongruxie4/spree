@@ -239,7 +239,7 @@ module Spree
         if facet_distribution['option_value_ids'].present?
           prefixed_ids = facet_distribution['option_value_ids'].keys
           raw_ids = prefixed_ids.filter_map { |pid| Spree::OptionValue.decode_prefixed_id(pid) }
-          option_values = Spree::OptionValue.where(id: raw_ids).includes(:option_type).index_by(&:prefixed_id)
+          option_values = Spree::OptionValue.where(id: raw_ids).includes(:option_type).preload_associations_lazily.index_by(&:prefixed_id)
 
           # Group by option type
           by_option_type = {}

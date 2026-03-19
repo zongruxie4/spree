@@ -14,6 +14,9 @@ module Spree
         documents = []
 
         market_locale_pairs.each do |market, locale|
+          # Skip if product has no price in this currency
+          next unless lowest_price(market.currency)
+
           Mobility.with_locale(locale) do
             documents << build_document(locale, market.currency, default_locale)
           end

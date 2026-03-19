@@ -484,6 +484,66 @@ RSpec.describe Spree::Api::V3::Store::ProductsController, type: :controller do
         expect(mock_index).to have_received(:search)
         expect(json_response['data'].size).to eq(2)
       end
+
+      it 'filters by current locale in Meilisearch' do
+        allow(mock_index).to receive(:search).and_return({
+          'hits' => [{ 'product_id' => product.prefixed_id }],
+          'estimatedTotalHits' => 1,
+          'facetDistribution' => {}
+        })
+
+        get :index
+
+        expect(response).to have_http_status(:ok)
+        expect(mock_index).to have_received(:search).with(anything, hash_including(
+          filter: include("locale = '#{store.default_locale}'")
+        ))
+      end
+
+      it 'filters by current currency in Meilisearch' do
+        allow(mock_index).to receive(:search).and_return({
+          'hits' => [{ 'product_id' => product.prefixed_id }],
+          'estimatedTotalHits' => 1,
+          'facetDistribution' => {}
+        })
+
+        get :index
+
+        expect(response).to have_http_status(:ok)
+        expect(mock_index).to have_received(:search).with(anything, hash_including(
+          filter: include("currency = '#{store.default_currency}'")
+        ))
+      end
+
+      it 'filters by store_id in Meilisearch' do
+        allow(mock_index).to receive(:search).and_return({
+          'hits' => [{ 'product_id' => product.prefixed_id }],
+          'estimatedTotalHits' => 1,
+          'facetDistribution' => {}
+        })
+
+        get :index
+
+        expect(response).to have_http_status(:ok)
+        expect(mock_index).to have_received(:search).with(anything, hash_including(
+          filter: include("store_ids = '#{store.id}'")
+        ))
+      end
+
+      it 'always filters by active status in Meilisearch' do
+        allow(mock_index).to receive(:search).and_return({
+          'hits' => [{ 'product_id' => product.prefixed_id }],
+          'estimatedTotalHits' => 1,
+          'facetDistribution' => {}
+        })
+
+        get :index
+
+        expect(response).to have_http_status(:ok)
+        expect(mock_index).to have_received(:search).with(anything, hash_including(
+          filter: include("status = 'active'")
+        ))
+      end
     end
   end
 end
