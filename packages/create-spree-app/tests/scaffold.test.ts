@@ -4,6 +4,57 @@ import path from 'node:path'
 import os from 'node:os'
 import { scaffold } from '../src/scaffold'
 
+const FAKE_COMPOSE = `x-app: &app
+  image: ghcr.io/spree/spree:\${SPREE_VERSION_TAG:-latest}
+  depends_on:
+    postgres:
+      condition: service_healthy
+  env_file: .env
+  environment: &app-env
+    DATABASE_URL: postgres://postgres@postgres:5432/spree_production
+    REDIS_URL: redis://redis:6379/0
+    SECRET_KEY_BASE: \${SECRET_KEY_BASE}
+    MEILISEARCH_URL: http://meilisearch:7700
+
+services:
+  postgres:
+    image: postgres:18-alpine
+  web:
+    <<: *app
+    ports:
+      - "\${SPREE_PORT:-3000}:3000"
+  worker:
+    <<: *app
+    command: bundle exec sidekiq
+volumes:
+  postgres_data:
+`
+
+const FAKE_COMPOSE_DEV = `x-app: &app
+  build:
+    context: .
+    dockerfile: Dockerfile
+  depends_on:
+    postgres:
+      condition: service_healthy
+  env_file: .env
+  environment: &app-env
+    DATABASE_URL: postgres://postgres@postgres:5432/spree_production
+
+services:
+  postgres:
+    image: postgres:18-alpine
+  web:
+    <<: *app
+    ports:
+      - "\${SPREE_PORT:-3000}:3000"
+  worker:
+    <<: *app
+    command: bundle exec sidekiq
+volumes:
+  postgres_data:
+`
+
 vi.mock('../src/storefront', async (importOriginal) => {
   const mod = await importOriginal<typeof import('../src/storefront')>()
   return {
@@ -16,7 +67,13 @@ vi.mock('../src/storefront', async (importOriginal) => {
 })
 
 vi.mock('../src/backend', () => ({
-  downloadBackend: vi.fn(),
+  downloadBackend: vi.fn(async (projectDir: string) => {
+    // Simulate what downloadBackend does: create backend/ with compose files
+    const backendDir = path.join(projectDir, 'backend')
+    fs.mkdirSync(backendDir, { recursive: true })
+    fs.writeFileSync(path.join(backendDir, 'docker-compose.yml'), FAKE_COMPOSE)
+    fs.writeFileSync(path.join(backendDir, 'docker-compose.dev.yml'), FAKE_COMPOSE_DEV)
+  }),
 }))
 
 function createTempDir(): string {
@@ -60,7 +117,7 @@ describe('scaffold (no-start)', () => {
     expect(fs.existsSync(path.join(projectDir, '.gitignore'))).toBe(true)
   })
 
-  it('generates docker-compose with Spree image', async () => {
+  it('copies docker-compose.yml from backend template', async () => {
     const projectDir = getTempProjectDir()
 
     await scaffold({
@@ -74,9 +131,10 @@ describe('scaffold (no-start)', () => {
 
     const compose = fs.readFileSync(path.join(projectDir, 'docker-compose.yml'), 'utf-8')
     expect(compose).toContain('ghcr.io/spree/spree')
+    expect(compose).toContain('MEILISEARCH_URL')
   })
 
-  it('generates docker-compose.dev.yml with build context', async () => {
+  it('adjusts docker-compose.dev.yml build context to ./backend', async () => {
     const projectDir = getTempProjectDir()
 
     await scaffold({

@@ -8,12 +8,15 @@ x-app: &app
       condition: service_healthy
     redis:
       condition: service_healthy
+    meilisearch:
+      condition: service_healthy
   environment: &app-env
     DATABASE_URL: postgres://postgres@postgres:5432/spree_development
     REDIS_URL: redis://redis:6379/0
     SECRET_KEY_BASE: development_secret_key_base_not_for_production_use_only
     RAILS_FORCE_SSL: "false"
     RAILS_ASSUME_SSL: "false"
+    MEILISEARCH_URL: http://meilisearch:7700
     SMTP_HOST: mailpit
     SMTP_PORT: "1025"
 
@@ -44,6 +47,18 @@ services:
       timeout: 5s
       retries: 5
 
+  meilisearch:
+    image: getmeili/meilisearch:latest
+    volumes:
+      - meilisearch_data:/meili_data
+    ports:
+      - "7700:7700"
+    healthcheck:
+      test: curl -f http://localhost:7700/health || exit 1
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
   mailpit:
     image: axllent/mailpit
     ports:
@@ -68,3 +83,4 @@ services:
 volumes:
   postgres_data:
   redis_data:
+  meilisearch_data:

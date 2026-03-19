@@ -1,81 +1,8 @@
 import { describe, it, expect } from 'vitest'
-import { dockerComposeContent, dockerComposeDevContent } from '../src/templates/docker-compose'
 import { envContent, storefrontEnvContent } from '../src/templates/env'
 import { rootPackageJsonContent } from '../src/templates/package-json'
 import { readmeContent } from '../src/templates/readme'
 import { gitignoreContent } from '../src/templates/gitignore'
-
-describe('dockerComposeContent', () => {
-  const content = dockerComposeContent()
-
-  it('includes the Spree image', () => {
-    expect(content).toContain('ghcr.io/spree/spree')
-  })
-
-  it('includes postgres service', () => {
-    expect(content).toContain('postgres:18-alpine')
-  })
-
-  it('includes healthcheck for web service', () => {
-    expect(content).toContain('curl -f http://localhost:3000/up')
-  })
-
-  it('includes worker service with sidekiq command', () => {
-    expect(content).toContain('command: bundle exec sidekiq')
-  })
-
-  it('includes volume definition', () => {
-    expect(content).toContain('postgres_data:')
-  })
-
-  it('uses DATABASE_URL pointing to postgres service', () => {
-    expect(content).toContain('DATABASE_URL: postgres://postgres@postgres:5432/spree_production')
-  })
-
-  it('includes redis service and REDIS_URL', () => {
-    expect(content).toContain('redis:7-alpine')
-    expect(content).toContain('REDIS_URL: redis://redis:6379/0')
-  })
-
-  it('includes mailpit service for local email', () => {
-    expect(content).toContain('axllent/mailpit')
-    expect(content).toContain('SMTP_HOST: mailpit')
-  })
-
-  it('disables SSL for local dev', () => {
-    expect(content).toContain('RAILS_FORCE_SSL: "false"')
-    expect(content).toContain('RAILS_ASSUME_SSL: "false"')
-  })
-
-  it('loads env_file', () => {
-    expect(content).toContain('env_file: .env')
-  })
-
-  it('uses SPREE_PORT variable for port mapping', () => {
-    expect(content).toContain('${SPREE_PORT:-3000}:3000')
-  })
-
-  it('includes SECRET_KEY_BASE from env', () => {
-    expect(content).toContain('SECRET_KEY_BASE: ${SECRET_KEY_BASE}')
-  })
-})
-
-describe('dockerComposeDevContent', () => {
-  const content = dockerComposeDevContent()
-
-  it('uses build context instead of image', () => {
-    expect(content).toContain('context: ./backend')
-    expect(content).toContain('dockerfile: Dockerfile')
-    expect(content).not.toContain('ghcr.io/spree/spree')
-  })
-
-  it('has same services as production compose', () => {
-    expect(content).toContain('postgres:18-alpine')
-    expect(content).toContain('redis:7-alpine')
-    expect(content).toContain('axllent/mailpit')
-    expect(content).toContain('command: bundle exec sidekiq')
-  })
-})
 
 describe('envContent', () => {
   it('includes the provided secret key', () => {

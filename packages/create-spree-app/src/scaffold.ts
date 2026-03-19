@@ -6,7 +6,6 @@ import { execa } from 'execa'
 import type { ScaffoldOptions } from './types.js'
 import { DEFAULT_ADMIN_EMAIL, DEFAULT_ADMIN_PASSWORD } from './constants.js'
 import { generateSecretKeyBase, isDockerRunning } from './utils.js'
-import { dockerComposeContent, dockerComposeDevContent } from './templates/docker-compose.js'
 import { envContent } from './templates/env.js'
 import { rootPackageJsonContent } from './templates/package-json.js'
 import { readmeContent } from './templates/readme.js'
@@ -36,14 +35,30 @@ export async function scaffold(options: ScaffoldOptions): Promise<void> {
     }
   }
 
-  // Phase 1: Generate project files
   const s = p.spinner()
 
+  fs.mkdirSync(projectDir, { recursive: true })
+
+  // Phase 1: Download backend (always included)
+  s.start('Downloading backend template...')
+  await downloadBackend(projectDir)
+  s.stop('Backend template downloaded.')
+
+  // Phase 2: Generate project files
   s.start('Creating project structure...')
 
-  fs.mkdirSync(projectDir, { recursive: true })
-  fs.writeFileSync(path.join(projectDir, 'docker-compose.yml'), dockerComposeContent())
-  fs.writeFileSync(path.join(projectDir, 'docker-compose.dev.yml'), dockerComposeDevContent())
+  // Copy compose files from backend template and adjust paths for project root
+  const backendDir = path.join(projectDir, 'backend')
+  const compose = fs.readFileSync(path.join(backendDir, 'docker-compose.yml'), 'utf-8')
+  const composeDev = fs.readFileSync(path.join(backendDir, 'docker-compose.dev.yml'), 'utf-8')
+
+  fs.writeFileSync(path.join(projectDir, 'docker-compose.yml'), compose)
+  // Adjust build context from current dir to ./backend for the wrapper project
+  fs.writeFileSync(
+    path.join(projectDir, 'docker-compose.dev.yml'),
+    composeDev.replace('context: .', 'context: ./backend'),
+  )
+
   fs.writeFileSync(path.join(projectDir, '.env'), envContent(generateSecretKeyBase(), port))
   fs.writeFileSync(path.join(projectDir, 'package.json'), rootPackageJsonContent(projectName))
   fs.writeFileSync(path.join(projectDir, 'README.md'), readmeContent(projectName, storefront, port))
@@ -55,11 +70,6 @@ export async function scaffold(options: ScaffoldOptions): Promise<void> {
   s.start('Installing dependencies...')
   await installRootDeps(projectDir, options.packageManager)
   s.stop('Dependencies installed.')
-
-  // Phase 2: Backend (always included)
-  s.start('Downloading backend template...')
-  await downloadBackend(projectDir)
-  s.stop('Backend template downloaded.')
 
   // Phase 3: Storefront (optional)
   if (storefront) {

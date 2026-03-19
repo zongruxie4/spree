@@ -1,5 +1,11 @@
 # create-spree-app
 
+## 0.5.0
+
+### Minor Changes
+
+- Add Meilisearch to docker-compose.yml for built-in full-text search with typo tolerance, relevance ranking, and faceted filtering. Meilisearch runs automatically alongside PostgreSQL and Redis — no additional setup needed for development.
+
 ## 0.4.0
 
 ### Minor Changes
