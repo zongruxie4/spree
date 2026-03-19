@@ -441,7 +441,7 @@ RSpec.describe Spree::Api::V3::Store::ProductsController, type: :controller do
 
       it 'searches via Meilisearch when q[search] is present' do
         allow(mock_index).to receive(:search).and_return({
-          'hits' => [{ 'prefixed_id' => product.prefixed_id }],
+          'hits' => [{ 'product_id' => product.prefixed_id }],
           'estimatedTotalHits' => 1,
           'facetDistribution' => {}
         })
@@ -458,7 +458,7 @@ RSpec.describe Spree::Api::V3::Store::ProductsController, type: :controller do
 
       it 'respects AR scope visibility (does not return draft products from Meilisearch)' do
         allow(mock_index).to receive(:search).and_return({
-          'hits' => [{ 'prefixed_id' => product.prefixed_id }, { 'prefixed_id' => draft_product.prefixed_id }],
+          'hits' => [{ 'product_id' => product.prefixed_id }, { 'product_id' => draft_product.prefixed_id }],
           'estimatedTotalHits' => 2,
           'facetDistribution' => {}
         })
@@ -473,7 +473,7 @@ RSpec.describe Spree::Api::V3::Store::ProductsController, type: :controller do
 
       it 'uses Meilisearch for browsing without search query' do
         allow(mock_index).to receive(:search).and_return({
-          'hits' => [{ 'prefixed_id' => product.prefixed_id }, { 'prefixed_id' => product2.prefixed_id }],
+          'hits' => [{ 'product_id' => product.prefixed_id }, { 'product_id' => product2.prefixed_id }],
           'estimatedTotalHits' => 2,
           'facetDistribution' => {}
         })

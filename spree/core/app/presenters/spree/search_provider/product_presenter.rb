@@ -8,17 +8,49 @@ module Spree
         @store = store
       end
 
+      # Returns an array of documents — one per market × locale combination.
+      # Each document has flat name, description, price fields (no dynamic suffixes).
       def call
+        documents = []
+
+        market_locale_pairs.each do |market, locale|
+          Mobility.with_locale(locale) do
+            documents << build_document(locale, market.currency)
+          end
+        end
+
+        # Fallback: if no markets, index with store defaults
+        if documents.empty?
+          documents << build_document(store.default_locale || I18n.default_locale.to_s, store.default_currency)
+        end
+
+        documents
+      end
+
+      private
+
+      def build_document(locale, currency)
+        price = lowest_price(currency)
+
         {
-          prefixed_id: product.prefixed_id,
+          # Composite ID: product + locale + currency
+          prefixed_id: "#{product.prefixed_id}_#{locale}_#{currency}",
+          product_id: product.prefixed_id,
+          locale: locale.to_s,
+          currency: currency,
+          # Translated fields (Mobility resolves via current locale)
           name: product.name,
           description: product.description,
           slug: product.slug,
+          # Price in this currency
+          price: price&.to_f,
+          compare_at_price: compare_at_price(currency)&.to_f,
+          # Non-locale/currency fields
           status: product.status,
           sku: product.sku,
           in_stock: product.in_stock?,
           store_ids: product.store_ids.map(&:to_s),
-          currency_codes: product.prices_including_master.base_prices.where.not(amount: nil).pluck(:currency).uniq,
+          discontinue_on: product.discontinue_on&.to_i || 0,
           category_ids: product.taxons.map(&:prefixed_id),
           category_names: product.taxons.pluck(:name),
           option_type_ids: product.option_types.map(&:prefixed_id),
@@ -28,73 +60,37 @@ module Spree
           tags: product.tag_list || [],
           thumbnail_url: product.primary_media&.url(:large),
           units_sold_count: product.store_products.find_by(store: store)&.units_sold_count || 0,
-          discontinue_on: product.discontinue_on&.to_i || 0,
           available_on: product.available_on&.iso8601,
           created_at: product.created_at&.iso8601,
-          updated_at: product.updated_at&.iso8601,
-          # Multi-currency prices
-          **prices_by_currency,
-          # Multi-language translations
-          **translations_by_locale
+          updated_at: product.updated_at&.iso8601
         }
       end
 
-      private
-
-      # Indexes base prices (no price list overrides) for all currencies:
-      # { price_USD: 19.99, price_EUR: 17.50, compare_at_price_USD: 24.99 }
-      def prices_by_currency
-        result = {}
-
-        product.prices_including_master.base_prices.where.not(amount: nil).each do |price|
-          currency = price.currency
-          amount = price.amount.to_f
-
-          # Keep the lowest price per currency across all variants
-          key = "price_#{currency}"
-          if result[key].nil? || amount < result[key]
-            result[key] = amount
-          end
-
-          if price.compare_at_amount.present?
-            result["compare_at_price_#{currency}"] = price.compare_at_amount.to_f
-          end
+      # Returns all market × locale pairs for this store
+      def market_locale_pairs
+        @market_locale_pairs ||= store.markets.flat_map do |market|
+          market.supported_locales_list.map { |locale| [market, locale] }
         end
-
-        result
       end
 
-      # Indexes translations for all locales: { name_en: "Shirt", name_fr: "Chemise", description_en: "...", ... }
-      def translations_by_locale
-        result = {}
+      def lowest_price(currency)
+        product.price_in(currency)&.amount
+      end
 
-        if product.respond_to?(:translations)
-          product.translations.each do |translation|
-            locale = translation.locale
-            result["name_#{locale}"] = translation.name if translation.name.present?
-            result["description_#{locale}"] = translation.description if translation.description.present?
-            result["slug_#{locale}"] = translation.slug if translation.slug.present?
-          end
-        end
-
-        # Ensure current locale is always indexed
-        result["name_#{I18n.locale}"] ||= product.name
-        result["description_#{I18n.locale}"] ||= product.description
-        result["slug_#{I18n.locale}"] ||= product.slug
-
-        result
+      def compare_at_price(currency)
+        product.compare_at_amount_in(currency)
       end
 
       def variant_option_value_ids
-        variant_option_values_data.map { |ov| ov.prefixed_id }.uniq
+        variant_option_values_data.map(&:prefixed_id).uniq
       end
 
       def variant_option_value_presentations
-        variant_option_values_data.map { |ov| ov.presentation }.uniq
+        variant_option_values_data.map(&:presentation).uniq
       end
 
       def variant_option_values_data
-        @variant_option_values_data ||= product.variants.includes(:option_values).flat_map { |v| v.option_values }
+        @variant_option_values_data ||= product.variants.includes(:option_values).flat_map(&:option_values)
       end
     end
   end

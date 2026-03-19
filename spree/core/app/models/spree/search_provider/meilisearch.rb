@@ -33,8 +33,9 @@ module Spree
 
         Rails.logger.debug { "[Meilisearch] #{ms_result['estimatedTotalHits']} hits in #{ms_result['processingTimeMs']}ms" }
 
-        prefixed_ids = ms_result['hits'].map { |h| h['prefixed_id'] }
-        raw_ids = prefixed_ids.filter_map { |pid| Spree::Product.decode_prefixed_id(pid) }
+        # Hits have composite prefixed_id (prod_abc_en_USD), extract product_id (prod_abc)
+        product_prefixed_ids = ms_result['hits'].map { |h| h['product_id'] }.uniq
+        raw_ids = product_prefixed_ids.filter_map { |pid| Spree::Product.decode_prefixed_id(pid) }
 
         # Intersect with AR scope for security/visibility.
         # Since we filter by store/status/currency/discontinue_on in Meilisearch,
@@ -59,12 +60,14 @@ module Spree
       end
 
       def index(product)
-        document = ProductPresenter.new(product, store).call
-        client.index(index_name).add_documents([document], 'prefixed_id')
+        documents = ProductPresenter.new(product, store).call
+        client.index(index_name).add_documents(documents, 'prefixed_id')
       end
 
       def remove(product)
-        client.index(index_name).delete_document(product.prefixed_id)
+        # Delete all locale/currency variants of this product
+        filter = "product_id = '#{product.prefixed_id}'"
+        client.index(index_name).delete_documents(filter: filter)
       rescue ::Meilisearch::ApiError => e
         raise unless e.http_code == 404
       end
@@ -73,9 +76,10 @@ module Spree
         client.index(index_name).add_documents(documents, 'prefixed_id')
       end
 
-      # Remove document by prefixed_id (e.g. 'prod_abc')
+      # Remove all documents for a product by its prefixed_id (e.g. 'prod_abc')
       def remove_by_id(prefixed_id)
-        client.index(index_name).delete_document(prefixed_id)
+        filter = "product_id = '#{sanitize_prefixed_id(prefixed_id)}'"
+        client.index(index_name).delete_documents(filter: filter)
       rescue ::Meilisearch::ApiError => e
         raise unless e.http_code == 404
       end
@@ -116,29 +120,15 @@ module Spree
       end
 
       def searchable_attributes
-        ['name', 'name_*', 'description', 'description_*', 'sku', 'option_values', 'category_names', 'tags']
+        %w[name description sku option_values category_names tags]
       end
 
       def filterable_attributes
-        attrs = %w[status in_stock store_ids currency_codes discontinue_on category_ids tags]
-
-        # Price fields per currency: price_USD, price_EUR, etc.
-        currencies = store.supported_currencies_list.map(&:iso_code)
-        currencies.each { |c| attrs << "price_#{c}" }
-
-        attrs << 'option_value_ids'
-
-        attrs
+        %w[product_id status in_stock store_ids locale currency discontinue_on price category_ids tags option_value_ids]
       end
 
       def sortable_attributes
-        attrs = %w[created_at available_on units_sold_count]
-
-        # Price fields per currency
-        currencies = store.supported_currencies_list.map(&:iso_code)
-        currencies.each { |c| attrs << "price_#{c}" }
-
-        attrs
+        %w[name price created_at available_on units_sold_count]
       end
 
       def facet_attributes
@@ -156,11 +146,12 @@ module Spree
       def build_filters(filters)
         conditions = []
 
-        # Always scope to current store and active products with prices in currency.
-        # This mirrors the AR scope: store.products.active(currency)
+        # Always scope to current store, locale, currency, active, not discontinued.
+        # This mirrors the AR scope: store.products.active(currency) with locale
         conditions << "store_ids = '#{store.id}'"
         conditions << "status = 'active'"
-        conditions << "currency_codes = '#{currency}'"
+        conditions << "locale = '#{locale}'"
+        conditions << "currency = '#{currency}'"
         conditions << "(discontinue_on = 0 OR discontinue_on > #{Time.current.to_i})"
 
         filters = filters.to_unsafe_h if filters.respond_to?(:to_unsafe_h)
@@ -172,9 +163,9 @@ module Spree
           key = key.to_s
           case key
           when 'price_gte'
-            conditions << "price_#{currency} >= #{value.to_f}"
+            conditions << "price >= #{value.to_f}"
           when 'price_lte'
-            conditions << "price_#{currency} <= #{value.to_f}"
+            conditions << "price <= #{value.to_f}"
           when 'in_stock'
             conditions << 'in_stock = true' if value.to_s != '0'
           when 'out_of_stock'
@@ -198,13 +189,13 @@ module Spree
 
         case sort
         when 'price'
-          ["price_#{currency}:asc"]
+          ['price:asc']
         when '-price'
-          ["price_#{currency}:desc"]
+          ['price:desc']
         when 'name'
-          ["name_#{I18n.locale}:asc"]
+          ['name:asc']
         when '-name'
-          ["name_#{I18n.locale}:desc"]
+          ['name:desc']
         when '-available_on'
           ['available_on:desc']
         when 'available_on'
@@ -219,9 +210,8 @@ module Spree
         filters = []
 
         # Price range
-        price_key = "price_#{currency}"
-        if facet_distribution[price_key].present?
-          amounts = facet_distribution[price_key].keys.map(&:to_f)
+        if facet_distribution['price'].present?
+          amounts = facet_distribution['price'].keys.map(&:to_f)
           filters << {
             id: 'price',
             type: 'price_range',
@@ -305,6 +295,10 @@ module Spree
         })
 
         Pagy::MeilisearchPaginator.paginate(fake_result, {})
+      end
+
+      def locale
+        Spree::Current.locale || store.default_locale || I18n.locale.to_s
       end
 
       def currency

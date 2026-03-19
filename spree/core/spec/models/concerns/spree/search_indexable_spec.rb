@@ -7,11 +7,11 @@ RSpec.describe Spree::SearchIndexable, type: :concern do
   let(:product) { create(:product, stores: [store]) }
 
   describe '#search_presentation' do
-    it 'returns the presenter hash' do
+    it 'returns an array of document hashes (one per market × locale)' do
       result = product.search_presentation(store)
-      expect(result).to be_a(Hash)
-      expect(result[:prefixed_id]).to eq(product.prefixed_id)
-      expect(result[:name]).to eq(product.name)
+      expect(result).to be_an(Array)
+      expect(result.first[:product_id]).to eq(product.prefixed_id)
+      expect(result.first[:name]).to eq(product.name)
     end
   end
 

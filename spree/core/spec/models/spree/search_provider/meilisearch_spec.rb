@@ -20,13 +20,13 @@ module Spree
       let(:ms_response) do
         {
           'hits' => [
-            { 'prefixed_id' => product_1.prefixed_id },
-            { 'prefixed_id' => product_2.prefixed_id }
+            { 'product_id' => product_1.prefixed_id },
+            { 'product_id' => product_2.prefixed_id }
           ],
           'estimatedTotalHits' => 2,
           'facetDistribution' => {
             'in_stock' => { 'true' => 2 },
-            "price_#{store.default_currency}" => { '19.99' => 1, '29.99' => 1 }
+            'price' => { '19.99' => 1, '29.99' => 1 }
           }
         }
       end
@@ -84,7 +84,7 @@ module Spree
       context 'with price filter' do
         it 'passes price filter to Meilisearch' do
           expect(mock_index).to receive(:search).with(anything, hash_including(
-            filter: include("price_#{store.default_currency} >= 10.0")
+            filter: include('price >= 10.0')
           )).and_return(ms_response)
 
           provider.search_and_filter(scope: store.products, filters: { 'price_gte' => '10' })
@@ -104,7 +104,7 @@ module Spree
       context 'with sort' do
         it 'passes price sort to Meilisearch' do
           expect(mock_index).to receive(:search).with(anything, hash_including(
-            sort: ["price_#{store.default_currency}:asc"]
+            sort: ['price:asc']
           )).and_return(ms_response)
 
           provider.search_and_filter(scope: store.products, sort: 'price')
@@ -112,7 +112,7 @@ module Spree
 
         it 'passes descending price sort' do
           expect(mock_index).to receive(:search).with(anything, hash_including(
-            sort: ["price_#{store.default_currency}:desc"]
+            sort: ['price:desc']
           )).and_return(ms_response)
 
           provider.search_and_filter(scope: store.products, sort: '-price')
@@ -140,38 +140,39 @@ module Spree
     end
 
     describe '#index' do
-      it 'adds document to Meilisearch index with prefixed_id as primary key' do
+      it 'adds documents to Meilisearch index with prefixed_id as primary key' do
         expect(mock_index).to receive(:add_documents).with(
-          [hash_including(prefixed_id: product_1.prefixed_id, name: 'Blue Shirt')],
+          array_including(hash_including(product_id: product_1.prefixed_id, name: 'Blue Shirt')),
           'prefixed_id'
         )
         provider.index(product_1)
       end
 
       it 'uses ProductPresenter to serialize' do
-        presenter = instance_double(SearchProvider::ProductPresenter, call: { prefixed_id: 'prod_abc' })
+        docs = [{ prefixed_id: 'prod_abc_en_USD', product_id: 'prod_abc' }]
+        presenter = instance_double(SearchProvider::ProductPresenter, call: docs)
         allow(SearchProvider::ProductPresenter).to receive(:new).with(product_1, store).and_return(presenter)
-        expect(mock_index).to receive(:add_documents).with([{ prefixed_id: 'prod_abc' }], 'prefixed_id')
+        expect(mock_index).to receive(:add_documents).with(docs, 'prefixed_id')
         provider.index(product_1)
       end
     end
 
     describe '#remove' do
-      it 'deletes document by prefixed_id from Meilisearch index' do
-        expect(mock_index).to receive(:delete_document).with(product_1.prefixed_id)
+      it 'deletes all locale/currency variants by product_id filter' do
+        expect(mock_index).to receive(:delete_documents).with(filter: "product_id = '#{product_1.prefixed_id}'")
         provider.remove(product_1)
       end
     end
 
     describe '#remove_by_id' do
-      it 'deletes document by prefixed_id' do
-        expect(mock_index).to receive(:delete_document).with('prod_abc')
+      it 'deletes all documents by product_id filter' do
+        expect(mock_index).to receive(:delete_documents).with(filter: "product_id = 'prod_abc'")
         provider.remove_by_id('prod_abc')
       end
 
       it 'ignores 404 errors' do
         error = ::Meilisearch::ApiError.new(404, 'not found', 'document_not_found')
-        allow(mock_index).to receive(:delete_document).and_raise(error)
+        allow(mock_index).to receive(:delete_documents).and_raise(error)
         expect { provider.remove_by_id('prod_abc') }.not_to raise_error
       end
     end

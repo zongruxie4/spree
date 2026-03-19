@@ -7,32 +7,52 @@ module Spree
     let(:presenter) { described_class.new(product, store) }
 
     describe '#call' do
-      subject(:result) { presenter.call }
+      subject(:documents) { presenter.call }
 
-      it 'returns a hash' do
-        expect(result).to be_a(Hash)
+      it 'returns an array of documents' do
+        expect(documents).to be_an(Array)
+        expect(documents).not_to be_empty
       end
 
-      it 'includes core product attributes' do
-        expect(result[:prefixed_id]).to eq(product.prefixed_id)
-        expect(result[:name]).to eq('Test Shirt')
-        expect(result[:slug]).to eq(product.slug)
-        expect(result[:status]).to eq(product.status)
-        expect(result[:sku]).to eq(product.sku)
-      end
+      context 'document structure' do
+        subject(:doc) { documents.first }
 
-      it 'includes timestamps' do
-        expect(result[:created_at]).to be_present
-        expect(result[:updated_at]).to be_present
-      end
+        it 'includes composite prefixed_id and product_id' do
+          expect(doc[:prefixed_id]).to start_with(product.prefixed_id)
+          expect(doc[:product_id]).to eq(product.prefixed_id)
+        end
 
-      it 'includes stock status' do
-        expect(result).to have_key(:in_stock)
-      end
+        it 'includes locale and currency' do
+          expect(doc[:locale]).to be_present
+          expect(doc[:currency]).to be_present
+        end
 
-      it 'includes category data' do
-        expect(result[:category_ids]).to be_an(Array)
-        expect(result[:category_names]).to be_an(Array)
+        it 'includes flat name and description' do
+          expect(doc[:name]).to eq('Test Shirt')
+          expect(doc[:slug]).to eq(product.slug)
+        end
+
+        it 'includes flat price' do
+          expect(doc).to have_key(:price)
+        end
+
+        it 'includes stock status' do
+          expect(doc).to have_key(:in_stock)
+        end
+
+        it 'includes timestamps' do
+          expect(doc[:created_at]).to be_present
+          expect(doc[:updated_at]).to be_present
+        end
+
+        it 'includes category data as prefixed IDs' do
+          expect(doc[:category_ids]).to be_an(Array)
+        end
+
+        it 'includes option data as prefixed IDs' do
+          expect(doc[:option_type_ids]).to be_an(Array)
+          expect(doc[:option_value_ids]).to be_an(Array)
+        end
       end
 
       context 'with categories' do
@@ -41,41 +61,29 @@ module Spree
         let(:product) { create(:product, name: 'Test Shirt', stores: [store], taxons: [taxon]) }
 
         it 'indexes category_ids as prefixed IDs' do
-          expect(result[:category_ids]).to eq([taxon.prefixed_id])
-          expect(result[:category_ids].first).to start_with('ctg_')
+          doc = documents.first
+          expect(doc[:category_ids]).to eq([taxon.prefixed_id])
+          expect(doc[:category_ids].first).to start_with('ctg_')
         end
       end
 
-      it 'includes option data as prefixed IDs' do
-        expect(result[:option_type_ids]).to be_an(Array)
-        expect(result[:option_value_ids]).to be_an(Array)
-      end
+      context 'with multiple markets' do
+        let!(:us_market) { create(:market, store: store, name: 'US', currency: 'USD', default_locale: 'en') }
+        let!(:eu_market) { create(:market, store: store, name: 'EU', currency: 'EUR', default_locale: 'de', supported_locales: 'de,fr') }
 
-      context 'with prices in multiple currencies' do
-        before do
-          product.master.prices.find_by(currency: 'USD')&.update!(amount: 19.99)
-          create(:price, variant: product.master, amount: 17.50, currency: 'EUR')
+        # Reload store to pick up new markets
+        let(:presenter) { described_class.new(product, store.reload) }
+
+        it 'creates documents for each market × locale combination' do
+          locales_currencies = documents.map { |d| [d[:locale], d[:currency]] }
+          expect(locales_currencies).to include(['en', 'USD'])
+          expect(locales_currencies).to include(['de', 'EUR'])
+          expect(locales_currencies).to include(['fr', 'EUR'])
         end
 
-        it 'indexes prices for each currency' do
-          expect(result['price_USD']).to eq(19.99)
-          expect(result['price_EUR']).to eq(17.50)
-        end
-      end
-
-      context 'with compare_at_price' do
-        before do
-          product.master.prices.find_by(currency: 'USD')&.update!(amount: 19.99, compare_at_amount: 29.99)
-        end
-
-        it 'indexes compare_at_price' do
-          expect(result['compare_at_price_USD']).to eq(29.99)
-        end
-      end
-
-      context 'with translations' do
-        it 'indexes translations for the current locale' do
-          expect(result["name_#{I18n.locale}"]).to eq('Test Shirt')
+        it 'each document has a unique composite prefixed_id' do
+          ids = documents.map { |d| d[:prefixed_id] }
+          expect(ids.uniq.size).to eq(ids.size)
         end
       end
 
@@ -83,8 +91,8 @@ module Spree
         let(:product) { create(:product_with_option_types, stores: [store]) }
 
         it 'includes option value prefixed IDs' do
-          expect(result[:option_value_ids]).to be_an(Array)
-          result[:option_value_ids].each do |ov_id|
+          doc = documents.first
+          doc[:option_value_ids].each do |ov_id|
             expect(ov_id).to start_with('optval_')
           end
         end

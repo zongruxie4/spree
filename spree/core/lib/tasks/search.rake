@@ -16,7 +16,7 @@ namespace :spree do
              .preload(:taxons, :option_types, :primary_media,
                       variants_including_master: [:prices, :option_values])
              .find_in_batches(batch_size: 500) do |batch|
-          documents = batch.map { |product| Spree::SearchProvider::ProductPresenter.new(product, store).call }
+          documents = batch.flat_map { |product| Spree::SearchProvider::ProductPresenter.new(product, store).call }
           provider.index_batch(documents) if provider.respond_to?(:index_batch)
           indexed += batch.size
           print "\r  #{indexed}/#{total} products indexed"
