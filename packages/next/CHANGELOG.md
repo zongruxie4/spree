@@ -1,5 +1,11 @@
 # @spree/next
 
+## 0.13.1
+
+### Patch Changes
+
+- Updated to use `search` instead of `multi_search` parameter, matching the renamed Store API param. No breaking change — `multi_search` still works via backward compatibility.
+
 ## 0.13.0
 
 ### Minor Changes

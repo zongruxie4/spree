@@ -1,5 +1,11 @@
 # @spree/sdk
 
+## 0.13.2
+
+### Patch Changes
+
+- Rename `multi_search` to `search` in `ProductListParams` and `OrderListParams`. The `multi_search` param still works via backward compatibility on the backend but `search` is now the recommended parameter name for full-text search.
+
 ## 0.13.1
 
 ### Patch Changes
