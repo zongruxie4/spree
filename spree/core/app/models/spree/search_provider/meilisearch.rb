@@ -298,11 +298,11 @@ module Spree
       end
 
       def locale
-        Spree::Current.locale || store.default_locale || I18n.locale.to_s
+        Spree::Current.locale || store.default_market&.default_locale || I18n.locale.to_s
       end
 
       def currency
-        Spree::Current.currency || store.default_currency
+        Spree::Current.currency || store.default_market&.currency
       end
 
       def valid_prefixed_id?(value)

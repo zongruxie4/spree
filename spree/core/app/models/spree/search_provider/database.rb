@@ -55,7 +55,7 @@ module Spree
 
         Spree::Api::V3::FiltersAggregator.new(
           scope: scope,
-          currency: Spree::Current.currency || store.default_currency,
+          currency: Spree::Current.currency || store.default_market&.currency,
           category: category
         ).call
       end

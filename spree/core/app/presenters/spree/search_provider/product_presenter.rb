@@ -22,9 +22,12 @@ module Spree
           end
         end
 
-        # Fallback: if no markets, index with store defaults (only if product has a price)
-        if documents.empty? && lowest_price(store.default_currency)
-          documents << build_document(default_locale, store.default_currency, default_locale)
+        # Fallback for stores without markets (legacy/test)
+        if documents.empty?
+          fallback_currency = store.default_market&.currency || store.supported_currencies_list.first&.iso_code
+          if fallback_currency && lowest_price(fallback_currency)
+            documents << build_document(default_locale, fallback_currency, default_locale)
+          end
         end
 
         documents
@@ -77,7 +80,7 @@ module Spree
       end
 
       def default_locale
-        @default_locale ||= store.default_locale || I18n.default_locale.to_s
+        @default_locale ||= store.default_market&.default_locale || I18n.default_locale.to_s
       end
 
       # Read a translated attribute with fallback to default locale.
