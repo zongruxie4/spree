@@ -15,13 +15,13 @@ module Spree
 
         market_locale_pairs.each do |market, locale|
           Mobility.with_locale(locale) do
-            documents << build_document(locale, market.currency)
+            documents << build_document(locale, market.currency, default_locale)
           end
         end
 
         # Fallback: if no markets, index with store defaults
         if documents.empty?
-          documents << build_document(store.default_locale || I18n.default_locale.to_s, store.default_currency)
+          documents << build_document(default_locale, store.default_currency, default_locale)
         end
 
         documents
@@ -29,7 +29,7 @@ module Spree
 
       private
 
-      def build_document(locale, currency)
+      def build_document(locale, currency, fallback_locale)
         price = lowest_price(currency)
 
         {
@@ -38,10 +38,10 @@ module Spree
           product_id: product.prefixed_id,
           locale: locale.to_s,
           currency: currency,
-          # Translated fields (Mobility resolves via current locale)
-          name: product.name,
-          description: product.description,
-          slug: product.slug,
+          # Translated fields — with fallback to default locale
+          name: translated(product, :name, fallback_locale),
+          description: translated(product, :description, fallback_locale),
+          slug: translated(product, :slug, fallback_locale),
           # Price in this currency
           price: price&.to_f,
           compare_at_price: compare_at_price(currency)&.to_f,
@@ -52,11 +52,11 @@ module Spree
           store_ids: product.store_ids.map(&:to_s),
           discontinue_on: product.discontinue_on&.to_i || 0,
           category_ids: product.taxons.map(&:prefixed_id),
-          category_names: product.taxons.pluck(:name),
+          category_names: product.taxons.map { |t| translated(t, :name, fallback_locale) },
           option_type_ids: product.option_types.map(&:prefixed_id),
-          option_type_names: product.option_types.pluck(:presentation),
+          option_type_names: product.option_types.map { |ot| translated(ot, :presentation, fallback_locale) },
           option_value_ids: variant_option_value_ids,
-          option_values: variant_option_value_presentations,
+          option_values: variant_option_values_data.map { |ov| translated(ov, :presentation, fallback_locale) }.uniq,
           tags: product.tag_list || [],
           thumbnail_url: product.primary_media&.url(:large),
           units_sold_count: product.store_products.find_by(store: store)&.units_sold_count || 0,
@@ -73,6 +73,22 @@ module Spree
         end
       end
 
+      def default_locale
+        @default_locale ||= store.default_locale || I18n.default_locale.to_s
+      end
+
+      # Read a translated attribute with fallback to default locale.
+      # Uses Mobility's locale: option which works across all backends.
+      def translated(record, attribute, fallback_locale)
+        value = record.send(attribute)
+        return value if value.present?
+
+        record.send(attribute, locale: fallback_locale.to_sym)
+      rescue ArgumentError
+        # Attribute doesn't support locale: kwarg (not a Mobility attribute)
+        value
+      end
+
       def lowest_price(currency)
         product.price_in(currency)&.amount
       end
@@ -83,10 +99,6 @@ module Spree
 
       def variant_option_value_ids
         variant_option_values_data.map(&:prefixed_id).uniq
-      end
-
-      def variant_option_value_presentations
-        variant_option_values_data.map(&:presentation).uniq
       end
 
       def variant_option_values_data
