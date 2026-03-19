@@ -12,7 +12,7 @@
 
 Rails.application.config.after_initialize do
   # Register Products table
-  Spree.admin.tables.register(:products, model_class: Spree::Product, search_param: :multi_search)
+  Spree.admin.tables.register(:products, model_class: Spree::Product, search_param: :search)
 
   # Product name with image (custom partial)
   Spree.admin.tables.products.add :name,
@@ -190,7 +190,7 @@ Rails.application.config.after_initialize do
                                                     condition: -> { can?(:manage_tags, Spree::Product) }
 
   # Register Orders table
-  Spree.admin.tables.register(:orders, model_class: Spree::Order, search_param: :multi_search, date_range_param: :completed_at)
+  Spree.admin.tables.register(:orders, model_class: Spree::Order, search_param: :search, date_range_param: :completed_at)
 
   Spree.admin.tables.orders.add :number,
                                       label: :number,
@@ -351,7 +351,7 @@ Rails.application.config.after_initialize do
                                       search_url: ->(view_context) { view_context.spree.select_options_admin_promotions_path(format: :json) }
 
   # Register Checkouts table (draft orders)
-  Spree.admin.tables.register(:checkouts, model_class: Spree::Order, search_param: :multi_search, date_range_param: :created_at, new_resource: false)
+  Spree.admin.tables.register(:checkouts, model_class: Spree::Order, search_param: :search, date_range_param: :created_at, new_resource: false)
 
   Spree.admin.tables.checkouts.add :number,
                                         label: :number,
@@ -427,7 +427,7 @@ Rails.application.config.after_initialize do
                                         position: 80
 
   # Register Users table
-  Spree.admin.tables.register(:users, model_class: Spree.user_class, search_param: :multi_search, row_actions: false, link_to_action: :show)
+  Spree.admin.tables.register(:users, model_class: Spree.user_class, search_param: :search, row_actions: false, link_to_action: :show)
 
   # User name with avatar
   Spree.admin.tables.users.add :name,
@@ -934,7 +934,7 @@ Rails.application.config.after_initialize do
                                                position: 70
 
   # Register Metafield Definitions table
-  Spree.admin.tables.register(:metafield_definitions, model_class: Spree::MetafieldDefinition, search_param: :multi_search, row_actions: true)
+  Spree.admin.tables.register(:metafield_definitions, model_class: Spree::MetafieldDefinition, search_param: :search, row_actions: true)
 
   Spree.admin.tables.metafield_definitions.add :key,
                                                      label: :key,
@@ -1433,7 +1433,7 @@ Rails.application.config.after_initialize do
   # ==========================================
   # Price List Products Table
   # ==========================================
-  Spree.admin.tables.register(:price_list_products, model_class: Spree::Product, search_param: :multi_search, row_actions: false, new_resource: false)
+  Spree.admin.tables.register(:price_list_products, model_class: Spree::Product, search_param: :search, row_actions: false, new_resource: false)
 
   Spree.admin.tables.price_list_products.add :name,
                                                    label: :name,
@@ -1541,7 +1541,7 @@ Rails.application.config.after_initialize do
   # ==========================================
   # Customer Group Users Table (users within a customer group)
   # ==========================================
-  Spree.admin.tables.register(:customer_group_users, model_class: Spree.user_class, search_param: :multi_search, row_actions: false, new_resource: false)
+  Spree.admin.tables.register(:customer_group_users, model_class: Spree.user_class, search_param: :search, row_actions: false, new_resource: false)
 
   Spree.admin.tables.customer_group_users.add :name,
                                                     label: :name,

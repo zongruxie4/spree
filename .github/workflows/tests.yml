@@ -135,11 +135,21 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
+      meilisearch:
+        image: getmeili/meilisearch:latest
+        ports:
+          - 7700:7700
+        options: >-
+          --health-cmd "curl -f http://localhost:7700/health"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     env:
       DB: postgres
       DB_HOST: localhost
       DB_USERNAME: postgres
       DB_PASSWORD: postgres
+      MEILISEARCH_URL: http://localhost:7700
       RAILS_VERSION: "~> 8.1.0"
       CI_ARTIFACTS: /tmp/test-artifacts
       BUNDLE_JOBS: 4

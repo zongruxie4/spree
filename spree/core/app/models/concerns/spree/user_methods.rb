@@ -9,7 +9,7 @@ module Spree
     include Spree::UserReporting
     include Spree::UserRoles
     include Spree::RansackableAttributes
-    include Spree::MultiSearchable
+    include Spree::Searchable
     include Spree::Publishable
 
     included do
@@ -74,28 +74,31 @@ module Spree
         find_by_token_for!(:password_reset, token)
       end
 
-      def self.multi_search(query)
-        sanitized_query = sanitize_query_for_multi_search(query)
+      def self.search(query)
+        sanitized_query = sanitize_query_for_search(query)
         return none if query.blank?
 
         name_conditions = []
 
-        name_conditions << multi_search_condition(self, :first_name, sanitized_query)
-        name_conditions << multi_search_condition(self, :last_name, sanitized_query)
+        name_conditions << search_condition(self, :first_name, sanitized_query)
+        name_conditions << search_condition(self, :last_name, sanitized_query)
 
         full_name = NameOfPerson::PersonName.full(sanitized_query)
 
         if full_name.first.present? && full_name.last.present?
-          name_conditions << multi_search_condition(self, :first_name, full_name.first)
-          name_conditions << multi_search_condition(self, :last_name, full_name.last)
+          name_conditions << search_condition(self, :first_name, full_name.first)
+          name_conditions << search_condition(self, :last_name, full_name.last)
         end
 
         where(arel_table[:email].lower.eq(query.downcase)).or(where(name_conditions.reduce(:or)))
       end
 
+      # Backward compatibility alias — remove in Spree 6.0
+      def self.multi_search(query) = search(query)
+
       self.whitelisted_ransackable_associations = %w[bill_address ship_address addresses tags spree_roles]
       self.whitelisted_ransackable_attributes = %w[id email first_name last_name accepts_email_marketing]
-      self.whitelisted_ransackable_scopes = %w[multi_search]
+      self.whitelisted_ransackable_scopes = %w[search multi_search]
 
       def self.with_email(query)
         where("#{table_name}.email LIKE ?", "%#{query}%")

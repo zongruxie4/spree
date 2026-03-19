@@ -30,7 +30,7 @@ RSpec.describe Spree::Admin::ProductsController, type: :controller do
     it 'can find a product by variant sku' do
       variant = create(:variant, sku: 'ABC123', is_master: false)
       product = create(:product, stores: [store], variants: [variant])
-      get :index, params: { q: { multi_search: 'ABC123' } }
+      get :index, params: { q: { search: 'ABC123' } }
       expect(assigns[:collection]).not_to be_empty
       expect(assigns[:collection]).to include(product)
     end
@@ -60,11 +60,11 @@ RSpec.describe Spree::Admin::ProductsController, type: :controller do
     context 'with views' do
       render_views
 
-      it 'can perform multi search' do
+      it 'can perform search' do
         get :index, params: {
           'q' => {
             'status_eq' => 'active',
-            'multi_search' => 'anchor',
+            'search' => 'anchor',
             'classifications_taxon_id_in' => ['8b03b40e-094f-4803-8704-20ac02f9c167', '42e63c13-dbe7-483f-8237-3b0207145fed'],
             'shipping_category_id_eq' => '8b03b40e-094f-4803-8704-20ac02f9c167',
             'tags_name_in' => ['awesome'],
@@ -77,7 +77,7 @@ RSpec.describe Spree::Admin::ProductsController, type: :controller do
       end
 
       it 'renders the export dialog inside the table turbo frame with search params' do
-        get :index, params: { q: { multi_search: 'test-filter' } }
+        get :index, params: { q: { search: 'test-filter' } }
 
         doc = Nokogiri::HTML(response.body)
         table_frame = doc.at_css('turbo-frame#products')

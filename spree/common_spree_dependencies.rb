@@ -17,6 +17,8 @@ platforms :ruby do
   gem 'sqlite3', '>= 2.0'
 end
 
+gem 'meilisearch', '>= 0.28'
+
 group :test do
   gem 'parallel_tests'
   gem 'capybara'

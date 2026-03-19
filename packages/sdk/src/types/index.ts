@@ -173,7 +173,7 @@ export interface ProductListParams extends ListParams {
   /** Sort: 'price', '-price', 'best_selling', 'name', '-name', '-available_on', 'available_on' */
   sort?: string;
   /** Full-text search across name and SKU */
-  multi_search?: string;
+  search?: string;
   /** Filter: name contains */
   name_cont?: string;
   /** Filter: price >= value */
@@ -207,7 +207,7 @@ export interface OrderListParams extends ListParams {
   /** Sort order, e.g. 'completed_at desc' */
   sort?: string;
   /** Full-text search across number, email, customer name */
-  multi_search?: string;
+  search?: string;
   state_eq?: string;
   completed_at_gte?: string;
   completed_at_lte?: string;

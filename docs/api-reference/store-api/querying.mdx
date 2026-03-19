@@ -146,7 +146,7 @@ curl -G 'http://localhost:3000/api/v3/store/products' \
 | `with_option_value_ids` | Filter by option value IDs | `with_option_value_ids: ['optval_abc']` | `q[with_option_value_ids][]=optval_abc` |
 | `in_stock` | Only in-stock products | `in_stock: true` | `q[in_stock]=true` |
 | `out_of_stock` | Only out-of-stock products | `out_of_stock: true` | `q[out_of_stock]=true` |
-| `multi_search` | Full-text search | `multi_search: 'shirt'` | `q[multi_search]=shirt` |
+| `search` | Full-text search | `search: 'shirt'` | `q[search]=shirt` |
 
 ## Sorting
 

@@ -129,33 +129,14 @@ module Spree
 
     scope :with_digital_assets, -> { joins(:digitals) }
 
-    if defined?(PgSearch)
-      include PgSearch::Model
+    scope :search, ->(query) {
+      next none if query.blank? || query.length < 3
 
-      pg_search_scope :search_by_sku, against: :sku, using: { tsearch: { prefix: true } }
+      product_name_or_sku_cont(query)
+    }
 
-      pg_search_scope :search_by_sku_or_options,
-                      against: :sku,
-                      using: { tsearch: { prefix: true } },
-                      associated_against: { option_values: %i[presentation] }
-
-      pg_search_scope :search_by_name_sku_or_options, against: :sku, associated_against: {
-        product: %i[name],
-        option_values: %i[presentation]
-      }, using: { tsearch: { prefix: true } }
-
-      scope :multi_search, lambda { |query|
-        return none if query.blank? || query.length < 3
-
-        search_by_name_sku_or_options(query)
-      }
-    else
-      scope :multi_search, lambda { |query|
-        return none if query.blank? || query.length < 3
-
-        product_name_or_sku_cont(query)
-      }
-    end
+    # Backward compatibility alias — remove in Spree 6.0
+    scope :multi_search, ->(*args) { search(*args) }
 
     # FIXME: cost price should be represented with DisplayMoney class
     LOCALIZED_NUMBERS = %w(cost_price weight depth width height)

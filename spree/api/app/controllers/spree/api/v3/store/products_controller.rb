@@ -4,13 +4,7 @@ module Spree
       module Store
         class ProductsController < ResourceController
           include Spree::Api::V3::HttpCaching
-
-          # Sort values that require special scopes (not plain Ransack column sorts).
-          CUSTOM_SORT_SCOPES = {
-            'price' => :ascend_by_price,
-            '-price' => :descend_by_price,
-            'best_selling' => :by_best_selling
-          }.freeze
+          include Spree::Api::V3::Store::SearchProviderSupport
 
           protected
 
@@ -47,37 +41,23 @@ module Spree
             ]
           end
 
-          # Applies sorting from the unified `sort` param.
-          # Custom values ('price', '-price', 'best_selling') use product-specific scopes.
-          # Standard Ransack values ('name', '-created_at') are handled by base ResourceController.
-          def apply_collection_sort(collection)
-            sort_value = sort_param
-            return collection unless sort_value.present?
+          # Override collection to use search provider.
+          # The provider handles search, filtering, sorting, pagination, and returns a Pagy object.
+          def collection
+            return @collection if @collection.present?
 
-            scope_method = CUSTOM_SORT_SCOPES[sort_value]
-            return collection unless scope_method
+            result = search_provider.search_and_filter(
+              scope: scope.includes(collection_includes).preload_associations_lazily.accessible_by(current_ability, :show),
+              query: search_query,
+              filters: search_filters,
+              sort: sort_param,
+              page: page,
+              limit: limit
+            )
 
-            sorted = collection.reorder(nil)
-            sorted.send(scope_method)
-          end
-
-          # Skip base Ransack sort injection for custom sort scopes
-          def ransack_params
-            rp = super
-
-            # Remove Ransack sort when a custom scope handles it
-            if sort_param.present? && CUSTOM_SORT_SCOPES.key?(sort_param)
-              rp = rp.is_a?(Hash) ? rp.dup : rp.to_unsafe_h
-              rp.delete('s')
-            end
-
-            rp
-          end
-
-          private
-
-          def custom_sort_requested?
-            CUSTOM_SORT_SCOPES.key?(sort_param)
+            @search_result = result
+            @pagy = result.pagy
+            @collection = result.products
           end
         end
       end

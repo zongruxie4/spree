@@ -96,7 +96,7 @@ const filtered = await client.products.list({
 
 // Search by keyword
 const results = await client.products.list({
-  multi_search: 'tote bag',
+  search: 'tote bag',
 })
 
 // Sort products
@@ -115,7 +115,7 @@ curl 'https://api.mystore.com/api/v3/store/products?q[price_gte]=10&q[price_lte]
   -H 'Authorization: Bearer spree_pk_xxx'
 
 # Search
-curl 'https://api.mystore.com/api/v3/store/products?q[multi_search]=tote+bag' \
+curl 'https://api.mystore.com/api/v3/store/products?q[search]=tote+bag' \
   -H 'Authorization: Bearer spree_pk_xxx'
 ```
 

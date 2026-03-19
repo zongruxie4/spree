@@ -24,6 +24,8 @@ Current plans:
 - `6.0-returns-exchanges-claims.md` — First-class Return, Exchange, Claim models replacing ReturnAuthorization/Reimbursement chain
 - `6.0-channels-catalogs-b2b.md` — Channel, Catalog, ProductListing (replaces StoreProduct), Company/CompanyLocation/CompanyContact for B2B
 - `6.0-platform-auth.md` — Drop Devise, own auth stack, User→Customer/Staff rename
+- `6.0-search-provider.md` — Pluggable SearchProvider interface (Database default, Meilisearch/Elasticsearch/Algolia adapters), MetafieldDefinition faceting, autocomplete endpoint
+- `6.0-tax-provider.md` — Pluggable TaxProvider interface (Internal default, Avalara/TaxJar/Vertex adapters), estimate/commit/void lifecycle, tax exemption certificates
 - `5.x-store-api-bridges.md` — Bridge 6.0 naming into 5.5 Store API (fulfillments, delivery, status, remove master_variant)
 - `spree-starter-and-create-spree-app.md` — Replace monorepo server/ with spree-starter template repo, always include backend/ in create-spree-app, add spree eject
 

@@ -516,6 +516,10 @@
             ]
           },
           {
+            "group": "Search",
+            "pages": ["integrations/search/meilisearch"]
+          },
+          {
             "group": "Analytics",
             "pages": [
               "integrations/analytics/google-analytics",

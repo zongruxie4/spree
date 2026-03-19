@@ -26,7 +26,7 @@ const products = await client.products.list({
   price_lte: 100,                                          // Max price
   with_option_value_ids: ['optval_abc', 'optval_def'], // By option values
   in_stock: true,                                          // In stock only
-  multi_search: 'blue shirt',                              // Full-text search
+  search: 'blue shirt',                                     // Full-text search
 });
 ```
 

@@ -4,29 +4,33 @@ module Spree
       module Store
         module Products
           class FiltersController < Store::BaseController
+            include Spree::Api::V3::Store::SearchProviderSupport
+
             def index
-              aggregator = Spree::Api::V3::FiltersAggregator.new(
+              result = search_provider.search_and_filter(
                 scope: filters_scope,
-                currency: current_currency,
-                category: category
+                query: search_query,
+                filters: (search_filters || {}).merge('_category' => category),
+                page: 1,
+                limit: 0
               )
-              render json: aggregator.call
+
+              render json: {
+                filters: result.filters,
+                sort_options: result.sort_options,
+                default_sort: result.default_sort,
+                total_count: result.total_count
+              }
             end
 
             private
 
-            # Build scope from category and/or ransack params
-            # @return [ActiveRecord::Relation]
             def filters_scope
               scope = current_store.products.active(current_currency)
               scope = scope.in_category(category) if category.present?
-              scope = scope.ransack(params[:q]).result if params[:q].present?
               scope.accessible_by(current_ability, :show)
             end
 
-            # Fetches category from params
-            # @param [String] category_id
-            # @return [Spree::Category]
             def category
               category_id = params[:category_id]
               @category ||= category_id.present? ? current_store.categories.find_by_param(category_id) : nil
