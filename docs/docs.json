@@ -275,6 +275,11 @@
                 "group": "Reports",
                 "icon": "chart-bar",
                 "pages": ["developer/how-to/custom-report"]
+              },
+              {
+                "group": "Search",
+                "icon": "search",
+                "pages": ["developer/how-to/custom-search-provider"]
               }
             ]
           },
