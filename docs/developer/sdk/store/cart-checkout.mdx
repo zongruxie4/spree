@@ -74,17 +74,17 @@ await client.carts.couponCodes.remove(cartId, 'SUMMER20', options);
 ```typescript
 await client.carts.update(cartId, {
   email: 'customer@example.com',
-  ship_address: {
-    firstname: 'John',
-    lastname: 'Doe',
+  shipping_address: {
+    first_name: 'John',
+    last_name: 'Doe',
     address1: '123 Main St',
     city: 'New York',
-    zipcode: '10001',
+    postal_code: '10001',
     phone: '+1 555 123 4567',
     country_iso: 'US',
     state_abbr: 'NY',
   },
-  bill_address_id: 'addr_xxx', // Or use existing address by ID
+  billing_address_id: 'addr_xxx', // Or use existing address by ID
 }, { spreeToken: cart.token });
 ```
 

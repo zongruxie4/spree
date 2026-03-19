@@ -192,6 +192,61 @@ module Spree
         end
       end
 
+      describe 'use_shipping (billing same as shipping)' do
+        let(:country) { Spree::Country.find_by(iso: 'US') || create(:country, iso: 'US') }
+        let!(:state) { country.states.find_by(abbr: 'NY') || create(:state, country: country, abbr: 'NY', name: 'New York') }
+
+        let(:shipping_address) do
+          {
+            first_name: 'John',
+            last_name: 'Doe',
+            address1: '123 Main St',
+            city: 'New York',
+            postal_code: '10001',
+            country_iso: 'US',
+            state_abbr: 'NY',
+            phone: '555-1234'
+          }
+        end
+
+        it 'copies shipping address to billing address' do
+          # First set a shipping address
+          result = described_class.call(cart: order, params: { shipping_address: shipping_address })
+          expect(result).to be_success
+
+          # Then use_shipping to copy it to billing
+          result = described_class.call(cart: order, params: { use_shipping: true })
+          expect(result).to be_success
+
+          order.reload
+          expect(order.bill_address).to be_present
+          expect(order.bill_address.first_name).to eq('John')
+          expect(order.bill_address.address1).to eq('123 Main St')
+          expect(order.bill_address.postal_code).to eq('10001')
+        end
+
+        it 'works when set alongside shipping address in the same request' do
+          params = { shipping_address: shipping_address, use_shipping: true }
+          result = described_class.call(cart: order, params: params)
+          expect(result).to be_success
+
+          order.reload
+          expect(order.ship_address.first_name).to eq('John')
+          expect(order.bill_address.first_name).to eq('John')
+          expect(order.bill_address.address1).to eq(order.ship_address.address1)
+        end
+
+        it 'does not copy when use_shipping is false' do
+          # Set shipping address first
+          described_class.call(cart: order, params: { shipping_address: shipping_address })
+          original_bill_address_id = order.reload.bill_address_id
+
+          result = described_class.call(cart: order, params: { use_shipping: false })
+          expect(result).to be_success
+          expect(order.reload.bill_address_id).to eq(original_bill_address_id)
+        end
+      end
+
       describe 'address ownership' do
         let(:other_user) { create(:user) }
         let(:other_users_address) { create(:address, user: other_user) }

@@ -15,6 +15,7 @@ module Spree
                  included_tax_total: :string, display_included_tax_total: :string,
                  additional_tax_total: :string, display_additional_tax_total: :string,
                  total: :string, display_total: :string,
+                 shipping_eq_billing_address: :boolean,
                  billing_address: { nullable: true }, shipping_address: { nullable: true }
 
         # Override ID to use cart_ prefix
@@ -42,6 +43,10 @@ module Spree
 
         attribute :requirements do |order|
           Spree::Checkout::Requirements.new(order).call
+        end
+
+        attribute :shipping_eq_billing_address do |order|
+          order.shipping_eq_billing_address?
         end
 
         many :discounts, resource: Spree.api.discount_serializer

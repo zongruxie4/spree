@@ -1,5 +1,12 @@
 # @spree/sdk
 
+## 0.14.1
+
+### Patch Changes
+
+- Added `use_shipping` option to `UpdateCartParams` — when `true`, copies the shipping address to billing address (billing same as shipping). Write-only flag, not returned in cart responses.
+- Added `shipping_eq_billing_address` boolean to Cart — `true` when shipping and billing addresses match. Lets frontends pre-check the "same as shipping" checkbox without comparing addresses manually.
+
 ## 0.14.0
 
 ### Minor Changes

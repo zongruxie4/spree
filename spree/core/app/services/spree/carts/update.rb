@@ -38,6 +38,7 @@ module Spree
         cart.currency = params[:currency].upcase if params[:currency].present?
         cart.locale = params[:locale] if params[:locale].present?
         cart.metadata = cart.metadata.merge(params[:metadata].to_h) if params[:metadata].present?
+        cart.use_shipping = params[:use_shipping] if params.key?(:use_shipping)
       end
 
       def assign_address(address_type)

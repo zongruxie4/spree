@@ -37,6 +37,7 @@ export const CartSchema = z.object({
   current_step: z.string(),
   completed_steps: z.array(z.string()),
   requirements: z.array(z.object({ step: z.string(), field: z.string(), message: z.string() })),
+  shipping_eq_billing_address: z.boolean(),
   discounts: z.array(DiscountSchema),
   items: z.array(LineItemSchema),
   fulfillments: z.array(FulfillmentSchema),

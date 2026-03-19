@@ -214,15 +214,15 @@ await client.carts.associate('cart_xxx', {
 // List all active carts for authenticated user
 const { data: carts } = await client.carts.list({ token: jwtToken });
 
-// Update cart (email, addresses, special instructions)
+// Update cart (email, addresses, customer note)
 await client.carts.update('cart_xxx', {
   email: 'customer@example.com',
-  ship_address: {
-    firstname: 'John',
-    lastname: 'Doe',
+  shipping_address: {
+    first_name: 'John',
+    last_name: 'Doe',
     address1: '123 Main St',
     city: 'New York',
-    zipcode: '10001',
+    postal_code: '10001',
     phone: '+1 555 123 4567',
     country_iso: 'US',
     state_abbr: 'NY',
@@ -448,11 +448,11 @@ const address = await client.customer.addresses.get('addr_xxx', options);
 
 // Create address
 await client.customer.addresses.create({
-  firstname: 'John',
-  lastname: 'Doe',
+  first_name: 'John',
+  last_name: 'Doe',
   address1: '123 Main St',
   city: 'New York',
-  zipcode: '10001',
+  postal_code: '10001',
   country_iso: 'US',
   state_abbr: 'NY',
 }, options);
@@ -512,7 +512,7 @@ const { data: wishlists } = await client.wishlists.list({}, options);
 
 // Get wishlist by ID
 const wishlist = await client.wishlists.get('wl_xxx', {
-  expand: ['wished_items'],
+  expand: ['wishlist_items'],
 }, options);
 
 // Create wishlist
@@ -695,8 +695,7 @@ All types are exported as unprefixed names (e.g., `Product`, `Order`). Legacy `S
 - `DeliveryMethod` - Delivery method
 - `CreditCard` - Saved credit card
 - `GiftCard` - Gift card
-- `CartPromotion` - Promotion applied to a cart (uses `cpromo_` prefixed IDs)
-- `OrderPromotion` - Promotion applied to an order (uses `oprom_` prefixed IDs)
+- `Discount` - Discount applied to a cart or order
 
 ### Product Types
 - `Media` - Product media (images, videos)
@@ -708,7 +707,7 @@ All types are exported as unprefixed names (e.g., `Product`, `Order`). Legacy `S
 
 ### Wishlist Types
 - `Wishlist` - Wishlist
-- `WishedItem` - Wishlist item
+- `WishlistItem` - Wishlist item
 
 ### Client Types
 - `Client` - Main client interface

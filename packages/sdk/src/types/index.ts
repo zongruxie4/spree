@@ -241,6 +241,8 @@ export interface UpdateCartParams {
   billing_address?: AddressParams;
   /** New shipping address */
   shipping_address?: AddressParams;
+  /** When true, copies shipping address to billing address */
+  use_shipping?: boolean;
   /** Items to upsert (sets quantity for existing, creates new) */
   items?: LineItemInput[];
 }

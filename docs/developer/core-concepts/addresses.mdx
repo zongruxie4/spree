@@ -24,10 +24,10 @@ An address represents a shipping or billing location. Every order has a shipping
 
 | Field | Description |
 |-------|-------------|
-| `firstname`, `lastname` | Contact name |
+| `first_name`, `last_name` | Contact name |
 | `address1`, `address2` | Street address |
 | `city` | City |
-| `zipcode` | Postal code (not required for all countries) |
+| `postal_code` | Postal code (not required for all countries) |
 | `phone` | Phone number |
 | `company` | Company name (optional) |
 | `label` | User-facing label like "Home" or "Office" (optional, unique per customer) |
@@ -48,13 +48,13 @@ const { data: addresses } = await client.customer.addresses.list()
 
 // Create an address
 const address = await client.customer.addresses.create({
-  firstname: 'John',
-  lastname: 'Doe',
+  first_name: 'John',
+  last_name: 'Doe',
   address1: '123 Main St',
   city: 'Los Angeles',
   country_iso: 'US',
   state_abbr: 'CA',
-  zipcode: '90001',
+  postal_code: '90001',
   phone: '555-0100',
 })
 
@@ -78,13 +78,13 @@ curl -X POST 'https://api.mystore.com/api/v3/store/customer/addresses' \
   -H 'Authorization: Bearer <jwt_token>' \
   -H 'Content-Type: application/json' \
   -d '{
-    "firstname": "John",
-    "lastname": "Doe",
+    "first_name": "John",
+    "last_name": "Doe",
     "address1": "123 Main St",
     "city": "Los Angeles",
     "country_iso": "US",
     "state_abbr": "CA",
-    "zipcode": "90001",
+    "postal_code": "90001",
     "phone": "555-0100"
   }'
 
@@ -110,20 +110,20 @@ During checkout, you can either reference a saved address by ID or pass a new ad
 ```typescript SDK
 // Use saved addresses
 await client.carts.update(cartId, {
-  ship_address_id: 'addr_xxx',
-  bill_address_id: 'addr_yyy',
+  shipping_address_id: 'addr_xxx',
+  billing_address_id: 'addr_yyy',
 })
 
 // Or pass new addresses inline
 await client.carts.update(cartId, {
-  ship_address: {
-    firstname: 'John',
-    lastname: 'Doe',
+  shipping_address: {
+    first_name: 'John',
+    last_name: 'Doe',
     address1: '123 Main St',
     city: 'Los Angeles',
     country_iso: 'US',
     state_abbr: 'CA',
-    zipcode: '90001',
+    postal_code: '90001',
     phone: '555-0100',
   },
 })
@@ -135,7 +135,7 @@ curl -X PATCH 'https://api.mystore.com/api/v3/store/carts/cart_xxx' \
   -H 'Authorization: Bearer spree_pk_xxx' \
   -H 'X-Spree-Token: order_token' \
   -H 'Content-Type: application/json' \
-  -d '{ "ship_address_id": "addr_xxx", "bill_address_id": "addr_yyy" }'
+  -d '{ "shipping_address_id": "addr_xxx", "billing_address_id": "addr_yyy" }'
 
 # Or pass a new address inline
 curl -X PATCH 'https://api.mystore.com/api/v3/store/carts/cart_xxx' \
@@ -143,14 +143,14 @@ curl -X PATCH 'https://api.mystore.com/api/v3/store/carts/cart_xxx' \
   -H 'X-Spree-Token: order_token' \
   -H 'Content-Type: application/json' \
   -d '{
-    "ship_address": {
-      "firstname": "John",
-      "lastname": "Doe",
+    "shipping_address": {
+      "first_name": "John",
+      "last_name": "Doe",
       "address1": "123 Main St",
       "city": "Los Angeles",
       "country_iso": "US",
       "state_abbr": "CA",
-      "zipcode": "90001",
+      "postal_code": "90001",
       "phone": "555-0100"
     }
   }'

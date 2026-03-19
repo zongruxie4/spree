@@ -31,11 +31,11 @@ const address = await client.customer.addresses.get('addr_xxx', options);
 
 // Create address
 await client.customer.addresses.create({
-  firstname: 'John',
-  lastname: 'Doe',
+  first_name: 'John',
+  last_name: 'Doe',
   address1: '123 Main St',
   city: 'New York',
-  zipcode: '10001',
+  postal_code: '10001',
   country_iso: 'US',
   state_abbr: 'NY',
 }, options);

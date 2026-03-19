@@ -152,7 +152,7 @@ import {
 } from '@spree/next';
 
 const checkout = await getCheckout();
-await updateCheckout({ ship_address: { ... }, bill_address: { ... } });
+await updateCheckout({ shipping_address: { ... }, billing_address: { ... } });
 const fulfillments = await getFulfillments();
 await selectDeliveryRate(fulfillmentId, rateId);
 await applyCoupon('SAVE20');
@@ -194,7 +194,7 @@ import { listAddresses, getAddress, createAddress, updateAddress, deleteAddress 
 
 const addresses = await listAddresses();
 const address = await getAddress(addressId);
-await createAddress({ firstname: 'John', address1: '123 Main St', ... });
+await createAddress({ first_name: 'John', address1: '123 Main St', ... });
 await updateAddress(addressId, { city: 'Brooklyn' });
 await deleteAddress(addressId);
 ```
