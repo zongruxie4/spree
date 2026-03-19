@@ -12,16 +12,16 @@ RSpec.describe Spree::Api::V3::PaymentSourceSerializer do
 
   subject { described_class.new(payment_source, params: base_params).to_h }
 
-  it 'includes only the id attribute' do
-    expect(subject.keys).to match_array(%w[id])
+  it 'includes expected attributes' do
+    expect(subject.keys).to match_array(%w[id gateway_payment_profile_id])
   end
 
   it 'returns the prefixed id' do
     expect(subject['id']).to eq(payment_source.prefixed_id)
   end
 
-  it 'does not expose gateway_payment_profile_id' do
-    expect(subject).not_to have_key('gateway_payment_profile_id')
+  it 'exposes gateway_payment_profile_id for saved payment method flows' do
+    expect(subject['gateway_payment_profile_id']).to eq('pp_abc123')
   end
 
   it 'does not expose metadata in Store API responses' do

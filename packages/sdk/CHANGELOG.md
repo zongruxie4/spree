@@ -1,5 +1,11 @@
 # @spree/sdk
 
+## 0.14.2
+
+### Patch Changes
+
+- Restored `gateway_payment_profile_id` on `CreditCard` and `PaymentSource` types — needed by frontends for saved card payment flows (Stripe, Adyen, etc.)
+
 ## 0.14.1
 
 ### Patch Changes

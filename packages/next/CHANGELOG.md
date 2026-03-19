@@ -1,5 +1,11 @@
 # @spree/next
 
+## 0.14.1
+
+### Patch Changes
+
+- Updated peer dependency to `@spree/sdk >= 0.14.2`
+
 ## 0.14.0
 
 ### Minor Changes
