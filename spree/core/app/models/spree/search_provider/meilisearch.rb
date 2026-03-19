@@ -242,7 +242,7 @@ module Spree
 
             ot = ov.option_type
             by_option_type[ot] ||= []
-            by_option_type[ot] << { id: ov.prefixed_id, name: ov.name, presentation: ov.presentation, position: ov.position, count: count }
+            by_option_type[ot] << { id: ov.prefixed_id, name: ov.name, label: ov.label, position: ov.position, count: count }
           end
 
           by_option_type.each do |option_type, values|
@@ -250,7 +250,7 @@ module Spree
               id: option_type.prefixed_id,
               type: 'option',
               name: option_type.name,
-              presentation: option_type.presentation,
+              label: option_type.label,
               options: values.sort_by { |o| o[:position] }
             }
           end

@@ -32,8 +32,8 @@ RSpec.describe Spree::Api::V3::LineItemSerializer do
     it 'includes adjustment attributes' do
       expect(subject).to have_key('adjustment_total')
       expect(subject).to have_key('display_adjustment_total')
-      expect(subject).to have_key('promo_total')
-      expect(subject).to have_key('display_promo_total')
+      expect(subject).to have_key('discount_total')
+      expect(subject).to have_key('display_discount_total')
     end
 
     it 'includes tax attributes' do

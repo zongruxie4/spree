@@ -1,6 +1,6 @@
 // This file is auto-generated. Do not edit directly.
 import { z } from 'zod';
-import { WishedItemSchema } from './WishedItem';
+import { WishlistItemSchema } from './WishlistItem';
 
 export const WishlistSchema = z.object({
   id: z.string(),
@@ -10,7 +10,7 @@ export const WishlistSchema = z.object({
   updated_at: z.string(),
   is_default: z.boolean(),
   is_private: z.boolean(),
-  items: z.array(WishedItemSchema).optional(),
+  items: z.array(WishlistItemSchema).optional(),
 });
 
 export type Wishlist = z.infer<typeof WishlistSchema>;

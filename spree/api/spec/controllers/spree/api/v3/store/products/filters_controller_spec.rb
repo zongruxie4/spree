@@ -82,12 +82,12 @@ RSpec.describe Spree::Api::V3::Store::Products::FiltersController, type: :contro
       size_filter = json_response['filters'].find { |f| f['name'] == 'size' }
       expect(size_filter).to be_present
       expect(size_filter['type']).to eq('option')
-      expect(size_filter['presentation']).to eq('Size')
+      expect(size_filter['label']).to eq('Size')
 
       size_options = size_filter['options']
-      expect(size_options.map { |o| o['presentation'] }).to include('S', 'M')
+      expect(size_options.map { |o| o['label'] }).to include('S', 'M')
 
-      small_option = size_options.find { |o| o['presentation'] == 'S' }
+      small_option = size_options.find { |o| o['label'] == 'S' }
       expect(small_option['count']).to eq(1)
     end
 

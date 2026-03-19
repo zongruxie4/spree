@@ -22,14 +22,14 @@ RSpec.describe Spree::Api::V3::Store::Carts::ItemsController, type: :controller 
 
       expect(response).to have_http_status(:created)
       expect(json_response['id']).to start_with('cart_')
-      expect(json_response['item_count']).to eq(2)
+      expect(json_response['total_quantity']).to eq(2)
     end
 
     it 'defaults quantity to 1' do
       post :create, params: { cart_id: order.prefixed_id, variant_id: variant.prefixed_id }
 
       expect(response).to have_http_status(:created)
-      expect(json_response['item_count']).to eq(1)
+      expect(json_response['total_quantity']).to eq(1)
     end
 
     it 'returns updated totals' do

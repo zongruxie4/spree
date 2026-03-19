@@ -9,8 +9,8 @@ module Spree
 
         ApplicationRecord.transaction do
           assign_cart_attributes
-          assign_address(:ship_address)
-          assign_address(:bill_address)
+          assign_address(:shipping_address)
+          assign_address(:billing_address)
 
           cart.save!
 
@@ -34,7 +34,7 @@ module Spree
 
       def assign_cart_attributes
         cart.email = params[:email] if params[:email].present?
-        cart.special_instructions = params[:special_instructions] if params.key?(:special_instructions)
+        cart.customer_note = params[:customer_note] if params.key?(:customer_note)
         cart.currency = params[:currency].upcase if params[:currency].present?
         cart.locale = params[:locale] if params[:locale].present?
         cart.metadata = cart.metadata.merge(params[:metadata].to_h) if params[:metadata].present?
@@ -59,7 +59,7 @@ module Spree
           # Only revert to address state when shipping address changes.
           # Billing address updates (e.g. during payment) should not
           # destroy shipments and reset the checkout flow.
-          revert_to_address_state if address_type == :ship_address && cart.has_checkout_step?('address')
+          revert_to_address_state if address_type == :shipping_address && cart.has_checkout_step?('address')
           cart.public_send(:"#{address_type}_attributes=", address_params)
         end
       end

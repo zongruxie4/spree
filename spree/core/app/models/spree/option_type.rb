@@ -33,6 +33,9 @@ module Spree
     has_many :option_type_prototypes, class_name: 'Spree::OptionTypePrototype'
     has_many :prototypes, through: :option_type_prototypes, class_name: 'Spree::Prototype'
 
+    # 5.5 API naming bridge (DB column rename in 6.0)
+    alias_attribute :label, :presentation
+
     #
     # Validations
     #

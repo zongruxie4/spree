@@ -24,9 +24,9 @@ describe('payments', () => {
       expect(payment.source).toBeDefined();
       expect(payment.source!.id).toBe('card_1');
       if (payment.source_type === 'credit_card') {
-        const source = payment.source as { cc_type: string; last_digits: string };
-        expect(source.cc_type).toBe('visa');
-        expect(source.last_digits).toBe('4242');
+        const source = payment.source as { brand: string; last4: string };
+        expect(source.brand).toBe('visa');
+        expect(source.last4).toBe('4242');
       }
     });
 

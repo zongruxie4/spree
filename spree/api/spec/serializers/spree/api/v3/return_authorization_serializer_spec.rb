@@ -11,7 +11,7 @@ RSpec.describe Spree::Api::V3::ReturnAuthorizationSerializer do
 
   it 'includes all expected attributes' do
     expect(subject.keys).to match_array(%w[
-      id number state order_id stock_location_id return_authorization_reason_id created_at updated_at
+      id number status order_id stock_location_id return_authorization_reason_id created_at updated_at
     ])
   end
 
@@ -23,7 +23,7 @@ RSpec.describe Spree::Api::V3::ReturnAuthorizationSerializer do
     expect(subject['order_id']).to eq(return_authorization.order.prefixed_id)
   end
 
-  it 'returns state as string' do
-    expect(subject['state']).to be_a(String)
+  it 'returns status as string' do
+    expect(subject['status']).to be_a(String)
   end
 end

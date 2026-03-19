@@ -64,11 +64,11 @@ describe('customer', () => {
     it('creates an address', async () => {
       const result = await client.customer.addresses.create(
         {
-          firstname: 'Test',
-          lastname: 'User',
+          first_name: 'Test',
+          last_name: 'User',
           address1: '123 Main St',
           city: 'New York',
-          zipcode: '10001',
+          postal_code: '10001',
           country_iso: 'US',
         },
         opts

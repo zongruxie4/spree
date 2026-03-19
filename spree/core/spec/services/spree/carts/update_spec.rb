@@ -18,25 +18,25 @@ module Spree
         end
       end
 
-      describe 'updating special_instructions' do
-        let(:params) { { special_instructions: 'Leave at the door' } }
+      describe 'updating customer_note' do
+        let(:params) { { customer_note: 'Leave at the door' } }
 
-        it 'updates the special instructions' do
+        it 'updates the customer note' do
           expect(subject).to be_success
           expect(order.reload.special_instructions).to eq('Leave at the door')
         end
 
-        context 'when clearing special_instructions' do
+        context 'when clearing customer_note' do
           let(:order) { create(:order_with_line_items, user: user, store: store, special_instructions: 'Existing instructions') }
 
           it 'clears with empty string' do
-            result = described_class.call(cart: order, params: { special_instructions: '' })
+            result = described_class.call(cart: order, params: { customer_note: '' })
             expect(result).to be_success
             expect(order.reload.special_instructions).to eq('')
           end
 
           it 'clears with nil' do
-            result = described_class.call(cart: order, params: { special_instructions: nil })
+            result = described_class.call(cart: order, params: { customer_note: nil })
             expect(result).to be_success
             expect(order.reload.special_instructions).to be_nil
           end
@@ -85,11 +85,11 @@ module Spree
             let(:params) do
               {
                 address_key => {
-                  firstname: 'John',
-                  lastname: 'Doe',
+                  first_name: 'John',
+                  last_name: 'Doe',
                   address1: '123 Main St',
                   city: 'New York',
-                  zipcode: '10001',
+                  postal_code: '10001',
                   country_iso: 'US',
                   state_abbr: 'NY',
                   phone: '555-1234'
@@ -100,11 +100,11 @@ module Spree
             it 'creates a new address' do
               expect(subject).to be_success
               address = order.reload.public_send(address_key)
-              expect(address.firstname).to eq('John')
-              expect(address.lastname).to eq('Doe')
+              expect(address.first_name).to eq('John')
+              expect(address.last_name).to eq('Doe')
               expect(address.address1).to eq('123 Main St')
               expect(address.city).to eq('New York')
-              expect(address.zipcode).to eq('10001')
+              expect(address.postal_code).to eq('10001')
               expect(address.country.iso).to eq('US')
               expect(address.state.abbr).to eq('NY')
             end
@@ -149,12 +149,12 @@ module Spree
           end
         end
 
-        describe 'ship_address' do
-          include_examples 'address update', :ship_address
+        describe 'shipping_address' do
+          include_examples 'address update', :shipping_address
         end
 
-        describe 'bill_address' do
-          include_examples 'address update', :bill_address
+        describe 'billing_address' do
+          include_examples 'address update', :billing_address
         end
       end
 
@@ -165,12 +165,12 @@ module Spree
 
         let(:params) do
           {
-            bill_address: {
-              firstname: 'Jane',
-              lastname: 'Doe',
+            billing_address: {
+              first_name: 'Jane',
+              last_name: 'Doe',
               address1: '456 Oak Ave',
               city: 'New York',
-              zipcode: '10002',
+              postal_code: '10002',
               country_iso: 'US',
               state_abbr: 'NY',
               phone: '555-9999'
@@ -220,12 +220,12 @@ module Spree
           end
         end
 
-        include_examples 'ignores other users address', :ship_address
-        include_examples 'ignores other users address', :bill_address
+        include_examples 'ignores other users address', :shipping_address
+        include_examples 'ignores other users address', :billing_address
 
         context 'when order has no user (guest order)' do
           let(:order) { create(:order_with_line_items, user: nil, store: store) }
-          let(:params) { { ship_address_id: other_users_address.prefixed_id } }
+          let(:params) { { shipping_address_id: other_users_address.prefixed_id } }
 
           it 'ignores address_id params and keeps existing address' do
             original_address_id = order.ship_address_id
@@ -262,13 +262,13 @@ module Spree
         let(:params) do
           {
             email: 'customer@example.com',
-            special_instructions: 'Handle with care',
-            ship_address: {
-              firstname: 'John',
-              lastname: 'Doe',
+            customer_note: 'Handle with care',
+            shipping_address: {
+              first_name: 'John',
+              last_name: 'Doe',
               address1: '123 Main St',
               city: 'New York',
-              zipcode: '10001',
+              postal_code: '10001',
               country_iso: 'US',
               state_abbr: 'NY'
             }
@@ -279,8 +279,8 @@ module Spree
           expect(subject).to be_success
           order.reload
           expect(order.email).to eq('customer@example.com')
-          expect(order.special_instructions).to eq('Handle with care')
-          expect(order.ship_address.firstname).to eq('John')
+          expect(order.customer_note).to eq('Handle with care')
+          expect(order.shipping_address.first_name).to eq('John')
         end
       end
 
@@ -352,7 +352,7 @@ module Spree
 
       describe 'error handling' do
         context 'with invalid address prefix_id' do
-          let(:params) { { ship_address_id: 'addr_invalid123' } }
+          let(:params) { { shipping_address_id: 'addr_invalid123' } }
 
           it 'succeeds but does not change the address' do
             original_address_id = order.ship_address_id

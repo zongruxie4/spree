@@ -54,7 +54,7 @@ describe('address actions', () => {
 
   describe('listAddresses', () => {
     it('returns addresses list', async () => {
-      const mockAddresses = { data: [{ id: '1', firstname: 'John' }] };
+      const mockAddresses = { data: [{ id: '1', first_name: 'John' }] };
       mockClient.customer.addresses.list.mockResolvedValue(mockAddresses);
 
       const result = await listAddresses();
@@ -68,7 +68,7 @@ describe('address actions', () => {
 
   describe('getAddress', () => {
     it('returns a single address', async () => {
-      const mockAddress = { id: '1', firstname: 'John', lastname: 'Doe' };
+      const mockAddress = { id: '1', first_name: 'John', last_name: 'Doe' };
       mockClient.customer.addresses.get.mockResolvedValue(mockAddress);
 
       const result = await getAddress('1');
@@ -83,11 +83,11 @@ describe('address actions', () => {
   describe('createAddress', () => {
     it('creates address and revalidates', async () => {
       const params = {
-        firstname: 'Jane',
-        lastname: 'Doe',
+        first_name: 'Jane',
+        last_name: 'Doe',
         address1: '456 Oak Ave',
         city: 'LA',
-        zipcode: '90001',
+        postal_code: '90001',
         country_iso: 'US',
       };
       const mockAddress = { id: '2', ...params };
@@ -105,8 +105,8 @@ describe('address actions', () => {
 
   describe('updateAddress', () => {
     it('updates address and revalidates', async () => {
-      const params = { firstname: 'Updated' };
-      const mockAddress = { id: '1', firstname: 'Updated', lastname: 'Doe' };
+      const params = { first_name: 'Updated' };
+      const mockAddress = { id: '1', first_name: 'Updated', last_name: 'Doe' };
       mockClient.customer.addresses.update.mockResolvedValue(mockAddress);
 
       const result = await updateAddress('1', params);

@@ -54,6 +54,12 @@ module Spree
     alias display_ship_total display_shipment_total
     alias_attribute :ship_total, :shipment_total
 
+    # 5.5 API naming bridges (DB columns rename in 6.0)
+    alias_attribute :discount_total, :promo_total
+    alias display_discount_total display_promo_total
+    alias_attribute :customer_note, :special_instructions
+    alias_attribute :total_quantity, :item_count
+
     MONEY_THRESHOLD  = 100_000_000
     MONEY_VALIDATION = {
       presence: true,
@@ -108,11 +114,13 @@ module Spree
                               optional: true, dependent: :destroy
     alias_method :billing_address, :bill_address
     alias_method :billing_address=, :bill_address=
+    alias_attribute :billing_address_id, :bill_address_id
 
     belongs_to :ship_address, foreign_key: :ship_address_id, class_name: 'Spree::Address',
                               optional: true, dependent: :destroy
     alias_method :shipping_address, :ship_address
     alias_method :shipping_address=, :ship_address=
+    alias_attribute :shipping_address_id, :ship_address_id
 
     belongs_to :store, class_name: 'Spree::Store'
 
@@ -139,7 +147,6 @@ module Spree
              inverse_of: :order
 
     has_many :order_promotions, class_name: 'Spree::OrderPromotion'
-    has_many :cart_promotions, class_name: 'Spree::CartPromotion', foreign_key: :order_id
     has_many :promotions, through: :order_promotions, class_name: 'Spree::Promotion'
 
     has_many :shipments, class_name: 'Spree::Shipment', dependent: :destroy, inverse_of: :order do
@@ -150,10 +157,18 @@ module Spree
     has_many :shipment_adjustments, through: :shipments, source: :adjustments
 
     alias items line_items
+    alias discounts order_promotions
+    alias fulfillments shipments
+    alias_attribute :delivery_total, :shipment_total
+    alias display_delivery_total display_shipment_total
+    alias_attribute :fulfillment_status, :shipment_state
+    alias_attribute :payment_status, :payment_state
 
     accepts_nested_attributes_for :line_items
     accepts_nested_attributes_for :bill_address
     accepts_nested_attributes_for :ship_address
+    alias shipping_address_attributes= ship_address_attributes=
+    alias billing_address_attributes= bill_address_attributes=
     accepts_nested_attributes_for :payments, reject_if: :credit_card_nil_payment?
     accepts_nested_attributes_for :shipments
 

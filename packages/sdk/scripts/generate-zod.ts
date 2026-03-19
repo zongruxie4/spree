@@ -16,12 +16,12 @@ interface ParsedType {
 }
 
 function parseTypeFile(content: string): ParsedType | null {
-  const typeNameMatch = content.match(/^type\s+(\w+)\s*=\s*\{/m);
+  const typeNameMatch = content.match(/^(?:type\s+(\w+)\s*=\s*\{|interface\s+(\w+)\s*\{)/m);
   if (!typeNameMatch) return null;
-  const typeName = typeNameMatch[1];
+  const typeName = typeNameMatch[1] || typeNameMatch[2];
 
   // Find the body between braces, handling nested braces (e.g., inline object types)
-  const typeStart = content.indexOf('{', content.search(/^type\s+\w+\s*=\s*\{/m));
+  const typeStart = content.indexOf('{', content.search(/^(?:type\s+\w+\s*=\s*\{|interface\s+\w+\s*\{)/m));
   if (typeStart === -1) return null;
   let depth = 1;
   let i = typeStart + 1;

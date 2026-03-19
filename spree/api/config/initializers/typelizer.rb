@@ -10,10 +10,22 @@ Rails.application.config.after_initialize do
     config.comments = true
     config.listen = false
 
+    # Serializers that exist only for Admin API or events — no Store API controller
+    store_excluded = %w[
+      Asset CartPromotion OrderPromotion
+      StockItem StockMovement StockTransfer ShippingCategory
+      Reimbursement Report Export Import ImportRow
+      TaxCategory CustomerReturn
+    ].to_set
+
     # Store SDK — no prefix, package provides namespace
     config.writer(:store) do |c|
       c.output_dir = api_root.join('../../packages/sdk/src/types/generated')
-      c.reject_class = ->(serializer:) { serializer.name.to_s.include?('::Admin::') }
+      c.reject_class = ->(serializer:) {
+        name = serializer.name.to_s
+        name.include?('::Admin::') ||
+          store_excluded.include?(name.sub(/\ASpree::Api::V3::/, '').sub(/Serializer\z/, ''))
+      }
       c.serializer_name_mapper = ->(serializer) {
         serializer.name.to_s
           .sub(/\ASpree::Api::V3::/, '')

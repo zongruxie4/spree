@@ -93,16 +93,16 @@ RSpec.describe Spree::Api::V3::FiltersAggregator do
 
         expect(size_filter).to be_present
         expect(size_filter[:type]).to eq('option')
-        expect(size_filter[:presentation]).to eq('Size')
+        expect(size_filter[:label]).to eq('Size')
       end
 
       it 'includes option values with counts' do
         size_filter = result[:filters].find { |f| f[:name] == 'size' }
         options = size_filter[:options]
 
-        expect(options.map { |o| o[:presentation] }).to contain_exactly('S', 'M')
+        expect(options.map { |o| o[:label] }).to contain_exactly('S', 'M')
 
-        s_option = options.find { |o| o[:presentation] == 'S' }
+        s_option = options.find { |o| o[:label] == 'S' }
         expect(s_option[:count]).to eq(1)
       end
 

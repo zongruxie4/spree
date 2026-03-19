@@ -5,10 +5,10 @@ export const OptionValueSchema = z.object({
   id: z.string(),
   option_type_id: z.string(),
   name: z.string(),
-  presentation: z.string(),
+  label: z.string(),
   position: z.number(),
   option_type_name: z.string(),
-  option_type_presentation: z.string(),
+  option_type_label: z.string(),
 });
 
 export type OptionValue = z.infer<typeof OptionValueSchema>;

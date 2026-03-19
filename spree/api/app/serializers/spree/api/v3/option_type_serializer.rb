@@ -2,9 +2,9 @@ module Spree
   module Api
     module V3
       class OptionTypeSerializer < BaseSerializer
-        typelize name: :string, presentation: :string, position: :number
+        typelize name: :string, label: :string, position: :number
 
-        attributes :name, :presentation, :position
+        attributes :name, :label, :position
       end
     end
   end

@@ -26,7 +26,7 @@ RSpec.describe Spree::Api::V3::Store::Customer::AddressesController, type: :cont
       get :index
 
       address_data = json_response['data'].first
-      expect(address_data).to include('id', 'firstname', 'lastname', 'address1', 'city', 'zipcode')
+      expect(address_data).to include('id', 'first_name', 'last_name', 'address1', 'city', 'postal_code')
     end
 
     it 'only returns addresses belonging to the current user' do
@@ -62,7 +62,7 @@ RSpec.describe Spree::Api::V3::Store::Customer::AddressesController, type: :cont
     it 'returns address attributes' do
       get :show, params: { id: address.prefixed_id }
 
-      expect(json_response).to include('id', 'firstname', 'lastname', 'address1', 'city', 'zipcode')
+      expect(json_response).to include('id', 'first_name', 'last_name', 'address1', 'city', 'postal_code')
     end
 
     context 'when address belongs to another user' do
@@ -90,11 +90,11 @@ RSpec.describe Spree::Api::V3::Store::Customer::AddressesController, type: :cont
   describe 'POST #create' do
     let(:address_params) do
       {
-        firstname: 'John',
-        lastname: 'Doe',
+        first_name: 'John',
+        last_name: 'Doe',
         address1: '123 Main St',
         city: 'New York',
-        zipcode: '10001',
+        postal_code: '10001',
         phone: '555-1234',
         country_iso: country.iso,
         state_abbr: state.abbr
@@ -112,14 +112,14 @@ RSpec.describe Spree::Api::V3::Store::Customer::AddressesController, type: :cont
     it 'returns the created address' do
       post :create, params: address_params
 
-      expect(json_response['firstname']).to eq('John')
-      expect(json_response['lastname']).to eq('Doe')
+      expect(json_response['first_name']).to eq('John')
+      expect(json_response['last_name']).to eq('Doe')
       expect(json_response['address1']).to eq('123 Main St')
     end
 
     context 'with invalid params' do
-      it 'returns validation errors for missing firstname' do
-        post :create, params: address_params.except(:firstname)
+      it 'returns validation errors for missing first_name' do
+        post :create, params: address_params.except(:first_name)
 
         expect(response).to have_http_status(:unprocessable_content)
         expect(json_response['error']['code']).to eq('validation_error')
@@ -139,16 +139,16 @@ RSpec.describe Spree::Api::V3::Store::Customer::AddressesController, type: :cont
 
   describe 'PATCH #update' do
     it 'updates the address' do
-      patch :update, params: { id: address.prefixed_id, firstname: 'Updated' }
+      patch :update, params: { id: address.prefixed_id, first_name: 'Updated' }
 
       expect(response).to have_http_status(:ok)
       expect(address.reload.firstname).to eq('Updated')
     end
 
     it 'returns the updated address' do
-      patch :update, params: { id: address.prefixed_id, firstname: 'Updated' }
+      patch :update, params: { id: address.prefixed_id, first_name: 'Updated' }
 
-      expect(json_response['firstname']).to eq('Updated')
+      expect(json_response['first_name']).to eq('Updated')
     end
 
     context 'when address belongs to another user' do
@@ -156,7 +156,7 @@ RSpec.describe Spree::Api::V3::Store::Customer::AddressesController, type: :cont
       let(:other_address) { create(:address, user: other_user) }
 
       it 'returns not found' do
-        patch :update, params: { id: other_address.prefixed_id, firstname: 'Hacker' }
+        patch :update, params: { id: other_address.prefixed_id, first_name: 'Hacker' }
 
         expect(response).to have_http_status(:not_found)
         expect(other_address.reload.firstname).not_to eq('Hacker')
@@ -167,7 +167,7 @@ RSpec.describe Spree::Api::V3::Store::Customer::AddressesController, type: :cont
       before { request.headers['Authorization'] = nil }
 
       it 'returns unauthorized' do
-        patch :update, params: { id: address.prefixed_id, firstname: 'Updated' }
+        patch :update, params: { id: address.prefixed_id, first_name: 'Updated' }
 
         expect(response).to have_http_status(:unauthorized)
       end

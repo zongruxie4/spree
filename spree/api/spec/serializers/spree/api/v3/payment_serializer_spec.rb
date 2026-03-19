@@ -53,8 +53,8 @@ RSpec.describe Spree::Api::V3::PaymentSerializer do
       it 'serializes the credit card source' do
         expect(subject['source']).to be_a(Hash)
         expect(subject['source']['id']).to eq(payment.source.prefixed_id)
-        expect(subject['source']).to have_key('cc_type')
-        expect(subject['source']).to have_key('last_digits')
+        expect(subject['source']).to have_key('brand')
+        expect(subject['source']).to have_key('last4')
         expect(subject['source']).to have_key('month')
         expect(subject['source']).to have_key('year')
         expect(subject['source']).to have_key('name')
@@ -75,7 +75,7 @@ RSpec.describe Spree::Api::V3::PaymentSerializer do
       it 'serializes the payment source' do
         expect(subject['source']).to be_a(Hash)
         expect(subject['source']['id']).to eq(payment.source.prefixed_id)
-        expect(subject['source']).to have_key('gateway_payment_profile_id')
+        expect(subject['source']).not_to have_key('gateway_payment_profile_id')
         expect(subject['source']).not_to have_key('public_metadata')
       end
     end

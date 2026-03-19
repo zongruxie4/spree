@@ -11,9 +11,7 @@ RSpec.describe Spree::Api::V3::PromotionSerializer do
 
   it 'includes all expected attributes' do
     expect(subject.keys).to match_array(%w[
-      id name description code type kind path match_policy usage_limit
-      advertise multi_codes code_prefix number_of_codes
-      starts_at expires_at promotion_category_id created_at updated_at
+      id name description code
     ])
   end
 

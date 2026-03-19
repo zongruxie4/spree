@@ -2,7 +2,7 @@
 import { z } from 'zod';
 import { VariantSchema } from './Variant';
 
-export const WishedItemSchema = z.object({
+export const WishlistItemSchema = z.object({
   id: z.string(),
   variant_id: z.string(),
   wishlist_id: z.string(),
@@ -12,4 +12,4 @@ export const WishedItemSchema = z.object({
   variant: VariantSchema,
 });
 
-export type WishedItem = z.infer<typeof WishedItemSchema>;
+export type WishlistItem = z.infer<typeof WishlistItemSchema>;

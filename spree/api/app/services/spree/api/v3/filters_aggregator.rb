@@ -85,7 +85,7 @@ module Spree
               id: option_type.prefixed_id,
               type: 'option',
               name: option_type.name,
-              presentation: option_type.presentation,
+              label: option_type.label,
               options: values.map { |ov| option_value_data(option_type, ov) }
             }
           end
@@ -105,7 +105,7 @@ module Spree
           {
             id: option_value.prefixed_id,
             name: option_value.name,
-            presentation: option_value.presentation,
+            label: option_value.label,
             position: option_value.position,
             count: count
           }

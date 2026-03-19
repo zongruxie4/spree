@@ -28,6 +28,9 @@ module Spree
     has_many :variants, through: :option_value_variants, class_name: 'Spree::Variant'
     has_many :products, through: :variants, class_name: 'Spree::Product'
 
+    # 5.5 API naming bridge (DB column rename in 6.0)
+    alias_attribute :label, :presentation
+
     #
     # Validations
     #

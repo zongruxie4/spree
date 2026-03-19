@@ -1,5 +1,11 @@
 # @spree/next
 
+## 0.14.0
+
+### Minor Changes
+
+- Update for Store API naming standardization. Re-exports `Discount` type (replaces `CartPromotion`/`OrderPromotion`). All address, cart, and order types now use standardized field names. Requires `@spree/sdk >= 0.14.0`.
+
 ## 0.13.1
 
 ### Patch Changes

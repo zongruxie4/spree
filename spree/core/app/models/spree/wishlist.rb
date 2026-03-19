@@ -16,6 +16,7 @@ module Spree
     belongs_to :store, class_name: 'Spree::Store'
 
     has_many :wished_items, class_name: 'Spree::WishedItem', dependent: :destroy
+    alias wishlist_items wished_items
     has_many :variants, through: :wished_items, source: :variant, class_name: 'Spree::Variant'
     has_many :products, -> { distinct }, through: :variants, source: :product, class_name: 'Spree::Product'
 

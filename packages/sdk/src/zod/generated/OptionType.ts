@@ -4,7 +4,7 @@ import { z } from 'zod';
 export const OptionTypeSchema = z.object({
   id: z.string(),
   name: z.string(),
-  presentation: z.string(),
+  label: z.string(),
   position: z.number(),
 });
 

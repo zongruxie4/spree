@@ -5,38 +5,32 @@ module Spree
       # Pre-purchase cart data with checkout progression info
       class CartSerializer < BaseSerializer
         typelize number: :string, current_step: :string, completed_steps: 'string[]', token: :string, email: [:string, nullable: true],
-                 special_instructions: [:string, nullable: true], currency: :string, locale: [:string, nullable: true], item_count: :number,
+                 customer_note: [:string, nullable: true], currency: :string, locale: [:string, nullable: true], total_quantity: :number,
                  requirements: 'Array<{step: string, field: string, message: string}>',
                  item_total: :string, display_item_total: :string,
                  delivery_total: :string, display_delivery_total: :string,
                  adjustment_total: :string, display_adjustment_total: :string,
-                 promo_total: :string, display_promo_total: :string,
+                 discount_total: :string, display_discount_total: :string,
                  tax_total: :string, display_tax_total: :string,
                  included_tax_total: :string, display_included_tax_total: :string,
                  additional_tax_total: :string, display_additional_tax_total: :string,
                  total: :string, display_total: :string,
-                 bill_address: { nullable: true }, ship_address: { nullable: true }
+                 billing_address: { nullable: true }, shipping_address: { nullable: true }
 
         # Override ID to use cart_ prefix
         attribute :id do |order|
           "cart_#{Spree::PrefixedId::SQIDS.encode([order.id])}"
         end
 
-        attributes :number, :token, :email, :special_instructions,
-                   :currency, :locale, :item_count,
+        attributes :number, :token, :email, :customer_note,
+                   :currency, :locale, :total_quantity,
                    :item_total, :display_item_total,
-                   :adjustment_total, :display_adjustment_total, :promo_total, :display_promo_total,
+                   :adjustment_total, :display_adjustment_total,
+                   :discount_total, :display_discount_total,
                    :tax_total, :display_tax_total, :included_tax_total, :display_included_tax_total,
                    :additional_tax_total, :display_additional_tax_total, :total, :display_total,
+                   :delivery_total, :display_delivery_total,
                    created_at: :iso8601, updated_at: :iso8601
-
-        attribute :delivery_total do |order|
-          order.ship_total
-        end
-
-        attribute :display_delivery_total do |order|
-          order.display_ship_total.to_s
-        end
 
         attribute :current_step do |order|
           order.current_checkout_step
@@ -50,12 +44,12 @@ module Spree
           Spree::Checkout::Requirements.new(order).call
         end
 
-        many :cart_promotions, key: :promotions, resource: Spree.api.cart_promotion_serializer
+        many :discounts, resource: Spree.api.discount_serializer
         many :line_items, key: :items, resource: Spree.api.line_item_serializer
-        many :shipments, key: :fulfillments, resource: Spree.api.fulfillment_serializer
+        many :fulfillments, resource: Spree.api.fulfillment_serializer
         many :payments, resource: Spree.api.payment_serializer
-        one :bill_address, resource: Spree.api.address_serializer
-        one :ship_address, resource: Spree.api.address_serializer
+        one :billing_address, resource: Spree.api.address_serializer
+        one :shipping_address, resource: Spree.api.address_serializer
 
         many :payment_methods, resource: Spree.api.payment_method_serializer
       end

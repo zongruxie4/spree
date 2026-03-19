@@ -1,7 +1,7 @@
 // This file is auto-generated. Do not edit directly.
 import { z } from 'zod';
 
-export const OrderPromotionSchema = z.object({
+export const DiscountSchema = z.object({
   id: z.string(),
   promotion_id: z.string(),
   name: z.string(),
@@ -11,4 +11,4 @@ export const OrderPromotionSchema = z.object({
   display_amount: z.string(),
 });
 
-export type OrderPromotion = z.infer<typeof OrderPromotionSchema>;
+export type Discount = z.infer<typeof DiscountSchema>;

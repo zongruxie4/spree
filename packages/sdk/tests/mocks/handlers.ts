@@ -54,11 +54,11 @@ export const fixtures = {
   },
   address: {
     id: 'addr_1',
-    firstname: 'Test',
-    lastname: 'User',
+    first_name: 'Test',
+    last_name: 'User',
     address1: '123 Main St',
     city: 'New York',
-    zipcode: '10001',
+    postal_code: '10001',
     country_iso: 'US',
     state_abbr: 'NY',
   },
@@ -102,7 +102,7 @@ export const fixtures = {
     is_private: false,
     is_default: true,
   },
-  wishedItem: {
+  wishlistItem: {
     id: 'wi_1',
     quantity: 1,
     variant_id: 'var_1',
@@ -278,7 +278,7 @@ export const handlers = [
         display_amount: '$19.99',
         source_type: 'credit_card',
         source_id: 'card_1',
-        source: { id: 'card_1', cc_type: 'visa', last_digits: '4242', name: 'Test User', month: '12', year: '2028' },
+        source: { id: 'card_1', brand: 'visa', last4: '4242', name: 'Test User', month: '12', year: '2028' },
         created_at: '2026-02-17T00:00:00.000Z',
         updated_at: '2026-02-17T00:00:00.000Z',
         payment_method: { id: 'pm_1', name: 'Credit Card', description: null, type: 'Spree::Gateway::Bogus', session_required: true },
@@ -298,7 +298,7 @@ export const handlers = [
       display_amount: '$19.99',
       source_type: 'credit_card',
       source_id: 'card_1',
-      source: { id: 'card_1', cc_type: 'visa', last_digits: '4242', name: 'Test User', month: '12', year: '2028' },
+      source: { id: 'card_1', brand: 'visa', last4: '4242', name: 'Test User', month: '12', year: '2028' },
       created_at: '2026-02-17T00:00:00.000Z',
       updated_at: '2026-02-17T00:00:00.000Z',
       payment_method: { id: 'pm_1', name: 'Credit Card', description: null, type: 'Spree::Gateway::Bogus', session_required: true },
@@ -455,7 +455,7 @@ export const handlers = [
   ),
 
   http.get(`${API_PREFIX}/customer/credit_cards/:id`, () =>
-    HttpResponse.json({ id: 'cc_1', last_digits: '1234' })
+    HttpResponse.json({ id: 'cc_1', last4: '1234' })
   ),
 
   http.delete(`${API_PREFIX}/customer/credit_cards/:id`, () =>
@@ -558,11 +558,11 @@ export const handlers = [
 
   // Wishlist Items
   http.post(`${API_PREFIX}/wishlists/:wishlistId/items`, () =>
-    HttpResponse.json(fixtures.wishedItem)
+    HttpResponse.json(fixtures.wishlistItem)
   ),
 
   http.patch(`${API_PREFIX}/wishlists/:wishlistId/items/:id`, () =>
-    HttpResponse.json({ ...fixtures.wishedItem, quantity: 3 })
+    HttpResponse.json({ ...fixtures.wishlistItem, quantity: 3 })
   ),
 
   http.delete(`${API_PREFIX}/wishlists/:wishlistId/items/:id`, () =>

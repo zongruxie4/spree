@@ -164,17 +164,17 @@ RSpec.describe 'Carts API', type: :request, swagger_doc: 'api-reference/store.ya
       consumes 'application/json'
       produces 'application/json'
       security [api_key: [], bearer_auth: []]
-      description 'Updates cart info (email, addresses, special instructions). When addresses change, the order state is reverted to address to ensure shipments are recalculated.'
+      description 'Updates cart info (email, addresses, customer note). When addresses change, the order state is reverted to address to ensure shipments are recalculated.'
 
       sdk_example <<~JS
         const cart = await client.carts.update('cart_abc123', {
           email: 'customer@example.com',
-          ship_address: {
-            firstname: 'John',
-            lastname: 'Doe',
+          shipping_address: {
+            first_name: 'John',
+            last_name: 'Doe',
             address1: '123 Main St',
             city: 'New York',
-            zipcode: '10001',
+            postal_code: '10001',
             country_iso: 'US',
             state_abbr: 'NY',
           },
@@ -192,26 +192,26 @@ RSpec.describe 'Carts API', type: :request, swagger_doc: 'api-reference/store.ya
         type: :object,
         properties: {
           email: { type: :string, format: 'email', example: 'customer@example.com' },
-          special_instructions: { type: :string, example: 'Leave at door' },
+          customer_note: { type: :string, example: 'Leave at door' },
           metadata: { type: :object, additionalProperties: true },
-          ship_address_id: { type: :string, description: 'Existing address ID to use as shipping address', example: 'addr_abc123' },
-          bill_address_id: { type: :string, description: 'Existing address ID to use as billing address', example: 'addr_def456' },
-          bill_address: {
+          shipping_address_id: { type: :string, description: 'Existing address ID to use as shipping address', example: 'addr_abc123' },
+          billing_address_id: { type: :string, description: 'Existing address ID to use as billing address', example: 'addr_def456' },
+          billing_address: {
             type: :object,
             properties: {
-              firstname: { type: :string }, lastname: { type: :string },
+              first_name: { type: :string }, last_name: { type: :string },
               address1: { type: :string }, address2: { type: :string },
-              city: { type: :string }, zipcode: { type: :string },
+              city: { type: :string }, postal_code: { type: :string },
               phone: { type: :string }, company: { type: :string },
               country_iso: { type: :string }, state_abbr: { type: :string }
             }
           },
-          ship_address: {
+          shipping_address: {
             type: :object,
             properties: {
-              firstname: { type: :string }, lastname: { type: :string },
+              first_name: { type: :string }, last_name: { type: :string },
               address1: { type: :string }, address2: { type: :string },
-              city: { type: :string }, zipcode: { type: :string },
+              city: { type: :string }, postal_code: { type: :string },
               phone: { type: :string }, company: { type: :string },
               country_iso: { type: :string }, state_abbr: { type: :string }
             }
@@ -224,14 +224,14 @@ RSpec.describe 'Carts API', type: :request, swagger_doc: 'api-reference/store.ya
         let(:'x-spree-api-key') { api_key.token }
         let(:'Authorization') { "Bearer #{jwt_token}" }
         let(:id) { order.prefixed_id }
-        let(:body) { { special_instructions: 'Leave at door' } }
+        let(:body) { { customer_note: 'Leave at door' } }
 
         schema '$ref' => '#/components/schemas/Cart'
 
         run_test! do |response|
           data = JSON.parse(response.body)
           expect(data['id']).to start_with('cart_')
-          expect(data['special_instructions']).to eq('Leave at door')
+          expect(data['customer_note']).to eq('Leave at door')
         end
       end
     end

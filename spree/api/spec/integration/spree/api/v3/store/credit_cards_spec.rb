@@ -40,7 +40,7 @@ RSpec.describe 'Credit Cards API', type: :request, swagger_doc: 'api-reference/s
         run_test! do |response|
           data = JSON.parse(response.body)
           expect(data['data']).to be_an(Array)
-          expect(data['data'].first).to include('id', 'cc_type', 'last_digits', 'month', 'year')
+          expect(data['data'].first).to include('id', 'brand', 'last4', 'month', 'year')
         end
       end
 

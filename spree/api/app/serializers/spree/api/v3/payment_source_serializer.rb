@@ -2,11 +2,7 @@ module Spree
   module Api
     module V3
       class PaymentSourceSerializer < BaseSerializer
-        typelize gateway_payment_profile_id: [:string, nullable: true]
-
-        attribute :gateway_payment_profile_id do |source|
-          source.try(:gateway_payment_profile_id)
-        end
+        # gateway_payment_profile_id moved to Admin API only
       end
     end
   end

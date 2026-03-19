@@ -140,13 +140,13 @@ module Spree
           def permitted_params
             params.permit(
               :email,
-              :special_instructions,
+              :customer_note,
               :currency,
               :locale,
-              :ship_address_id,
-              :bill_address_id,
-              ship_address: address_params,
-              bill_address: address_params,
+              :shipping_address_id,
+              :billing_address_id,
+              shipping_address: address_params,
+              billing_address: address_params,
               metadata: {},
               items: item_params
             )
@@ -154,8 +154,9 @@ module Spree
 
           def address_params
             [
-              :id, :firstname, :lastname, :address1, :address2,
-              :city, :zipcode, :phone, :company,
+              :id, :first_name, :last_name,
+              :address1, :address2,
+              :city, :postal_code, :phone, :company,
               :country_iso, :state_abbr, :state_name, :quick_checkout
             ]
           end

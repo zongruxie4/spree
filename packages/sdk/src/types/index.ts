@@ -3,24 +3,19 @@ import type { ListParams, AddressParams } from '@spree/sdk-core';
 // Re-export all generated types (unprefixed: Product, Order, etc.)
 export type {
   Address,
-  Asset,
   Base,
   Cart,
-  CartPromotion,
   Category,
   Country,
   CreditCard,
   Currency,
-  CustomerReturn,
   Customer,
   DigitalLink,
   Digital,
-  Export,
+  Discount,
   GiftCardBatch,
   GiftCard,
   Media,
-  ImportRow,
-  Import,
   Invitation,
   LineItem,
   Locale,
@@ -29,7 +24,6 @@ export type {
   NewsletterSubscriber,
   OptionType,
   OptionValue,
-  OrderPromotion,
   Order,
   PaymentMethod,
   Payment,
@@ -40,36 +34,28 @@ export type {
   Product,
   Promotion,
   Refund,
-  Reimbursement,
-  Report,
   ReturnAuthorization,
   ReturnItem,
   DeliveryMethod,
   DeliveryRate,
   Fulfillment,
-  ShippingCategory,
   State,
-  StockItem,
   StockLocation,
-  StockMovement,
-  StockTransfer,
   StoreCredit,
-  TaxCategory,
   Variant,
-  WishedItem,
+  WishlistItem,
   Wishlist,
 } from './generated';
 
 // Backward compatibility aliases (Store* prefix)
 export type { Address as StoreAddress } from './generated';
-export type { Asset as StoreAsset } from './generated';
 export type { Cart as StoreCart } from './generated';
 export type { Category as StoreCategory } from './generated';
 export type { Country as StoreCountry } from './generated';
 export type { CreditCard as StoreCreditCard } from './generated';
 export type { Currency as StoreCurrency } from './generated';
-export type { CustomerReturn as StoreCustomerReturn } from './generated';
 export type { Customer as StoreCustomer } from './generated';
+export type { Discount as StoreDiscount } from './generated';
 export type { DigitalLink as StoreDigitalLink } from './generated';
 export type { Digital as StoreDigital } from './generated';
 export type { GiftCardBatch as StoreGiftCardBatch } from './generated';
@@ -81,8 +67,6 @@ export type { Market as StoreMarket } from './generated';
 export type { Metafield as StoreMetafield } from './generated';
 export type { OptionType as StoreOptionType } from './generated';
 export type { OptionValue as StoreOptionValue } from './generated';
-export type { CartPromotion as StoreCartPromotion } from './generated';
-export type { OrderPromotion as StoreOrderPromotion } from './generated';
 export type { Order as StoreOrder } from './generated';
 export type { PaymentMethod as StorePaymentMethod } from './generated';
 export type { Payment as StorePayment } from './generated';
@@ -93,27 +77,23 @@ export type { Price as StorePrice } from './generated';
 export type { Product as StoreProduct } from './generated';
 export type { Promotion as StorePromotion } from './generated';
 export type { Refund as StoreRefund } from './generated';
-export type { Reimbursement as StoreReimbursement } from './generated';
 export type { ReturnAuthorization as StoreReturnAuthorization } from './generated';
 export type { ReturnItem as StoreReturnItem } from './generated';
 export type { DeliveryMethod as StoreDeliveryMethod } from './generated';
 export type { DeliveryRate as StoreDeliveryRate } from './generated';
 export type { Fulfillment as StoreFulfillment } from './generated';
-export type { ShippingCategory as StoreShippingCategory } from './generated';
 export type { State as StoreState } from './generated';
-export type { StockItem as StoreStockItem } from './generated';
 export type { StockLocation as StoreStockLocation } from './generated';
 export type { StoreCredit as StoreStoreCredit } from './generated';
-export type { TaxCategory as StoreTaxCategory } from './generated';
 export type { Variant as StoreVariant } from './generated';
-export type { WishedItem as StoreWishedItem } from './generated';
+export type { WishlistItem as StoreWishlistItem } from './generated';
 export type { Wishlist as StoreWishlist } from './generated';
 
 // Checkout requirement — a single unsatisfied checkout prerequisite
 export interface CheckoutRequirement {
   /** Checkout step this requirement belongs to (e.g. "address", "payment") */
   step: string;
-  /** Field that needs to be satisfied (e.g. "email", "ship_address") */
+  /** Field that needs to be satisfied (e.g. "email", "shipping_address") */
   field: string;
   /** Human-readable message describing what's needed */
   message: string;
@@ -250,17 +230,17 @@ export interface UpdateCartParams {
   email?: string;
   currency?: string;
   locale?: string;
-  special_instructions?: string;
+  customer_note?: string;
   /** Arbitrary key-value metadata (merged with existing) */
   metadata?: Record<string, unknown>;
-  /** Existing address ID to use */
-  bill_address_id?: string;
-  /** Existing address ID to use */
-  ship_address_id?: string;
+  /** Existing address ID to use as billing address */
+  billing_address_id?: string;
+  /** Existing address ID to use as shipping address */
+  shipping_address_id?: string;
   /** New billing address */
-  bill_address?: AddressParams;
+  billing_address?: AddressParams;
   /** New shipping address */
-  ship_address?: AddressParams;
+  shipping_address?: AddressParams;
   /** Items to upsert (sets quantity for existing, creates new) */
   items?: LineItemInput[];
 }
@@ -307,7 +287,7 @@ export interface FilterOption {
 
 export interface OptionFilterOption extends FilterOption {
   name: string;
-  presentation: string;
+  label: string;
   position: number;
 }
 
@@ -336,7 +316,7 @@ export interface OptionFilter {
   id: string;
   type: 'option';
   name: string;
-  presentation: string;
+  label: string;
   options: OptionFilterOption[];
 }
 

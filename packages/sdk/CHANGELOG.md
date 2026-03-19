@@ -1,5 +1,27 @@
 # @spree/sdk
 
+## 0.14.0
+
+### Minor Changes
+
+- Standardize Store API naming against industry conventions (Shopify, Medusa, Saleor, Vendure).
+
+  **Breaking changes:**
+
+  - Address: `firstname` → `first_name`, `lastname` → `last_name`, `zipcode` → `postal_code`
+  - Cart/Order: `special_instructions` → `customer_note`, `item_count` → `total_quantity`, `promo_total` → `discount_total`, `bill_address` → `billing_address`, `ship_address` → `shipping_address`, `promotions` → `discounts`
+  - LineItem: `promo_total` → `discount_total`
+  - OptionType/OptionValue: `presentation` → `label`
+  - CreditCard: `cc_type` → `brand`, `last_digits` → `last4`, removed `gateway_payment_profile_id`
+  - ReturnAuthorization: `state` → `status`
+  - `CartPromotion`/`OrderPromotion` types replaced by unified `Discount` type
+  - `WishedItem` type replaced by `WishlistItem`
+  - `UpdateCartParams`: `ship_address` → `shipping_address`, `bill_address` → `billing_address`, `special_instructions` → `customer_note`
+  - `AddressParams`: `firstname` → `first_name`, `lastname` → `last_name`, `zipcode` → `postal_code`
+  - Promotion type slimmed to `id`, `name`, `description`, `code`
+  - Product filters: `presentation` → `label`
+  - Removed admin-only types from Store SDK (Asset, StockItem, StockMovement, StockTransfer, ShippingCategory, Reimbursement, Report, Export, Import, ImportRow, TaxCategory, CustomerReturn)
+
 ## 0.13.2
 
 ### Patch Changes

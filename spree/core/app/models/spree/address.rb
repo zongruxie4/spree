@@ -83,6 +83,8 @@ module Spree
     delegate :abbr, to: :state, prefix: true, allow_nil: true
 
     alias_attribute :postal_code, :zipcode
+    alias_attribute :first_name, :firstname
+    alias_attribute :last_name, :lastname
 
     # Writer methods for API convenience - these set country/state from ISO/abbr codes
     # The reader methods (country_iso, state_abbr) are delegates to country.iso and state.abbr
@@ -111,21 +113,7 @@ module Spree
       user.present? && id == user.ship_address_id
     end
 
-    def first_name
-      firstname
-    end
-
-    def first_name=(value)
-      self.firstname = value
-    end
-
-    def last_name
-      lastname
-    end
-
-    def last_name=(value)
-      self.lastname = value
-    end
+    # first_name / last_name aliases are defined via alias_attribute above
 
     def full_name
       "#{firstname} #{lastname}".strip

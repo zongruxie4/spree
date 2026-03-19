@@ -48,12 +48,12 @@ export interface ListParams {
 
 // Address params
 export interface AddressParams {
-  firstname: string;
-  lastname: string;
+  first_name: string;
+  last_name: string;
   address1: string;
   address2?: string;
   city: string;
-  zipcode: string;
+  postal_code: string;
   phone?: string;
   company?: string;
   /** ISO 3166-1 alpha-2 country code (e.g., "US", "DE") */
@@ -62,6 +62,6 @@ export interface AddressParams {
   state_abbr?: string;
   /** State name - used for countries without predefined states */
   state_name?: string;
-  /** When true, relaxes validation requirements (name, phone, zipcode, street) */
+  /** When true, relaxes validation requirements (name, phone, postal_code, street) */
   quick_checkout?: boolean;
 }

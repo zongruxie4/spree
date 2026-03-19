@@ -1,7 +1,7 @@
 module Spree
   module Api
     module V3
-      class WishedItemSerializer < BaseSerializer
+      class WishlistItemSerializer < BaseSerializer
         typelize variant_id: :string, wishlist_id: :string, quantity: :number
 
         attribute :variant_id do |wished_item|

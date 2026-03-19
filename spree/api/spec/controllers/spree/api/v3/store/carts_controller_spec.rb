@@ -352,7 +352,7 @@ RSpec.describe Spree::Api::V3::Store::CartsController, type: :controller do
           'requirements',
           'token',
           'currency',
-          'item_count',
+          'total_quantity',
           'item_total',
           'display_item_total',
           'total',
@@ -432,11 +432,11 @@ RSpec.describe Spree::Api::V3::Store::CartsController, type: :controller do
       request.headers['Authorization'] = "Bearer #{jwt_token}"
     end
 
-    it 'accepts ship_address_id to use an existing address' do
+    it 'accepts shipping_address_id to use an existing address' do
       order.update!(email: 'customer@example.com')
       existing_address = user.addresses.first || create(:address, user: user, country: country, state: us_state)
 
-      patch :update, params: { id: order.prefixed_id, ship_address_id: existing_address.prefixed_id }
+      patch :update, params: { id: order.prefixed_id, shipping_address_id: existing_address.prefixed_id }
 
       expect(response).to have_http_status(:ok)
       expect(order.reload.ship_address_id).to eq(existing_address.id)
@@ -450,10 +450,10 @@ RSpec.describe Spree::Api::V3::Store::CartsController, type: :controller do
 
       patch :update, params: {
         id: order.prefixed_id,
-        ship_address: {
-          firstname: 'John', lastname: 'Doe',
+        shipping_address: {
+          first_name: 'John', last_name: 'Doe',
           address1: '123 Main St', city: 'New York',
-          zipcode: '10001', country_iso: 'US', state_abbr: 'NY',
+          postal_code: '10001', country_iso: 'US', state_abbr: 'NY',
           phone: '555-1234'
         }
       }

@@ -3,13 +3,13 @@ import { z } from 'zod';
 
 export const AddressSchema = z.object({
   id: z.string(),
-  firstname: z.string().nullable(),
-  lastname: z.string().nullable(),
+  first_name: z.string().nullable(),
+  last_name: z.string().nullable(),
   full_name: z.string(),
   address1: z.string().nullable(),
   address2: z.string().nullable(),
+  postal_code: z.string().nullable(),
   city: z.string().nullable(),
-  zipcode: z.string().nullable(),
   phone: z.string().nullable(),
   company: z.string().nullable(),
   country_name: z.string(),

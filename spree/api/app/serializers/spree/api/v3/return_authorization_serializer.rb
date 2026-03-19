@@ -4,13 +4,13 @@ module Spree
   module Api
     module V3
       class ReturnAuthorizationSerializer < BaseSerializer
-        typelize number: :string, state: :string,
+        typelize number: :string, status: :string,
                  order_id: [:string, nullable: true], stock_location_id: [:string, nullable: true],
                  return_authorization_reason_id: [:string, nullable: true]
 
         attributes :number, created_at: :iso8601, updated_at: :iso8601
 
-        attribute :state do |return_authorization|
+        attribute :status do |return_authorization|
           return_authorization.state.to_s
         end
 

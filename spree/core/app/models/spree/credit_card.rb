@@ -48,6 +48,7 @@ module Spree
     scope :not_removed, -> { where(deleted_at: nil) }
 
     alias_attribute :brand, :cc_type
+    alias_attribute :last4, :last_digits
 
     store_accessor :private_metadata, :wallet
 

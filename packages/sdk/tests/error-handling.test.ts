@@ -58,7 +58,7 @@ describe('error handling', () => {
     const client = createTestClient();
     try {
       await client.customer.addresses.create(
-        { firstname: 'A', lastname: 'B', address1: '', city: '', zipcode: '00000', country_iso: 'US' },
+        { first_name: 'A', last_name: 'B', address1: '', city: '', postal_code: '00000', country_iso: 'US' },
         { token: 'jwt' }
       );
       expect.unreachable('Should have thrown');

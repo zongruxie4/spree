@@ -44,7 +44,7 @@ describe('credit card actions', () => {
 
   describe('listCreditCards', () => {
     it('returns credit cards list', async () => {
-      const mockCards = { data: [{ id: '1', last_digits: '4242' }] };
+      const mockCards = { data: [{ id: '1', last4: '4242' }] };
       mockClient.customer.creditCards.list.mockResolvedValue(mockCards);
 
       const result = await listCreditCards();

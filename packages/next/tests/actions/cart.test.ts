@@ -150,7 +150,7 @@ describe('cart actions', () => {
 
   describe('updateItem', () => {
     it('updates item and invalidates cache', async () => {
-      const updatedCart = { id: 'cart_1', token: 'cart_token', item_count: 3 };
+      const updatedCart = { id: 'cart_1', token: 'cart_token', total_quantity: 3 };
       mockCookies({
         '_spree_cart_token': 'cart_token',
         '_spree_cart_token_id': 'cart_1',
@@ -171,7 +171,7 @@ describe('cart actions', () => {
 
   describe('removeItem', () => {
     it('removes item and invalidates cache', async () => {
-      const updatedCart = { id: 'cart_1', token: 'cart_token', item_count: 0 };
+      const updatedCart = { id: 'cart_1', token: 'cart_token', total_quantity: 0 };
       mockCookies({
         '_spree_cart_token': 'cart_token',
         '_spree_cart_token_id': 'cart_1',
@@ -296,7 +296,7 @@ describe('cart actions', () => {
 
   describe('applyCoupon', () => {
     it('applies coupon and revalidates checkout and cart', async () => {
-      const updatedCart = { id: 'cart_1', promo_total: -10 };
+      const updatedCart = { id: 'cart_1', discount_total: -10 };
       mockCookies({
         '_spree_cart_token': 'order_token',
         '_spree_cart_token_id': 'cart_1',
@@ -318,7 +318,7 @@ describe('cart actions', () => {
 
   describe('removeCoupon', () => {
     it('removes coupon and revalidates checkout and cart', async () => {
-      const updatedCart = { id: 'cart_1', promo_total: 0 };
+      const updatedCart = { id: 'cart_1', discount_total: 0 };
       mockCookies({
         '_spree_cart_token': 'order_token',
         '_spree_cart_token_id': 'cart_1',

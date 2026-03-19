@@ -6,7 +6,7 @@ export const ReturnAuthorizationSchema = z.object({
   number: z.string(),
   created_at: z.string(),
   updated_at: z.string(),
-  state: z.string(),
+  status: z.string(),
   order_id: z.string().nullable(),
   stock_location_id: z.string().nullable(),
   return_authorization_reason_id: z.string().nullable(),

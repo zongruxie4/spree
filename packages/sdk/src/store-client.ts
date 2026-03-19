@@ -43,7 +43,7 @@ import type {
   PaymentSetupSession,
   Fulfillment,
   Wishlist,
-  WishedItem,
+  WishlistItem,
   Address,
   Customer,
 } from './types';
@@ -997,8 +997,8 @@ export class StoreClient {
         wishlistId: string,
         params: { variant_id: string; quantity?: number },
         options?: RequestOptions
-      ): Promise<WishedItem> =>
-        this.request<WishedItem>('POST', `/wishlists/${wishlistId}/items`, {
+      ): Promise<WishlistItem> =>
+        this.request<WishlistItem>('POST', `/wishlists/${wishlistId}/items`, {
           ...options,
           body: params,
         }),
@@ -1011,8 +1011,8 @@ export class StoreClient {
         itemId: string,
         params: { quantity: number },
         options?: RequestOptions
-      ): Promise<WishedItem> =>
-        this.request<WishedItem>(
+      ): Promise<WishlistItem> =>
+        this.request<WishlistItem>(
           'PATCH',
           `/wishlists/${wishlistId}/items/${itemId}`,
           { ...options, body: params }

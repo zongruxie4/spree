@@ -17,7 +17,7 @@ RSpec.describe Spree::Api::V3::CreditCardSerializer do
 
   it 'includes all expected attributes' do
     expect(subject.keys).to match_array(%w[
-      id cc_type last_digits month year name default gateway_payment_profile_id
+      id brand last4 month year name default
     ])
   end
 
@@ -26,21 +26,16 @@ RSpec.describe Spree::Api::V3::CreditCardSerializer do
   end
 
   it 'returns correct attribute values' do
-    expect(subject['cc_type']).to eq('visa')
-    expect(subject['last_digits']).to eq('1111')
+    expect(subject['brand']).to eq('visa')
+    expect(subject['last4']).to eq('1111')
     expect(subject['month']).to eq(12)
     expect(subject['year']).to eq(1.year.from_now.year)
     expect(subject['name']).to eq('John Doe')
     expect(subject['default']).to be true
-    expect(subject['gateway_payment_profile_id']).to eq('pm_abc123')
   end
 
-  context 'without gateway_payment_profile_id' do
-    let(:credit_card) { create(:credit_card, gateway_payment_profile_id: nil) }
-
-    it 'returns nil for gateway_payment_profile_id' do
-      expect(subject['gateway_payment_profile_id']).to be_nil
-    end
+  it 'does not expose gateway_payment_profile_id' do
+    expect(subject).not_to have_key('gateway_payment_profile_id')
   end
 
   context 'without name' do

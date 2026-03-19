@@ -255,7 +255,7 @@ RSpec.describe 'Wishlists API', type: :request, swagger_doc: 'api-reference/stor
         let(:wishlist_id) { wishlist.to_param }
         let(:body) { { variant_id: new_variant.prefixed_id, quantity: 1 } }
 
-        schema '$ref' => '#/components/schemas/WishedItem'
+        schema '$ref' => '#/components/schemas/WishlistItem'
 
         run_test!
       end

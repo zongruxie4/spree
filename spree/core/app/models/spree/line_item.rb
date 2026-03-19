@@ -102,6 +102,10 @@ module Spree
     alias single_money display_price
     alias single_display_amount display_price
 
+    # 5.5 API naming bridges (DB column rename in 6.0)
+    alias_attribute :discount_total, :promo_total
+    alias display_discount_total display_promo_total
+
     def discounted_price
       return price if quantity.zero?
 

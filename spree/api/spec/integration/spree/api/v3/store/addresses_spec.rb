@@ -64,11 +64,11 @@ RSpec.describe 'Addresses API', type: :request, swagger_doc: 'api-reference/stor
 
       sdk_example <<~JS
         const address = await client.customer.addresses.create({
-          firstname: 'John',
-          lastname: 'Doe',
+          first_name: 'John',
+          last_name: 'Doe',
           address1: '123 Main St',
           city: 'New York',
-          zipcode: '10001',
+          postal_code: '10001',
           country_iso: 'US',
           state_abbr: 'NY',
           phone: '+1 555 123 4567',
@@ -82,19 +82,19 @@ RSpec.describe 'Addresses API', type: :request, swagger_doc: 'api-reference/stor
       parameter name: :body, in: :body, schema: {
         type: :object,
         properties: {
-          firstname: { type: :string, example: 'John' },
-          lastname: { type: :string, example: 'Doe' },
+          first_name: { type: :string, example: 'John' },
+          last_name: { type: :string, example: 'Doe' },
           address1: { type: :string, example: '123 Main St' },
           address2: { type: :string, example: 'Apt 4B' },
           city: { type: :string, example: 'New York' },
-          zipcode: { type: :string, example: '10001' },
+          postal_code: { type: :string, example: '10001' },
           phone: { type: :string, example: '+1 555 123 4567' },
           company: { type: :string, example: 'Acme Inc' },
           country_iso: { type: :string, example: 'US', description: 'ISO 3166-1 alpha-2 country code (e.g., "US", "DE")' },
           state_abbr: { type: :string, example: 'NY', description: 'ISO 3166-2 subdivision code without country prefix (e.g., "CA", "NY")' },
           state_name: { type: :string, example: 'New York', description: 'State name - for countries without predefined states' }
         },
-        required: %w[firstname lastname address1 city zipcode country_iso]
+        required: %w[first_name last_name address1 city postal_code country_iso]
       }
 
       response '201', 'address created' do
@@ -102,11 +102,11 @@ RSpec.describe 'Addresses API', type: :request, swagger_doc: 'api-reference/stor
         let(:'Authorization') { "Bearer #{jwt_token}" }
         let(:body) do
           {
-            firstname: 'John',
-            lastname: 'Doe',
+            first_name: 'John',
+            last_name: 'Doe',
             address1: '123 Main St',
             city: 'New York',
-            zipcode: '10001',
+            postal_code: '10001',
             phone: '+1 555 123 4567',
             country_iso: country.iso,
             state_abbr: state.abbr
@@ -117,7 +117,7 @@ RSpec.describe 'Addresses API', type: :request, swagger_doc: 'api-reference/stor
 
         run_test! do |response|
           data = JSON.parse(response.body)
-          expect(data['firstname']).to eq('John')
+          expect(data['first_name']).to eq('John')
           expect(data['city']).to eq('New York')
           expect(data['country_iso']).to eq(country.iso)
           expect(data['state_abbr']).to eq(state.abbr)
@@ -127,7 +127,7 @@ RSpec.describe 'Addresses API', type: :request, swagger_doc: 'api-reference/stor
       response '422', 'validation error' do
         let(:'x-spree-api-key') { api_key.token }
         let(:'Authorization') { "Bearer #{jwt_token}" }
-        let(:body) { { firstname: '' } }
+        let(:body) { { first_name: '' } }
 
         schema '$ref' => '#/components/schemas/ErrorResponse'
 
@@ -195,8 +195,8 @@ RSpec.describe 'Addresses API', type: :request, swagger_doc: 'api-reference/stor
       parameter name: :body, in: :body, schema: {
         type: :object,
         properties: {
-          firstname: { type: :string, example: 'John' },
-          lastname: { type: :string, example: 'Doe' },
+          first_name: { type: :string, example: 'John' },
+          last_name: { type: :string, example: 'Doe' },
           address1: { type: :string, example: '456 Oak Ave' },
           city: { type: :string, example: 'Los Angeles' }
         }

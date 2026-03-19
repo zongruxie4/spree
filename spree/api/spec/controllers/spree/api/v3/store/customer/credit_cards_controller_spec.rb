@@ -24,7 +24,7 @@ RSpec.describe Spree::Api::V3::Store::Customer::CreditCardsController, type: :co
       get :index
 
       card_data = json_response['data'].first
-      expect(card_data).to include('id', 'last_digits', 'month', 'year', 'cc_type')
+      expect(card_data).to include('id', 'last4', 'month', 'year', 'brand')
     end
 
     it 'only returns credit cards belonging to the current user' do
