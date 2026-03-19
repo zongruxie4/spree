@@ -66,7 +66,7 @@ module Spree
 
       def remove(product)
         # Delete all locale/currency variants of this product
-        filter = "product_id = '#{product.prefixed_id}'"
+        filter = "product_id = '#{sanitize_prefixed_id(product.prefixed_id)}'"
         client.index(index_name).delete_documents(filter: filter)
       rescue ::Meilisearch::ApiError => e
         raise unless e.http_code == 404
@@ -92,7 +92,7 @@ module Spree
              .preload(:taxons, :option_types, :primary_media,
                       variants_including_master: [:prices, :option_values])
              .find_in_batches(batch_size: 500) do |batch|
-          documents = batch.map { |product| ProductPresenter.new(product, store).call }
+          documents = batch.flat_map { |product| ProductPresenter.new(product, store).call }
           index_batch(documents)
         end
       end
@@ -150,8 +150,8 @@ module Spree
         # This mirrors the AR scope: store.products.active(currency) with locale
         conditions << "store_ids = '#{store.id}'"
         conditions << "status = 'active'"
-        conditions << "locale = '#{locale}'"
-        conditions << "currency = '#{currency}'"
+        conditions << "locale = '#{locale.to_s.gsub(/[^a-zA-Z_-]/, '')}'"
+        conditions << "currency = '#{currency.to_s.gsub(/[^A-Z]/, '')}'"
         conditions << "(discontinue_on = 0 OR discontinue_on > #{Time.current.to_i})"
 
         filters = filters.to_unsafe_h if filters.respond_to?(:to_unsafe_h)

@@ -22,8 +22,8 @@ module Spree
           end
         end
 
-        # Fallback: if no markets, index with store defaults
-        if documents.empty?
+        # Fallback: if no markets, index with store defaults (only if product has a price)
+        if documents.empty? && lowest_price(store.default_currency)
           documents << build_document(default_locale, store.default_currency, default_locale)
         end
 
