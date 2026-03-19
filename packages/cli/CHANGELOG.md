@@ -1,6 +1,12 @@
 # @spree/cli
 
-## 2.0.0
+## 2.0.0-beta.7
+
+### Patch Changes
+
+- Run `spree:search:reindex` during `spree init` after sample data is loaded. This initializes the Meilisearch search index so product search works immediately after setup.
+
+## 2.0.0-beta.6
 
 ### Minor Changes
 

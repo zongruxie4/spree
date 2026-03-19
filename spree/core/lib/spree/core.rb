@@ -7,6 +7,7 @@ require 'active_record/railtie'
 require 'active_storage/engine'
 require 'action_text/engine'
 require 'action_cable/engine'
+require 'pagy'
 
 require 'mail'
 require 'action_mailer/railtie'

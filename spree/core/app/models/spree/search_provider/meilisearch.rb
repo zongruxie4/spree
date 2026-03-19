@@ -29,7 +29,13 @@ module Spree
 
         Rails.logger.debug { "[Meilisearch] index=#{index_name} query=#{query.inspect} #{search_params.compact.inspect}" }
 
-        ms_result = client.index(index_name).search(query.to_s, search_params)
+        begin
+          ms_result = client.index(index_name).search(query.to_s, search_params)
+        rescue ::Meilisearch::ApiError => e
+          Rails.logger.warn { "[Meilisearch] Search failed: #{e.message}. Run `rake spree:search:reindex` to initialize the index." }
+          Rails.error.report(e, handled: true, context: { index: index_name, query: query })
+          return empty_result(scope, page, limit)
+        end
 
         Rails.logger.debug { "[Meilisearch] #{ms_result['estimatedTotalHits']} hits in #{ms_result['processingTimeMs']}ms" }
 
@@ -278,7 +284,6 @@ module Spree
       end
 
       def build_pagy(ms_result, page, limit)
-        require 'pagy'
         require 'pagy/toolbox/paginators/meilisearch'
 
         fake_result = Struct.new(:raw_answer).new({
@@ -288,6 +293,17 @@ module Spree
         })
 
         Pagy::MeilisearchPaginator.paginate(fake_result, {})
+      end
+
+      def empty_result(scope, page, limit)
+        SearchResult.new(
+          products: scope.none,
+          filters: [],
+          sort_options: available_sort_options.map { |id| { id: id } },
+          default_sort: 'manual',
+          total_count: 0,
+          pagy: Pagy::Offset.new(count: 0, page: page, limit: limit)
+        )
       end
 
       def valid_prefixed_id?(value)

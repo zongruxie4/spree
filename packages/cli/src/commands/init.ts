@@ -48,6 +48,10 @@ export function registerInitCommand(program: Command): void {
         s.stop('Sample data loaded.')
       }
 
+      s.start('Indexing products for search...')
+      await rakeTask('spree:search:reindex', ctx.projectDir)
+      s.stop('Search index ready.')
+
       p.note(
         [
           '',

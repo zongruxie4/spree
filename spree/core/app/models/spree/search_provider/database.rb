@@ -46,7 +46,6 @@ module Spree
       private
 
       def build_pagy(count, page, limit)
-        require 'pagy'
         Pagy::Offset.new(count: count, page: page, limit: limit)
       end
 
