@@ -117,7 +117,7 @@
 
 <% if @customer_return.can_create_reimbursement? && can?(:create, Spree::Reimbursement) %>
   <%= form_for [:admin, @order, Spree::Reimbursement.new] do |f| %>
-    <%= hidden_field_tag :build_from_customer_return_id, @customer_return.id %>
+    <%= hidden_field_tag :build_from_customer_return_id, @customer_return.prefixed_id %>
     <%= f.button class: 'btn btn-primary' do %>
       <%= icon "plus" %>
       <%= Spree.t(:create_reimbursement) %>

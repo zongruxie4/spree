@@ -50,6 +50,8 @@ en:
       spree/customer_group:
         description: Description
         name: Name
+      spree/customer_return:
+        stock_location_id: Stock Location
       spree/gift_card:
         amount_used: Amount used
         expires_at: Expires at

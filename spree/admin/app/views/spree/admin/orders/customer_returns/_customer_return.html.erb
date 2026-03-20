@@ -42,7 +42,7 @@
               url: edit_link,
             ) %>
             <%= form_for [:admin, @order, Spree::Reimbursement.new] do |f| %>
-              <%= hidden_field_tag :build_from_customer_return_id, customer_return.id %>
+              <%= hidden_field_tag :build_from_customer_return_id, customer_return.prefixed_id %>
               <%= f.button class: 'dropdown-item' do %>
                 <%= icon "plus" %>
                 <%= Spree.t(:create_reimbursement) %>
