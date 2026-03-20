@@ -3,16 +3,14 @@
   "name": "Spree Commerce documentation",
   "theme": "sequoia",
   "colors": {
-    "primary": "#0A2242",
-    "light": "#D7DFE9",
-    "dark": "#0A2242"
+    "primary": "#0177FF"
   },
   "fonts": {
     "body": {
-      "family": "Inter"
+      "family": "Geist"
     },
     "heading": {
-      "family": "Inter"
+      "family": "Geist"
     }
   },
   "styling": {
@@ -760,7 +758,7 @@
   "navbar": {
     "links": [
       {
-        "label": "15.2k",
+        "label": "15.3k",
         "href": "https://github.com/spree/spree",
         "icon": {
           "library": "lucide",
@@ -768,8 +766,8 @@
         }
       },
       {
-        "label": "v5.3.4",
-        "href": "https://github.com/spree/spree/releases/tag/v5.3.4"
+        "label": "v5.4.0.RC1",
+        "href": "https://github.com/spree/spree/releases/tag/v5.4.0.rc1"
       },
       {
         "label": "Join Slack",
