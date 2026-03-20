@@ -394,8 +394,11 @@ module Spree
       end
 
       def sort_dropdown_item(label, sort_value, is_active, current_q)
+        url_params = { q: current_q.merge(s: sort_value) }
+        url_params[:query_state] = params[:query_state] if params[:query_state].present?
+
         link_to(
-          url_for(q: current_q.merge(s: sort_value)),
+          url_for(url_params),
           class: "dropdown-item flex items-center justify-between #{'active' if is_active}",
           data: { turbo_action: 'advance' }
         ) do

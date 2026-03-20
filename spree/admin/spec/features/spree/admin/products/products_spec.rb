@@ -27,6 +27,47 @@ describe 'Products', type: :feature do
     end
 
     context 'listing products' do
+      # Regression test for #13789
+      context 'search preserves filters', js: true do
+        let!(:active_cap) { create(:product, name: 'apache baseball cap', status: 'active') }
+        let!(:active_shirt) { create(:product, name: 'zomg shirt', status: 'active') }
+        let!(:draft_product) { create(:product, name: 'apache draft hat', status: 'draft') }
+
+        it 'preserves query_state filters when searching' do
+          query_state = { combinator: 'and', filters: [{ id: '1', field: 'status', operator: 'eq', value: 'active' }], groups: [] }.to_json
+          visit spree.admin_products_path(query_state: query_state)
+
+          # Only active products should be visible
+          expect(page).to have_content('apache baseball cap')
+          expect(page).to have_content('zomg shirt')
+          expect(page).not_to have_content('apache draft hat')
+
+          # Type in search box — filters should be preserved
+          fill_in 'products-table-search-input', with: 'apache'
+          wait_for_turbo
+
+          # Should show only active products matching search
+          expect(page).to have_content('apache baseball cap')
+          expect(page).not_to have_content('zomg shirt')
+          expect(page).not_to have_content('apache draft hat')
+
+          # Verify query_state is still present in the page
+          expect(page).to have_css('input[name="query_state"]', visible: :all)
+        end
+
+        it 'preserves search text when applying filters' do
+          visit spree.admin_products_path(q: { search: 'apache' })
+
+          # Only products matching search should be visible
+          expect(page).to have_content('apache baseball cap')
+          expect(page).to have_content('apache draft hat')
+          expect(page).not_to have_content('zomg shirt')
+
+          # Verify search text is still in the hidden field within the query builder form
+          expect(page).to have_css('input[name="q[search]"][value="apache"]', visible: :all)
+        end
+      end
+
       context 'sorting' do
         before do
           create(:product, name: 'apache baseball cap', price: 10)

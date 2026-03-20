@@ -24,6 +24,23 @@
          class="grow flex flex-col justify-between">
 
       <%= form_with url: url_for, method: :get, html: { class: 'grow flex flex-col justify-between' }, data: { turbo_frame: frame_name, turbo_action: 'advance', query_builder_target: 'form', action: 'submit->query-builder#submitForm' } do |f| %>
+        <%# Preserve search and date range state when applying filters %>
+        <% search_param = table.respond_to?(:search_param) ? table.search_param : :name_cont %>
+        <% if params.dig(:q, search_param).present? %>
+          <%= hidden_field_tag "q[#{search_param}]", params.dig(:q, search_param) %>
+        <% end %>
+        <% date_range_param = table.date_range_param %>
+        <% if date_range_param.present? %>
+          <% if params.dig(:q, :"#{date_range_param}_gt").present? %>
+            <%= hidden_field_tag "q[#{date_range_param}_gt]", params.dig(:q, :"#{date_range_param}_gt") %>
+          <% end %>
+          <% if params.dig(:q, :"#{date_range_param}_lt").present? %>
+            <%= hidden_field_tag "q[#{date_range_param}_lt]", params.dig(:q, :"#{date_range_param}_lt") %>
+          <% end %>
+        <% end %>
+        <% if params.dig(:q, :s).present? %>
+          <%= hidden_field_tag "q[s]", params.dig(:q, :s) %>
+        <% end %>
         <div class="drawer-body">
           <div class="mb-4 flex items-center gap-2 flex-wrap">
             <span class="text-sm text-gray-600">

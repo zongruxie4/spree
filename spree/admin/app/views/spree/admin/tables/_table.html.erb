@@ -27,6 +27,23 @@
                 <%= icon 'x', class: 'w-4 h-4' %>
               </button>
             </div>
+            <%# Preserve query builder filter state when submitting search %>
+            <% if params[:query_state].present? %>
+              <%= hidden_field_tag :query_state, params[:query_state] %>
+            <% end %>
+            <%# Preserve date range filter state when submitting search %>
+            <% if date_range_param.present? %>
+              <% if params.dig(:q, :"#{date_range_param}_gt").present? %>
+                <%= hidden_field_tag "q[#{date_range_param}_gt]", params.dig(:q, :"#{date_range_param}_gt") %>
+              <% end %>
+              <% if params.dig(:q, :"#{date_range_param}_lt").present? %>
+                <%= hidden_field_tag "q[#{date_range_param}_lt]", params.dig(:q, :"#{date_range_param}_lt") %>
+              <% end %>
+            <% end %>
+            <%# Preserve sort order when submitting search %>
+            <% if params.dig(:q, :s).present? %>
+              <%= hidden_field_tag "q[s]", params.dig(:q, :s) %>
+            <% end %>
           <% end %>
         </div>
 
@@ -39,6 +56,16 @@
                          date_from_value: params.dig(:q, :"#{date_range_param}_gt"),
                          date_to_value: params.dig(:q, :"#{date_range_param}_lt"),
                          css_classes: "btn-light btn-sm dropdown-toggle h-[2.125rem]" %>
+              <%# Preserve search and filter state when submitting date range %>
+              <% if params.dig(:q, search_param).present? %>
+                <%= hidden_field_tag "q[#{search_param}]", params.dig(:q, search_param) %>
+              <% end %>
+              <% if params[:query_state].present? %>
+                <%= hidden_field_tag :query_state, params[:query_state] %>
+              <% end %>
+              <% if params.dig(:q, :s).present? %>
+                <%= hidden_field_tag "q[s]", params.dig(:q, :s) %>
+              <% end %>
             <% end %>
           <% end %>
           <%= render 'spree/admin/tables/query_builder', table: table, table_key: table_key, frame_name: frame_name %>
