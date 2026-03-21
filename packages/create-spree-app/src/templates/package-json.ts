@@ -16,6 +16,7 @@ export function rootPackageJsonContent(name: string): string {
     },
     dependencies: {
       '@spree/cli': '2.0.0-beta.7',
+      '@spree/docs': 'latest',
     },
   }
 

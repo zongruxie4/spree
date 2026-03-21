@@ -120,6 +120,12 @@ importers:
         specifier: ^4.0.18
         version: 4.0.18(@types/node@20.19.33)(msw@2.12.9(@types/node@20.19.33)(typescript@5.9.3))(tsx@4.21.0)
 
+  packages/docs:
+    devDependencies:
+      vitest:
+        specifier: ^4.0.18
+        version: 4.0.18(@types/node@20.19.33)(msw@2.12.9(@types/node@20.19.33)(typescript@5.9.3))(tsx@4.21.0)
+
   packages/next:
     devDependencies:
       '@changesets/changelog-github':

@@ -5,7 +5,7 @@ Spree uses [RSpec](https://rspec.info), [Factory Bot](https://github.com/thought
 We also provide the `spree_dev_tools` gem that helps you write Spree-specific tests.
 
 <Info>
-  This guide assumes you've completed all previous tutorials through [Page Builder](/developer/tutorial/page-builder). You should have a complete `Spree::Brand` model with admin, storefront, and SEO features.
+  This guide assumes you've completed all previous tutorials through [Extending Models](/developer/tutorial/extending-models). You should have a complete `Spree::Brand` model with admin features.
 </Info>
 
 ## Setup
@@ -320,61 +320,6 @@ RSpec.describe Spree::Admin::BrandsController, type: :controller do
 end
 ```
 
-### Storefront Controller Tests
-
-```ruby spec/controllers/spree/brands_controller_spec.rb
-require 'rails_helper'
-
-RSpec.describe Spree::Brand, type: :model do
-  describe 'associations' do
-    it 'has many products' do
-      association = described_class.reflect_on_association(:products)
-      expect(association.macro).to eq(:has_many)
-      expect(association.class_name).to eq('Spree::Product')
-    end
-  end
-
-  describe 'validations' do
-    it 'validates presence of name' do
-      brand = build(:brand, name: nil)
-      expect(brand).not_to be_valid
-      expect(brand.errors[:name]).to include("can't be blank")
-    end
-
-    describe 'slug uniqueness' do
-      let!(:existing_brand) { create(:brand, slug: 'nike') }
-
-      it 'validates uniqueness of slug' do
-        brand = build(:brand, slug: 'nike')
-        expect(brand).not_to be_valid
-        expect(brand.errors[:slug]).to include('has already been taken')
-      end
-    end
-  end
-
-  describe 'FriendlyId' do
-    it 'generates slug from name' do
-      brand = create(:brand, name: 'Nike Sportswear', slug: nil)
-      expect(brand.slug).to eq('nike-sportswear')
-    end
-
-    it 'handles duplicate names by appending UUID' do
-      create(:brand, name: 'Nike', slug: 'nike')
-      brand = create(:brand, name: 'Nike', slug: nil)
-      expect(brand.slug).to match(/nike-[a-f0-9-]+/)
-    end
-  end
-
-  describe '#image' do
-    let(:brand) { create(:brand, :with_logo) }
-
-    it 'returns logo as image for Open Graph' do
-      expect(brand.image).to eq(brand.logo)
-    end
-  end
-end
-```
-
 ## Writing Feature Tests
 
 Feature tests (also called system tests) simulate real user interactions using Capybara.
@@ -560,7 +505,6 @@ spec/
 * [Model Tutorial](/developer/tutorial/model) - Creating the Brand model
 * [Admin Tutorial](/developer/tutorial/admin) - Building the admin interface
 * [Extending Core Models](/developer/tutorial/extending-models) - Connecting Brands to Products
-* [Storefront Tutorial](/developer/tutorial/storefront) - Creating storefront pages
 * [RSpec Documentation](https://rspec.info/documentation/) - Official RSpec docs
 * [Factory Bot Documentation](https://github.com/thoughtbot/factory_bot/blob/main/GETTING_STARTED.md) - Factory Bot guide
 

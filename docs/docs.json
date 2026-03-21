@@ -66,6 +66,54 @@
     {
       "source": "/developer/extending-spree/promotions",
       "destination": "/developer/how-to/custom-promotion"
+    },
+    {
+      "source": "/developer/tutorial/seo",
+      "destination": "/developer/core-concepts/slugs"
+    },
+    {
+      "source": "/developer/tutorial/storefront",
+      "destination": "/developer/storefront/rails/storefront"
+    },
+    {
+      "source": "/developer/tutorial/page-builder",
+      "destination": "/developer/storefront/rails/sections"
+    },
+    {
+      "source": "/developer/storefront/storefront",
+      "destination": "/developer/storefront/rails/storefront"
+    },
+    {
+      "source": "/developer/storefront/themes",
+      "destination": "/developer/storefront/rails/themes"
+    },
+    {
+      "source": "/developer/storefront/sections",
+      "destination": "/developer/storefront/rails/sections"
+    },
+    {
+      "source": "/developer/storefront/blocks",
+      "destination": "/developer/storefront/rails/blocks"
+    },
+    {
+      "source": "/developer/storefront/pages",
+      "destination": "/developer/storefront/rails/pages"
+    },
+    {
+      "source": "/developer/storefront/links",
+      "destination": "/developer/storefront/rails/links"
+    },
+    {
+      "source": "/developer/storefront/helper-methods",
+      "destination": "/developer/storefront/rails/helper-methods"
+    },
+    {
+      "source": "/developer/storefront/custom-css",
+      "destination": "/developer/storefront/rails/custom-css"
+    },
+    {
+      "source": "/developer/storefront/custom-javascript",
+      "destination": "/developer/storefront/rails/custom-javascript"
     }
   ],
   "contextual": {

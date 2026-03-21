@@ -5,12 +5,18 @@ on:
     branches: [main]
     paths:
       - "packages/**"
+      - "docs/developer/**"
+      - "docs/api-reference/**"
+      - "docs/integrations/**"
       - "pnpm-lock.yaml"
       - "turbo.json"
       - ".github/workflows/packages.yml"
   pull_request:
     paths:
       - "packages/**"
+      - "docs/developer/**"
+      - "docs/api-reference/**"
+      - "docs/integrations/**"
       - "pnpm-lock.yaml"
       - "turbo.json"
       - ".github/workflows/packages.yml"

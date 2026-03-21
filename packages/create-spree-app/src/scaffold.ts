@@ -10,6 +10,7 @@ import { envContent } from './templates/env.js'
 import { rootPackageJsonContent } from './templates/package-json.js'
 import { readmeContent } from './templates/readme.js'
 import { gitignoreContent } from './templates/gitignore.js'
+import { rootClaudeMdContent, agentsMdContent } from './templates/claude-md.js'
 import { downloadStorefront, installRootDeps, installStorefrontDeps, writeStorefrontEnv } from './storefront.js'
 import { downloadBackend } from './backend.js'
 
@@ -63,6 +64,8 @@ export async function scaffold(options: ScaffoldOptions): Promise<void> {
   fs.writeFileSync(path.join(projectDir, 'package.json'), rootPackageJsonContent(projectName))
   fs.writeFileSync(path.join(projectDir, 'README.md'), readmeContent(projectName, storefront, port))
   fs.writeFileSync(path.join(projectDir, '.gitignore'), gitignoreContent())
+  fs.writeFileSync(path.join(projectDir, 'CLAUDE.md'), rootClaudeMdContent(storefront))
+  fs.writeFileSync(path.join(projectDir, 'AGENTS.md'), agentsMdContent())
 
   s.stop('Project structure created.')
 
